@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign up — Abundance</title>
+<meta name="description" content="Create your Abundance account.">
+<meta property="og:title" content="Sign up — Abundance">
+<meta property="og:description" content="Create your Abundance account.">
+<meta property="og:image" content="assets/logo.png">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&amp;family=Geist+Mono:wght@400;500&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="auth">
+
+  <aside class="auth-side">
+    <a class="brand" href="index.html"><img src="assets/logo.png" alt="" width="46" height="32"><span>Abundance</span></a>
+    <h1>Create your account</h1>
+    <p class="intro">Join as a contributor to get paid for real-world tasks, or as a team that needs training data for physical AI.</p>
+    <ol class="progress" id="progress" aria-label="Sign-up progress">
+      <li><span class="dot"><span class="num">1</span><svg class="check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></span><span class="text">Create account</span></li>
+      <li><span class="dot"><span class="num">2</span><svg class="check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></span><span class="text">Choose your path</span></li>
+      <li><span class="dot"><span class="num">3</span><svg class="check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></span><span class="text" id="step3-label">Your details</span></li>
+      <li><span class="dot"><span class="num">4</span><svg class="check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></span><span class="text">Verify email</span></li>
+    </ol>
+    <div class="switch">Already have an account? <a href="login.html">Log in</a></div>
+  </aside>
+
+  <main class="auth-main" id="main">
+    <div class="auth-bar">
+      <button class="back" type="button" id="back" hidden>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+        <span>Back</span>
+      </button>
+      <span></span>
+      <span class="step-count" id="step-count">Step 1 of 4</span>
+    </div>
+
+    <form class="auth-form" id="signup-form" novalidate>
+
+      <!-- Step 1: account -->
+      <section class="screen" data-step="0">
+        <div class="screen-head">
+          <h2>Let’s get started</h2>
+          <p>Sign up with your email or Google account.</p>
+        </div>
+        <button class="btn btn-ghost btn-lg btn-block" type="button" id="google">Continue with Google</button>
+        <div class="or">or</div>
+        <div class="fields">
+          <div class="field-wrap">
+            <label class="field-label" for="su-name">Full name</label>
+            <input class="field" id="su-name" name="name" type="text" autocomplete="name">
+          </div>
+          <div class="field-wrap">
+            <label class="field-label" for="su-email">Email</label>
+            <input class="field" id="su-email" name="email" type="email" autocomplete="email">
+          </div>
+          <div class="field-wrap">
+            <label class="field-label" for="su-pass">Password</label>
+            <input class="field" id="su-pass" name="password" type="password" autocomplete="new-password" aria-describedby="su-pass-hint">
+            <span class="hint" id="su-pass-hint">At least 8 characters</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 2: path -->
+      <section class="screen" data-step="1" hidden>
+        <div class="screen-head">
+          <h2>How will you use Abundance?</h2>
+          <p>You can add the other later.</p>
+        </div>
+        <div class="choices" role="radiogroup" aria-label="Account type">
+          <label class="choice">
+            <input type="radio" name="path" value="contributor">
+            <span><span class="ct">I want to work</span><span class="cd">Get paid to record tasks, demonstrations, and movement that train robots.</span></span>
+          </label>
+          <label class="choice">
+            <input type="radio" name="path" value="team">
+            <span><span class="ct">I need training data</span><span class="cd">Request datasets for your robots and physical AI models.</span></span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Step 3a: contributor details -->
+      <section class="screen" data-step="2" data-path="contributor" hidden>
+        <div class="screen-head">
+          <h2>Tell us about you</h2>
+          <p>We use this to match you with jobs.</p>
+        </div>
+        <div class="field-wrap">
+          <label class="field-label" for="su-state">State</label>
+          <div class="select-wrap">
+            <select class="field" id="su-state" name="state" autocomplete="address-level1" required>
+              <option value="" disabled selected>Select your state</option>
+            </select>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3D4B5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+          </div>
+        </div>
+        <fieldset class="pick-group">
+          <legend>Products you’re interested in</legend>
+          <div class="chips" id="pick-products"></div>
+        </fieldset>
+        <fieldset class="pick-group">
+          <legend>Availability</legend>
+          <div class="chips">
+            <label class="pick"><input type="radio" name="availability" value="Full-time"><span>Full-time</span></label>
+            <label class="pick"><input type="radio" name="availability" value="Part-time"><span>Part-time</span></label>
+            <label class="pick"><input type="radio" name="availability" value="Flexible"><span>Flexible</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="pick-group">
+          <legend>Work mode</legend>
+          <div class="chips">
+            <label class="pick"><input type="checkbox" name="mode" value="Remote"><span>Remote</span></label>
+            <label class="pick"><input type="checkbox" name="mode" value="On-site"><span>On-site</span></label>
+          </div>
+        </fieldset>
+      </section>
+
+      <!-- Step 3b: team details -->
+      <section class="screen" data-step="2" data-path="team" hidden>
+        <div class="screen-head">
+          <h2>Tell us about your team</h2>
+          <p>We will follow up with a collection plan.</p>
+        </div>
+        <div class="field-wrap">
+          <label class="field-label" for="su-company">Company</label>
+          <input class="field" id="su-company" name="company" type="text" autocomplete="organization">
+        </div>
+        <fieldset class="pick-group">
+          <legend>Data you need</legend>
+          <div class="chips">
+            <label class="pick"><input type="checkbox" name="data" value="Egocentric video"><span>Egocentric video</span></label>
+            <label class="pick"><input type="checkbox" name="data" value="Teleoperation"><span>Teleoperation</span></label>
+            <label class="pick"><input type="checkbox" name="data" value="Motion capture"><span>Motion capture</span></label>
+            <label class="pick"><input type="checkbox" name="data" value="Sensor data"><span>Sensor data</span></label>
+          </div>
+        </fieldset>
+        <div class="field-wrap">
+          <label class="field-label" for="su-message">What are you training? <span class="opt-note">(optional)</span></label>
+          <textarea class="field" id="su-message" name="message"></textarea>
+        </div>
+      </section>
+
+      <!-- Step 4: verify -->
+      <section class="screen" data-step="3" hidden>
+        <div class="screen-head">
+          <h2>Check your email</h2>
+          <p>We sent a 6-digit code to <strong class="email-shown">your email</strong>.</p>
+        </div>
+        <div class="field-wrap">
+          <label class="field-label" for="su-code">Verification code</label>
+          <input class="field code-field" id="su-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+        </div>
+        <p class="hint">Didn’t get it? <button class="link-btn" type="button" id="resend">Resend code</button></p>
+      </section>
+
+      <!-- Done -->
+      <section class="screen done-screen" data-step="4" hidden>
+        <span class="done-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0A74E0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></span>
+        <h2 id="done-title" tabindex="-1">You’re in.</h2>
+        <p id="done-text">Your contributor account is ready.</p>
+        <div class="done-actions">
+          <a class="btn btn-primary btn-lg" id="done-link" href="jobs.html">Browse jobs</a>
+        </div>
+      </section>
+
+      <div class="form-foot" id="form-foot">
+        <p class="form-error" id="form-error" role="alert"></p>
+        <button class="btn btn-primary btn-lg btn-block" type="submit" id="submit">Create account</button>
+        <p class="legal" id="legal">By continuing you agree to the <a href="#terms">Terms</a> and <a href="#privacy">Privacy Policy</a>.</p>
+      </div>
+      <p class="mobile-switch">Already have an account? <a href="login.html">Log in</a></p>
+    </form>
+  </main>
+
+</div>
+
+<script src="js/signup.js" defer></script>
+</body>
+</html>

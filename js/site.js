@@ -1,0 +1,93 @@
+/* Shared header behavior: Products menu, search bar, mobile menu. */
+(function () {
+  var header = document.getElementById('site-header');
+  if (!header) return;
+
+  var productsBtn = document.getElementById('products-btn');
+  var menu = document.getElementById('products-menu');
+  var menuToggle = header.querySelector('.menu-toggle');
+  var actions = document.getElementById('header-actions');
+  var searchToggle = header.querySelector('.search-toggle');
+  var searchForm = header.querySelector('.search');
+  var searchInput = document.getElementById('site-search');
+  var searchClose = searchForm ? searchForm.querySelector('.close') : null;
+  var desktop = window.matchMedia('(min-width: 1025px)');
+
+  function setMenu(open) {
+    if (!menu) return;
+    menu.classList.toggle('open', open);
+    productsBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  if (productsBtn && menu) {
+    productsBtn.addEventListener('click', function () {
+      setMenu(!menu.classList.contains('open'));
+    });
+    productsBtn.addEventListener('mouseenter', function () {
+      if (desktop.matches) setMenu(true);
+    });
+    header.addEventListener('mouseleave', function () {
+      if (desktop.matches) setMenu(false);
+    });
+    header.querySelectorAll('.brand, .main-nav a, .header-actions').forEach(function (el) {
+      el.addEventListener('mouseenter', function () {
+        if (desktop.matches) setMenu(false);
+      });
+    });
+    document.addEventListener('click', function (e) {
+      if (desktop.matches && !header.contains(e.target)) setMenu(false);
+    });
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (menu && menu.classList.contains('open')) {
+      setMenu(false);
+      productsBtn.focus();
+    }
+  });
+
+  // Mobile menu
+  if (menuToggle) {
+    menuToggle.addEventListener('click', function () {
+      var open = !header.classList.contains('nav-open');
+      header.classList.toggle('nav-open', open);
+      menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      menuToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      if (!open) setMenu(false);
+    });
+  }
+
+  // Search
+  function openSearch() {
+    actions.classList.add('search-open');
+    setMenu(false);
+    searchInput.focus();
+  }
+  function closeSearch() {
+    actions.classList.remove('search-open');
+    if (searchInput.value) {
+      searchInput.value = '';
+      searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    searchToggle.focus();
+  }
+  if (searchToggle && searchForm) {
+    searchToggle.addEventListener('click', openSearch);
+    searchClose.addEventListener('click', closeSearch);
+    searchInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeSearch();
+    });
+    // Open the bar if the page loads with a search term (e.g. jobs.html?q=chef)
+    var q = new URLSearchParams(location.search).get('q');
+    if (q) {
+      searchInput.value = q;
+      actions.classList.add('search-open');
+    }
+  }
+
+  // Footer year
+  document.querySelectorAll('[data-year]').forEach(function (el) {
+    el.textContent = new Date().getFullYear();
+  });
+})();
