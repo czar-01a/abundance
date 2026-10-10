@@ -47,6 +47,7 @@ h1, h2, h3, p { margin: 0; }
 .mono { font-family: var(--mono); }
 .eyebrow { font-family: var(--mono); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #0A7CFF; }
 .accent { color: #0A7CFF; }
+.nowrap { white-space: nowrap; }
 
 /* ---------- Buttons ---------- */
 .btn {
