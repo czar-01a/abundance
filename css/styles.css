@@ -101,26 +101,26 @@ h1, h2, h3, p { margin: 0; }
   display: none; z-index: 60;
 }
 .mega.open { display: block; }
-.mega-panel { display: flex; background: #ffffff; border: 1px solid var(--line-2); border-radius: 20px; box-shadow: 0 24px 60px rgba(10, 22, 40, 0.12); overflow: hidden; }
-.mega-side { width: 320px; flex-shrink: 0; padding: 40px; border-right: 1px solid var(--line); display: flex; flex-direction: column; }
-.mega-label { font-size: 14px; color: var(--faint); }
-.mega-cats { display: flex; flex-direction: column; gap: 18px; margin-top: 28px; }
-.mega-cats a { font-size: 22px; letter-spacing: -0.02em; color: var(--ink); }
+.mega-panel { display: flex; max-height: calc(100vh - 100px); background: #ffffff; border: 1px solid var(--line-2); border-radius: 18px; box-shadow: 0 24px 60px rgba(10, 22, 40, 0.12); overflow: hidden; }
+.mega-side { width: 270px; flex-shrink: 0; padding: 28px 32px; overflow-y: auto; border-right: 1px solid var(--line); display: flex; flex-direction: column; }
+.mega-label { font-size: 13px; color: var(--faint); }
+.mega-cats { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
+.mega-cats a { font-size: 18px; letter-spacing: -0.02em; color: var(--ink); }
 .mega-cats a:hover { color: var(--blue-text); }
-.mega-divider { height: 1px; background: var(--line); margin: 32px 0; }
-.mega-feature { margin-top: auto; padding-top: 32px; display: flex; flex-direction: column; gap: 10px; color: var(--ink); }
+.mega-divider { height: 1px; background: var(--line); margin: 22px 0; }
+.mega-feature { margin-top: auto; padding-top: 22px; display: flex; flex-direction: column; gap: 6px; color: var(--ink); }
 .mega-feature:hover { color: var(--ink); }
-.mega-feature .tile { width: 44px; height: 44px; border-radius: 12px; background: var(--blue-soft); display: flex; align-items: center; justify-content: center; }
-.mega-feature .tile img { width: 26px; }
-.mega-main { flex: 1; min-width: 0; padding: 40px 44px; display: flex; flex-direction: column; gap: 36px; }
-.mega-group { display: flex; flex-direction: column; gap: 18px; }
-.mega-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 40px; row-gap: 22px; }
-.product-link { display: flex; flex-direction: column; gap: 6px; color: var(--ink); }
+.mega-feature .tile { width: 38px; height: 38px; border-radius: 12px; background: var(--blue-soft); display: flex; align-items: center; justify-content: center; }
+.mega-feature .tile img { width: 22px; }
+.mega-main { flex: 1; min-width: 0; padding: 28px 36px; overflow-y: auto; display: flex; flex-direction: column; gap: 22px; }
+.mega-group { display: flex; flex-direction: column; gap: 10px; }
+.mega-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 32px; row-gap: 14px; }
+.product-link { display: flex; flex-direction: column; gap: 3px; color: var(--ink); }
 .product-link:hover { color: var(--ink); }
 .product-link:hover .pname { color: var(--blue-text); }
-.pname { font-size: 17px; letter-spacing: -0.01em; transition: color .15s ease; }
+.pname { font-size: 16px; letter-spacing: -0.01em; transition: color .15s ease; }
 .pname b, .feature-name b { font-weight: 600; }
-.pdesc { font-size: 14px; line-height: 1.5; color: var(--muted); }
+.pdesc { font-size: 13px; line-height: 1.45; color: var(--muted); }
 
 /* ---------- Layout helpers ---------- */
 .section { padding-left: var(--gutter); padding-right: var(--gutter); }
@@ -364,8 +364,8 @@ textarea.field { height: 120px; padding: 14px 16px; resize: vertical; }
 /* ---------- Responsive ---------- */
 @media (max-width: 1180px) {
   .main-nav { gap: 4px; }
-  .mega-side { width: 260px; padding: 32px; }
-  .mega-main { padding: 32px; }
+  .mega-side { width: 230px; padding: 24px; }
+  .mega-main { padding: 24px 28px; }
   .job-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
@@ -385,7 +385,7 @@ textarea.field { height: 120px; padding: 14px 16px; resize: vertical; }
   .mega { position: static; padding: 0 0 8px; width: 100%; }
   .site-header.nav-open .mega.open { display: block; }
   .site-header:not(.nav-open) .mega { display: none; }
-  .mega-panel { flex-direction: column; box-shadow: none; }
+  .mega-panel { flex-direction: column; box-shadow: none; max-height: none; }
   .mega-side { width: auto; border-right: none; border-bottom: 1px solid var(--line); padding: 24px; }
   .mega-cats { margin-top: 16px; gap: 12px; }
   .mega-cats a { font-size: 18px; }
