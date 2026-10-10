@@ -23,15 +23,33 @@
     productsBtn.addEventListener('click', function () {
       setMenu(!menu.classList.contains('open'));
     });
+    // Hover zone = the Products button plus the open menu panel.
+    // A short delay lets the pointer cross the small gap between them.
+    var closeTimer = null;
+    function cancelClose() { clearTimeout(closeTimer); closeTimer = null; }
+    function scheduleClose() {
+      cancelClose();
+      closeTimer = setTimeout(function () { setMenu(false); }, 150);
+    }
+    var panel = menu.querySelector('.mega-panel');
     productsBtn.addEventListener('mouseenter', function () {
-      if (desktop.matches) setMenu(true);
+      if (!desktop.matches) return;
+      cancelClose();
+      setMenu(true);
     });
-    header.addEventListener('mouseleave', function () {
-      if (desktop.matches) setMenu(false);
+    [productsBtn, panel].forEach(function (el) {
+      el.addEventListener('mouseleave', function () {
+        if (desktop.matches) scheduleClose();
+      });
+    });
+    panel.addEventListener('mouseenter', function () {
+      if (desktop.matches) cancelClose();
     });
     header.querySelectorAll('.brand, .main-nav a, .header-actions').forEach(function (el) {
       el.addEventListener('mouseenter', function () {
-        if (desktop.matches) setMenu(false);
+        if (!desktop.matches) return;
+        cancelClose();
+        setMenu(false);
       });
     });
     document.addEventListener('click', function (e) {
