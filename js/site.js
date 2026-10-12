@@ -13,8 +13,27 @@
   var searchClose = searchForm ? searchForm.querySelector('.close') : null;
   var desktop = window.matchMedia('(min-width: 1025px)');
 
+  // Line the menu's left edge up with the Products button, keeping it on screen.
+  function placeMenu() {
+    if (!menu || !desktop.matches) return;
+    var inner = header.querySelector('.header-inner');
+    var box = inner.getBoundingClientRect();
+    var gutter = parseFloat(getComputedStyle(inner).paddingLeft) || 20;
+    var edge = 16; // minimum space to the window edge
+    var left = productsBtn.getBoundingClientRect().left - box.left;
+    var width = Math.min(900, box.width - edge - left);
+    if (width < 720) { // not enough room to the right: shift left just enough
+      width = Math.min(720, box.width - gutter * 2);
+      left = Math.max(gutter, box.width - edge - width);
+    }
+    menu.style.setProperty('--mega-left', left + 'px');
+    menu.style.setProperty('--mega-width', width + 'px');
+  }
+  window.addEventListener('resize', placeMenu);
+
   function setMenu(open) {
     if (!menu) return;
+    if (open) placeMenu();
     menu.classList.toggle('open', open);
     productsBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
