@@ -41,7 +41,7 @@
     sort: 'featured',
     query: params.get('q') || '',
     page: 0,
-    filtersOpen: window.matchMedia('(min-width: 1025px)').matches
+    filtersOpen: window.matchMedia('(min-width: 1200px)').matches
   };
   var requested = params.get('product');
   if (requested && catOf[requested]) {

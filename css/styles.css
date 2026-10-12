@@ -363,6 +363,10 @@ textarea.field { height: 120px; padding: 14px 16px; resize: vertical; }
 .done-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
 
 /* ---------- Responsive ---------- */
+@media (max-width: 1320px) {
+  .header-inner { padding-left: 40px; padding-right: 40px; }
+}
+
 @media (max-width: 1180px) {
   .main-nav { gap: 4px; }
   .mega-side { width: 220px; padding: 24px; }
@@ -370,7 +374,7 @@ textarea.field { height: 120px; padding: 14px 16px; resize: vertical; }
   .job-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1199px) {
   .header-inner { flex-wrap: wrap; }
   .menu-toggle { display: inline-flex; order: 1; }
   .main-nav { order: 2; }

@@ -11,7 +11,7 @@
   var searchForm = header.querySelector('.search');
   var searchInput = document.getElementById('site-search');
   var searchClose = searchForm ? searchForm.querySelector('.close') : null;
-  var desktop = window.matchMedia('(min-width: 1025px)');
+  var desktop = window.matchMedia('(min-width: 1200px)');
 
   // Line the menu's left edge up with the Products button, keeping it on screen.
   function placeMenu() {
