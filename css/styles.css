@@ -137,6 +137,7 @@ h1, h2, h3, p { margin: 0; }
 .hero h1 { font-size: clamp(44px, min(6.2vw, 10vh), 88px); line-height: 1.02; font-weight: 400; letter-spacing: -0.045em; max-width: 1000px; }
 .hero p { margin-top: clamp(20px, 3.5vh, 32px); font-size: clamp(17px, 1.5vw, 21px); line-height: 1.6; color: var(--ink-2); max-width: 680px; font-weight: 300; }
 .hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: clamp(28px, 5vh, 44px); }
+.btn-hero { min-height: 64px; padding: 20px 56px; font-size: 18px; }
 
 .panel-outer { border: 1px solid var(--line-2); border-radius: 24px; background: var(--tint); padding: 14px; }
 .panel { background: #ffffff; border: 1px solid var(--line-2); border-radius: 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -430,7 +431,7 @@ textarea.field { height: 120px; padding: 14px 16px; resize: vertical; }
 @media (max-width: 640px) {
   .brand img { width: 38px; }
   .brand span { font-size: 19px; }
-  .hero-actions .btn { width: 100%; }
+  .hero-actions .btn { width: 100%; max-width: 340px; }
   .panel-col { padding: 24px; }
   .card, .trust-card { padding: 28px; }
   .mega-grid { grid-template-columns: 1fr; }
