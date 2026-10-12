@@ -101,11 +101,11 @@ h1, h2, h3, p { margin: 0; }
   position: absolute; top: 100%; left: var(--mega-left, var(--gutter)); width: var(--mega-width, 900px); padding-top: 8px;
   z-index: 60;
   opacity: 0; visibility: hidden; transform: translateY(-6px); pointer-events: none;
-  transition: opacity .2s ease, transform .2s ease, visibility 0s linear .2s;
+  transition: opacity .12s ease, transform .12s ease, visibility 0s linear .12s;
 }
 .mega.open {
   opacity: 1; visibility: visible; transform: none; pointer-events: auto;
-  transition: opacity .2s ease, transform .2s ease, visibility 0s;
+  transition: opacity .12s ease, transform .12s ease, visibility 0s;
 }
 .mega-panel { display: flex; max-height: calc(100vh - 100px); background: #ffffff; border: 1px solid var(--line-2); border-radius: 18px; box-shadow: 0 24px 60px rgba(10, 22, 40, 0.12); overflow: hidden; }
 .mega-side { width: 240px; flex-shrink: 0; padding: 28px; overflow-y: auto; border-right: 1px solid var(--line); display: flex; flex-direction: column; }
