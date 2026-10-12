@@ -74,7 +74,7 @@ h1, h2, h3, p { margin: 0; }
 .brand { display: flex; align-items: center; gap: 12px; color: var(--ink); }
 .brand:hover { color: var(--ink); }
 .brand img { width: 46px; height: auto; }
-.brand span { font-size: 24px; font-weight: 500; letter-spacing: -0.02em; }
+.brand span { font-size: 20px; font-weight: 500; letter-spacing: -0.02em; }
 
 .main-nav { display: flex; align-items: center; gap: 12px; font-size: 15px; margin-left: clamp(16px, 2.8vw, 40px); margin-right: auto; }
 .navlink {
@@ -424,7 +424,7 @@ textarea.field { height: 120px; padding: 14px 16px; resize: vertical; }
 
 @media (max-width: 640px) {
   .brand img { width: 38px; }
-  .brand span { font-size: 21px; }
+  .brand span { font-size: 19px; }
   .hero-actions .btn { width: 100%; }
   .panel-col { padding: 24px; }
   .card, .trust-card { padding: 28px; }
