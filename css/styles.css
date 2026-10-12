@@ -76,7 +76,7 @@ h1, h2, h3, p { margin: 0; }
 .brand img { width: 46px; height: auto; }
 .brand span { font-size: 24px; font-weight: 500; letter-spacing: -0.02em; }
 
-.main-nav { display: flex; align-items: center; gap: 12px; font-size: 15px; }
+.main-nav { display: flex; align-items: center; gap: 12px; font-size: 15px; margin-left: clamp(16px, 2.8vw, 40px); margin-right: auto; }
 .navlink {
   display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 8px 14px; border-radius: 999px;
   color: var(--ink-2); background: none; border: none; cursor: pointer; transition: background-color .15s ease, color .15s ease;
@@ -381,7 +381,7 @@ textarea.field { height: 120px; padding: 14px 16px; resize: vertical; }
   .mega { order: 3; }
   .header-actions { order: 4; }
   .main-nav, .header-actions { display: none; width: 100%; }
-  .site-header.nav-open .main-nav { display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding-top: 8px; }
+  .site-header.nav-open .main-nav { display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding-top: 8px; margin: 0; }
   .site-header.nav-open .header-actions { display: flex; flex-wrap: wrap; order: 4; padding-bottom: 8px; }
   .site-header.nav-open .navlink { justify-content: space-between; border-radius: 12px; font-size: 17px; }
   .header-actions .search { width: 100%; }
