@@ -99,9 +99,14 @@ h1, h2, h3, p { margin: 0; }
 /* Products mega menu */
 .mega {
   position: absolute; top: 100%; left: var(--mega-left, var(--gutter)); width: var(--mega-width, 900px); padding-top: 8px;
-  display: none; z-index: 60;
+  z-index: 60;
+  opacity: 0; visibility: hidden; transform: translateY(-6px); pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease, visibility 0s linear .2s;
 }
-.mega.open { display: block; }
+.mega.open {
+  opacity: 1; visibility: visible; transform: none; pointer-events: auto;
+  transition: opacity .2s ease, transform .2s ease, visibility 0s;
+}
 .mega-panel { display: flex; max-height: calc(100vh - 100px); background: #ffffff; border: 1px solid var(--line-2); border-radius: 18px; box-shadow: 0 24px 60px rgba(10, 22, 40, 0.12); overflow: hidden; }
 .mega-side { width: 240px; flex-shrink: 0; padding: 28px; overflow-y: auto; border-right: 1px solid var(--line); display: flex; flex-direction: column; }
 .mega-label { font-size: 13px; color: var(--faint); }
@@ -389,6 +394,7 @@ textarea.field { height: 120px; padding: 14px 16px; resize: vertical; }
   .header-actions .btn:not(.icon-btn) { flex: 1; }
   .mega { position: static; padding: 0 0 8px; width: 100% !important; }
   .site-header.nav-open .mega.open { display: block; }
+  .mega:not(.open) { display: none; }
   .site-header:not(.nav-open) .mega { display: none; }
   .mega-panel { flex-direction: column; box-shadow: none; max-height: none; }
   .mega-side { width: auto; border-right: none; border-bottom: 1px solid var(--line); padding: 24px; }
