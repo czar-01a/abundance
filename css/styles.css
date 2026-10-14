@@ -50,11 +50,11 @@ h1, h2, h3, p { margin: 0; }
 .nowrap { white-space: nowrap; }
 /* Hero "AI" dial: rolls A -> S on hover */
 .ai-dial{display:inline-flex;vertical-align:top;cursor:default}
-.ai-dial .dial{display:block;height:1.02em;width:.7em;overflow:hidden;transition:width .7s cubic-bezier(.2,.8,.2,1)}
-.ai-dial .strip{display:flex;flex-direction:column;transition:transform 1s cubic-bezier(.2,.8,.2,1)}
+.ai-dial .dial{display:block;height:1.02em;width:.7em;overflow:hidden;transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.ai-dial .strip{display:flex;flex-direction:column;transition:transform .45s cubic-bezier(.3,1.4,.5,1)}
 .ai-dial .strip span{display:block;height:1.02em;line-height:1.02;text-align:center}
 .ai-dial .rest{display:block;line-height:1.02}
-.ai-dial:hover .strip{transform:translateY(-18.36em)}
+.ai-dial:hover .strip{transform:translateY(-1.02em)}
 .ai-dial:hover .dial{width:.62em}
 @media (prefers-reduced-motion:reduce){.ai-dial .strip,.ai-dial .dial{transition:none}}
 
