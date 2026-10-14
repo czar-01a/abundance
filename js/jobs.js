@@ -199,7 +199,7 @@
     art.appendChild(cover);
 
     var top = el('div', 'top');
-    top.appendChild(el('span', 'product', 'Abundance ' + job.product));
+    top.appendChild(el('span', 'product', job.product));
     var save = el('button', 'save');
     save.type = 'button';
     var isSaved = saved.indexOf(job.title) !== -1;
