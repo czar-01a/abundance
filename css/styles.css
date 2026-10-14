@@ -57,7 +57,6 @@ h1, h2, h3, p { margin: 0; }
 .ai-dial:hover .strip{transform:translateY(-1.02em)}
 .ai-dial:hover .dial{width:.62em}
 .ai-dial .di,.ai-dial:hover .di{width:auto}
-.ai-dial .di .strip{transition-delay:.07s}
 @media (prefers-reduced-motion:reduce){.ai-dial .strip,.ai-dial .dial{transition:none}}
 
 /* ---------- Buttons ---------- */
