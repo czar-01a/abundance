@@ -212,6 +212,8 @@
       var now = saved.indexOf(job.title) !== -1;
       save.setAttribute('aria-pressed', now ? 'true' : 'false');
       save.setAttribute('aria-label', (now ? 'Unsave ' : 'Save ') + job.title);
+      save.classList.remove('pop'); void save.offsetWidth; // restart the animation
+      if (now) save.classList.add('pop');
     });
     top.appendChild(save);
     art.appendChild(top);
