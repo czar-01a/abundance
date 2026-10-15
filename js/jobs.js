@@ -184,17 +184,16 @@
         state.products = [];
         state.page = 0;
         render();
-        fadeIn(document.getElementById('main'));
-        fadeIn(document.querySelector('.site-footer'));
+        fadeIn(grid);
       });
       tabsEl.appendChild(b);
     });
   }
 
-  // Page fade when switching product tabs (everything below the header)
+  // Soft fade for the job grid when switching product tabs
   function fadeIn(node) {
-    if (!node || !node.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    node.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 350, easing: 'ease-out' });
+    if (!node.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    node.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'ease-out' });
   }
 
   // ---------- Cards ----------
