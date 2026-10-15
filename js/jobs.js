@@ -179,13 +179,21 @@
       b.setAttribute('role', 'tab');
       b.setAttribute('aria-selected', state.cat === c.id ? 'true' : 'false');
       b.addEventListener('click', function () {
+        if (state.cat === c.id) return;
         state.cat = c.id;
         state.products = [];
         state.page = 0;
         render();
+        fadeIn(grid);
       });
       tabsEl.appendChild(b);
     });
+  }
+
+  // Soft fade for the job grid when switching product tabs
+  function fadeIn(node) {
+    if (!node.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    node.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'ease-out' });
   }
 
   // ---------- Cards ----------
