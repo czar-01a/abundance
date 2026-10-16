@@ -106,7 +106,7 @@
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (searchForm.animate && !reduceMotion && actions.classList.contains('search-open') && !searchForm.dataset.closing) {
       searchForm.dataset.closing = '1';
-      searchForm.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.94)' }], { duration: 160, easing: 'ease-in' })
+      searchForm.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.94)' }], { duration: 120, easing: 'ease' })
         .onfinish = function () { delete searchForm.dataset.closing; finishClose(); };
       return;
     }
