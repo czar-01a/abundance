@@ -102,6 +102,17 @@
     searchInput.focus();
   }
   function closeSearch() {
+    // Fade and shrink out, then hide (skipped when reduced motion is on)
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (searchForm.animate && !reduceMotion && actions.classList.contains('search-open') && !searchForm.dataset.closing) {
+      searchForm.dataset.closing = '1';
+      searchForm.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.94)' }], { duration: 160, easing: 'ease-in' })
+        .onfinish = function () { delete searchForm.dataset.closing; finishClose(); };
+      return;
+    }
+    finishClose();
+  }
+  function finishClose() {
     actions.classList.remove('search-open');
     if (searchInput.value) {
       searchInput.value = '';
