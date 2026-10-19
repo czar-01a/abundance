@@ -3,8 +3,6 @@
   var header = document.getElementById('site-header');
   if (!header) return;
 
-  var productsBtn = document.getElementById('products-btn');
-  var menu = document.getElementById('products-menu');
   var menuToggle = header.querySelector('.menu-toggle');
   var actions = document.getElementById('header-actions');
   var searchToggle = header.querySelector('.search-toggle');
@@ -13,75 +11,71 @@
   var searchClose = searchForm ? searchForm.querySelector('.close') : null;
   var desktop = window.matchMedia('(min-width: 1200px)');
 
-  // Line the menu's left edge up with the Products button, keeping it on screen.
-  function placeMenu() {
-    if (!menu || !desktop.matches) return;
+  // Dropdown menus (Products, Resources). Each lines up with its button.
+  var menus = [
+    { btn: document.getElementById('products-btn'), menu: document.getElementById('products-menu'), max: 900, min: 720 },
+    { btn: document.getElementById('resources-btn'), menu: document.getElementById('resources-menu'), max: 680, min: 560 }
+  ].filter(function (m) { return m.btn && m.menu; });
+
+  function placeMenu(m) {
+    if (!desktop.matches) return;
     var inner = header.querySelector('.header-inner');
     var box = inner.getBoundingClientRect();
     var gutter = parseFloat(getComputedStyle(inner).paddingLeft) || 20;
     var edge = 16; // minimum space to the window edge
-    var left = productsBtn.getBoundingClientRect().left - box.left;
-    var width = Math.min(900, box.width - edge - left);
-    if (width < 720) { // not enough room to the right: shift left just enough
-      width = Math.min(720, box.width - gutter * 2);
+    var left = m.btn.getBoundingClientRect().left - box.left;
+    var width = Math.min(m.max, box.width - edge - left);
+    if (width < m.min) { // not enough room to the right: shift left just enough
+      width = Math.min(m.min, box.width - gutter * 2);
       left = Math.max(gutter, box.width - edge - width);
     }
-    menu.style.setProperty('--mega-left', left + 'px');
-    menu.style.setProperty('--mega-width', width + 'px');
+    m.menu.style.setProperty('--mega-left', left + 'px');
+    m.menu.style.setProperty('--mega-width', width + 'px');
   }
-  window.addEventListener('resize', placeMenu);
+  window.addEventListener('resize', function () { menus.forEach(placeMenu); });
 
-  function setMenu(open) {
-    if (!menu) return;
-    if (open) placeMenu();
-    menu.classList.toggle('open', open);
-    productsBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  function setMenu(m, open) {
+    if (open) { menus.forEach(function (o) { if (o !== m) setMenu(o, false); }); placeMenu(m); }
+    m.menu.classList.toggle('open', open);
+    m.btn.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
+  function closeMenus() { menus.forEach(function (m) { setMenu(m, false); }); }
 
-  if (productsBtn && menu) {
-    productsBtn.addEventListener('click', function () {
-      setMenu(!menu.classList.contains('open'));
-    });
-    // Hover zone = the Products button plus the open menu panel.
-    // A short delay lets the pointer cross the small gap between them.
+  menus.forEach(function (m) {
+    m.btn.addEventListener('click', function () { setMenu(m, !m.menu.classList.contains('open')); });
+    // Hover zone = the button plus its open panel. A short delay lets the
+    // pointer cross the small gap between them.
     var closeTimer = null;
     function cancelClose() { clearTimeout(closeTimer); closeTimer = null; }
-    function scheduleClose() {
-      cancelClose();
-      closeTimer = setTimeout(function () { setMenu(false); }, 150);
-    }
-    var panel = menu.querySelector('.mega-panel');
-    productsBtn.addEventListener('mouseenter', function () {
+    function scheduleClose() { cancelClose(); closeTimer = setTimeout(function () { setMenu(m, false); }, 150); }
+    m.cancelClose = cancelClose;
+    var panel = m.menu.querySelector('.mega-panel');
+    m.btn.addEventListener('mouseenter', function () {
       if (!desktop.matches) return;
-      cancelClose();
-      setMenu(true);
+      menus.forEach(function (o) { if (o.cancelClose) o.cancelClose(); });
+      setMenu(m, true);
     });
-    [productsBtn, panel].forEach(function (el) {
-      el.addEventListener('mouseleave', function () {
-        if (desktop.matches) scheduleClose();
-      });
+    [m.btn, panel].forEach(function (el) {
+      el.addEventListener('mouseleave', function () { if (desktop.matches) scheduleClose(); });
     });
-    panel.addEventListener('mouseenter', function () {
-      if (desktop.matches) cancelClose();
+    panel.addEventListener('mouseenter', function () { if (desktop.matches) cancelClose(); });
+  });
+  header.querySelectorAll('.brand, .main-nav a, .header-actions').forEach(function (el) {
+    el.addEventListener('mouseenter', function () {
+      if (!desktop.matches) return;
+      menus.forEach(function (m) { if (m.cancelClose) m.cancelClose(); });
+      closeMenus();
     });
-    header.querySelectorAll('.brand, .main-nav a, .header-actions').forEach(function (el) {
-      el.addEventListener('mouseenter', function () {
-        if (!desktop.matches) return;
-        cancelClose();
-        setMenu(false);
-      });
-    });
-    document.addEventListener('click', function (e) {
-      if (desktop.matches && !header.contains(e.target)) setMenu(false);
-    });
-  }
+  });
+  document.addEventListener('click', function (e) {
+    if (desktop.matches && !header.contains(e.target)) closeMenus();
+  });
 
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape') return;
-    if (menu && menu.classList.contains('open')) {
-      setMenu(false);
-      productsBtn.focus();
-    }
+    menus.forEach(function (m) {
+      if (m.menu.classList.contains('open')) { setMenu(m, false); m.btn.focus(); }
+    });
   });
 
   // Mobile menu
@@ -91,14 +85,14 @@
       header.classList.toggle('nav-open', open);
       menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
       menuToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-      if (!open) setMenu(false);
+      if (!open) closeMenus();
     });
   }
 
   // Search
   function openSearch() {
     actions.classList.add('search-open');
-    setMenu(false);
+    closeMenus();
     searchInput.focus();
   }
   function closeSearch() {

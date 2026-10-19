@@ -134,6 +134,10 @@ h1, h2, h3, p { margin: 0; }
 .pname { font-size: 16px; letter-spacing: -0.01em; transition: color .15s ease; }
 .pname b, .feature-name b { font-weight: 600; }
 .pdesc { font-size: 13px; line-height: 1.45; color: var(--muted); }
+/* Resources menu: two columns (Company, Support) */
+.res-main { flex-direction: row; gap: 40px; }
+.res-main .mega-group { flex: 1; min-width: 0; }
+.res-list { display: flex; flex-direction: column; gap: 14px; margin-top: 4px; }
 
 /* ---------- Layout helpers ---------- */
 .section { padding-left: var(--gutter); padding-right: var(--gutter); }
@@ -412,6 +416,7 @@ textarea.field { height: 120px; padding: 14px 16px; resize: vertical; }
   .mega-cats a { font-size: 18px; }
   .mega-main { padding: 24px; gap: 28px; }
   .mega-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .res-main { flex-direction: column; gap: 28px; }
 
   .panel { grid-template-columns: 1fr; }
   .panel-col + .panel-col { border-left: none; border-top: 1px solid var(--line); }
