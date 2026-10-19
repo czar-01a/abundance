@@ -137,7 +137,8 @@ h1, h2, h3, p { margin: 0; }
 /* Resources menu: two columns (Company, Support) */
 .res-main { flex-direction: row; gap: 40px; }
 .res-main .mega-group { flex: 1; min-width: 0; }
-.res-list { display: flex; flex-direction: column; gap: 14px; margin-top: 4px; }
+.res-list { display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
+.res-list .pname { font-size: 17px; }
 
 /* ---------- Layout helpers ---------- */
 .section { padding-left: var(--gutter); padding-right: var(--gutter); }
