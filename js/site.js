@@ -14,7 +14,7 @@
   // Dropdown menus (Products, Resources). Each lines up with its button.
   var menus = [
     { btn: document.getElementById('products-btn'), menu: document.getElementById('products-menu'), max: 900, min: 720 },
-    { btn: document.getElementById('resources-btn'), menu: document.getElementById('resources-menu'), max: 560, min: 480, anchor: document.getElementById('products-btn') }
+    { btn: document.getElementById('resources-btn'), menu: document.getElementById('resources-menu'), max: 560, min: 480 }
   ].filter(function (m) { return m.btn && m.menu; });
 
   function placeMenu(m) {
@@ -23,7 +23,7 @@
     var box = inner.getBoundingClientRect();
     var gutter = parseFloat(getComputedStyle(inner).paddingLeft) || 20;
     var edge = 16; // minimum space to the window edge
-    var left = (m.anchor || m.btn).getBoundingClientRect().left - box.left; // Resources lines up with Products
+    var left = m.btn.getBoundingClientRect().left - box.left;
     var width = Math.min(m.max, box.width - edge - left);
     if (width < m.min) { // not enough room to the right: shift left just enough
       width = Math.min(m.min, box.width - gutter * 2);
