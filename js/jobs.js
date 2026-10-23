@@ -2,7 +2,7 @@
 (function () {
   var PRODUCTS = [
     { name: 'Factory', cat: 'industrial' }, { name: '3D Printer', cat: 'industrial' },
-    { name: 'Energy', cat: 'infrastructure' }, { name: 'Build', cat: 'infrastructure' },
+    { name: 'Energy', cat: 'infrastructure' }, { name: 'Build', cat: 'infrastructure' }, { name: 'Intelligence', cat: 'infrastructure' },
     { name: 'Home', cat: 'consumer' }, { name: 'Food', cat: 'consumer' }, { name: 'Sports', cat: 'consumer' },
     { name: 'Research', cat: 'frontier' }, { name: 'Medicine', cat: 'frontier' }, { name: 'Beyond', cat: 'frontier' }
   ];
