@@ -32,7 +32,9 @@
     m.menu.style.setProperty('--mega-left', left + 'px');
     m.menu.style.setProperty('--mega-width', width + 'px');
   }
-  window.addEventListener('resize', function () { menus.forEach(placeMenu); });
+  window.addEventListener('resize', function () { // only re-measure menus that are open
+    menus.forEach(function (m) { if (m.menu.classList.contains('open')) placeMenu(m); });
+  });
 
   function setMenu(m, open) {
     if (open) { menus.forEach(function (o) { if (o !== m) setMenu(o, false); }); placeMenu(m); }
