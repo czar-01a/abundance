@@ -130,6 +130,18 @@
     }
   }
 
+  // Hero "AI" dial on touch screens: a tap rolls it to "SI", then it rolls back
+  var dial = document.querySelector('.ai-dial');
+  if (dial) {
+    var dialTimer = null;
+    dial.addEventListener('click', function () {
+      if (window.matchMedia('(hover: hover)').matches) return; // mouse users get the hover version
+      dial.classList.add('flip');
+      clearTimeout(dialTimer);
+      dialTimer = setTimeout(function () { dial.classList.remove('flip'); }, 1500);
+    });
+  }
+
   // Footer year
   document.querySelectorAll('[data-year]').forEach(function (el) {
     el.textContent = new Date().getFullYear();

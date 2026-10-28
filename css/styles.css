@@ -53,8 +53,10 @@ h1, h2, h3, p { margin: 0; }
 .ai-dial .strip{display:flex;flex-direction:column;transition:transform .45s cubic-bezier(.3,1.4,.5,1)}
 .ai-dial .strip span{display:block;height:1.02em;line-height:1.02;text-align:center}
 .ai-dial .rest{display:block;line-height:1.02}
-.ai-dial:hover .strip{transform:translateY(-1.02em)}
-.ai-dial:hover .dial{width:.62em}
+/* Mouse: roll while hovered. Touch: a tap adds .flip briefly (see site.js) */
+@media (hover:hover){.ai-dial:hover .strip{transform:translateY(-1.02em)}.ai-dial:hover .dial{width:.62em}}
+.ai-dial.flip .strip{transform:translateY(-1.02em)}
+.ai-dial.flip .dial{width:.62em}
 @media (prefers-reduced-motion:reduce){.ai-dial .strip,.ai-dial .dial{transition:none}}
 
 /* ---------- Buttons ---------- */
