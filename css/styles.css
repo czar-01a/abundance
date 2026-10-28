@@ -401,7 +401,7 @@ textarea.field { height: 120px; padding: 14px 16px; resize: vertical; }
   .main-nav, .header-actions { display: none; width: 100%; }
   .site-header.nav-open .main-nav { display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding-top: 8px; margin: 0; }
   .site-header.nav-open .header-actions { display: flex; flex-wrap: wrap; order: 4; padding-bottom: 8px; }
-  .site-header.nav-open .navlink { justify-content: space-between; border-radius: 12px; font-size: 17px; }
+  .site-header.nav-open .main-nav .navlink { justify-content: space-between; border-radius: 12px; font-size: 17px; }
   .header-actions .search { width: 100%; }
   .header-actions.search-open { flex-direction: column; align-items: stretch; }
   .header-actions .btn:not(.icon-btn) { flex: 1; }
