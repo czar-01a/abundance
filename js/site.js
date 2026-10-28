@@ -130,15 +130,16 @@
     }
   }
 
-  // Hero "AI" dial on touch screens: a tap rolls it to "SI", then it rolls back
+  // Hero "AI" dial on touch screens: each tap switches AI <-> SI; SI rolls back to AI by itself
   var dial = document.querySelector('.ai-dial');
   if (dial) {
     var dialTimer = null;
     dial.addEventListener('click', function () {
       if (window.matchMedia('(hover: hover)').matches) return; // mouse users get the hover version
-      dial.classList.add('flip');
       clearTimeout(dialTimer);
-      dialTimer = setTimeout(function () { dial.classList.remove('flip'); }, 1500);
+      if (dial.classList.toggle('flip')) { // now showing SI: roll back on its own after a moment
+        dialTimer = setTimeout(function () { dial.classList.remove('flip'); }, 1500);
+      }
     });
   }
 
