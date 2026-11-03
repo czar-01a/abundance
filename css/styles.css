@@ -108,6 +108,12 @@ h1, h2, h3, p { margin: 0; }
 
 .menu-toggle { display: none; }
 
+/* Coming soon page */
+.soon { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 22px; padding-top: clamp(96px, 18vh, 200px); padding-bottom: clamp(96px, 18vh, 200px); }
+.soon h1 { font-size: clamp(40px, 6vw, 72px); line-height: 1.04; font-weight: 400; letter-spacing: -0.04em; max-width: 860px; text-wrap: balance; }
+.soon p { font-size: clamp(16px, 1.4vw, 19px); line-height: 1.6; color: var(--ink-2); font-weight: 300; max-width: 560px; }
+.soon-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 10px; }
+
 /* Products mega menu */
 .mega {
   position: absolute; top: 100%; left: var(--mega-left, var(--gutter)); width: var(--mega-width, 900px); padding-top: 8px;
