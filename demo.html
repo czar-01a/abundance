@@ -195,43 +195,60 @@
         <fieldset class="ctl">
           <legend class="ctl-label">Task</legend>
           <div class="chips">
+          <label class="chip"><input type="radio" name="task" value="pick"><span>Pick and place</span></label>
           <label class="chip"><input type="radio" name="task" value="household" checked><span>Household manipulation</span></label>
           <label class="chip"><input type="radio" name="task" value="warehouse"><span>Warehouse picking</span></label>
           <label class="chip"><input type="radio" name="task" value="assembly"><span>Assembly</span></label>
+          <label class="chip"><input type="radio" name="task" value="folding"><span>Cloth folding</span></label>
           <label class="chip"><input type="radio" name="task" value="food"><span>Food prep</span></label>
           <label class="chip"><input type="radio" name="task" value="sports"><span>Sports motion</span></label>
+          <label class="chip"><input type="radio" name="task" value="other"><span>Other</span></label>
           </div>
+          <input class="other-input" type="text" id="task-other" maxlength="80" placeholder="Describe your task" aria-label="Describe your task" hidden>
         </fieldset>
         <fieldset class="ctl">
           <legend class="ctl-label">Embodiment</legend>
           <div class="chips">
-          <label class="chip"><input type="radio" name="body" value="humanoid" checked><span>Humanoid</span></label>
-          <label class="chip"><input type="radio" name="body" value="bimanual"><span>Bimanual arms</span></label>
           <label class="chip"><input type="radio" name="body" value="arm"><span>Single arm</span></label>
+          <label class="chip"><input type="radio" name="body" value="bimanual"><span>Bimanual arms</span></label>
           <label class="chip"><input type="radio" name="body" value="mobile"><span>Mobile manipulator</span></label>
+          <label class="chip"><input type="radio" name="body" value="humanoid" checked><span>Humanoid</span></label>
           <label class="chip"><input type="radio" name="body" value="human"><span>Human only</span></label>
+          <label class="chip"><input type="radio" name="body" value="hand"><span>Dexterous hand</span></label>
+          <label class="chip"><input type="radio" name="body" value="other"><span>Other</span></label>
           </div>
+          <input class="other-input" type="text" id="body-other" maxlength="80" placeholder="Describe your robot or setup" aria-label="Describe your robot or setup" hidden>
         </fieldset>
         <fieldset class="ctl">
           <legend class="ctl-label">Modalities</legend>
           <div class="chips">
           <label class="chip"><input type="checkbox" name="mod" value="video" checked><span>Egocentric video</span></label>
+          <label class="chip"><input type="checkbox" name="mod" value="wrist"><span>Wrist camera</span></label>
+          <label class="chip"><input type="checkbox" name="mod" value="joints"><span>Joint states</span></label>
+          <label class="chip"><input type="checkbox" name="mod" value="teleop"><span>Teleoperation actions</span></label>
           <label class="chip"><input type="checkbox" name="mod" value="depth" checked><span>Depth</span></label>
           <label class="chip"><input type="checkbox" name="mod" value="hands" checked><span>Hand pose</span></label>
+          <label class="chip"><input type="checkbox" name="mod" value="force"><span>Force/torque</span></label>
           <label class="chip"><input type="checkbox" name="mod" value="imu"><span>IMU (Inertial Measurement Unit)</span></label>
-          <label class="chip"><input type="checkbox" name="mod" value="teleop"><span>Teleoperation actions</span></label>
+          <label class="chip"><input type="checkbox" name="mod" value="lidar"><span>LiDAR (Light Detection and Ranging)</span></label>
           <label class="chip"><input type="checkbox" name="mod" value="tactile"><span>Tactile</span></label>
           <label class="chip"><input type="checkbox" name="mod" value="audio"><span>Audio</span></label>
+          <label class="chip"><input type="checkbox" name="mod" value="other"><span>Other</span></label>
           </div>
+          <input class="other-input" type="text" id="mod-other" maxlength="80" placeholder="Describe other sensors" aria-label="Describe other sensors" hidden>
         </fieldset>
         <fieldset class="ctl">
           <legend class="ctl-label">Annotations</legend>
           <div class="chips">
-          <label class="chip"><input type="checkbox" name="note" value="actions" checked><span>Action labels</span></label>
           <label class="chip"><input type="checkbox" name="note" value="language" checked><span>Language instructions</span></label>
-          <label class="chip"><input type="checkbox" name="note" value="boxes"><span>Object boxes</span></label>
           <label class="chip"><input type="checkbox" name="note" value="success"><span>Success labels</span></label>
+          <label class="chip"><input type="checkbox" name="note" value="actions" checked><span>Action labels</span></label>
+          <label class="chip"><input type="checkbox" name="note" value="boxes"><span>Object boxes</span></label>
+          <label class="chip"><input type="checkbox" name="note" value="masks"><span>Segmentation masks</span></label>
+          <label class="chip"><input type="checkbox" name="note" value="keypoints"><span>Keypoints</span></label>
+          <label class="chip"><input type="checkbox" name="note" value="other"><span>Other</span></label>
           </div>
+          <input class="other-input" type="text" id="note-other" maxlength="80" placeholder="Describe other labels" aria-label="Describe other labels" hidden>
         </fieldset>
         <div class="ctl">
           <label class="ctl-label" for="hours">Volume <output id="hours-out" for="hours">200 hrs</output></label>

@@ -4,25 +4,36 @@
   if (!form) return;
 
   var TASKS = {
+    pick: { name: 'pick_place', label: 'Pick and place', sec: 20, say: 'Put the red block in the bowl.',
+      steps: [['Reach', 3], ['Grasp block', 3], ['Lift', 2], ['Move', 4], ['Place in bowl', 3], ['Release', 2]] },
     household: { name: 'household_manip', label: 'Household manipulation', sec: 45, say: 'Fold the towel and place it in the basket.',
       steps: [['Reach', 3], ['Grasp towel', 4], ['Fold in half', 9], ['Fold again', 8], ['Lift', 3], ['Place in basket', 5]] },
     warehouse: { name: 'warehouse_pick', label: 'Warehouse picking', sec: 30, say: 'Pick the blue box and put it on the conveyor.',
       steps: [['Scan shelf', 4], ['Reach', 3], ['Grasp box', 4], ['Lift', 3], ['Turn', 3], ['Place on conveyor', 4]] },
     assembly: { name: 'assembly', label: 'Assembly', sec: 60, say: 'Insert the bracket and fasten both screws.',
       steps: [['Pick bracket', 4], ['Align', 5], ['Insert', 4], ['Pick screwdriver', 3], ['Fasten screw 1', 7], ['Fasten screw 2', 7]] },
+    folding: { name: 'cloth_folding', label: 'Cloth folding', sec: 60, say: 'Fold the T-shirt and stack it.',
+      steps: [['Flatten', 8], ['Grasp sleeve', 4], ['Fold sleeves', 10], ['Fold in half', 8], ['Stack', 5]] },
     food: { name: 'food_prep', label: 'Food prep', sec: 90, say: 'Slice the cucumber and plate it.',
       steps: [['Wash', 6], ['Pick knife', 3], ['Slice', 14], ['Transfer', 5], ['Plate', 6]] },
     sports: { name: 'sports_motion', label: 'Sports motion', sec: 20, say: 'Shoot a free throw.',
-      steps: [['Set stance', 3], ['Dribble', 4], ['Gather', 2], ['Jump', 2], ['Release', 2], ['Land', 2]] }
+      steps: [['Set stance', 3], ['Dribble', 4], ['Gather', 2], ['Jump', 2], ['Release', 2], ['Land', 2]] },
+    other: { name: 'custom_task', label: 'Custom task', sec: 60, say: 'Your task, described in plain language.',
+      steps: [['Set up', 4], ['Reach', 3], ['Grasp', 4], ['Manipulate', 12], ['Place', 4], ['Reset', 3]] }
   };
   var MODS = {
     video: { label: 'Egocentric video', gb: 7, kind: 'frames', lerobot: 'observation.images.ego' },
+    wrist: { label: 'Wrist camera', gb: 5, kind: 'frames', lerobot: 'observation.images.wrist' },
+    joints: { label: 'Joint states', gb: 0.05, kind: 'wave', seed: 4 },
+    teleop: { label: 'Teleop actions', gb: 0.05, kind: 'wave', seed: 3 },
     depth: { label: 'Depth', gb: 5, kind: 'frames', lerobot: 'observation.images.depth' },
     hands: { label: 'Hand pose', gb: 0.1, kind: 'wave', seed: 2 },
+    force: { label: 'Force/torque', gb: 0.05, kind: 'wave', seed: 9 },
     imu: { label: 'IMU', gb: 0.02, kind: 'wave', seed: 5 },
-    teleop: { label: 'Teleop actions', gb: 0.5, kind: 'wave', seed: 3 },
+    lidar: { label: 'LiDAR', gb: 10, kind: 'frames' },
     tactile: { label: 'Tactile', gb: 1, kind: 'wave', seed: 7 },
-    audio: { label: 'Audio', gb: 0.2, kind: 'wave', seed: 11 }
+    audio: { label: 'Audio', gb: 0.2, kind: 'wave', seed: 11 },
+    other: { label: 'Other sensor', gb: 1, kind: 'wave', seed: 13 }
   };
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -33,6 +44,24 @@
   function size(gb) { return gb >= 1000 ? (gb / 1000).toFixed(gb >= 10000 ? 0 : 1) + ' TB' : Math.max(1, Math.round(gb)) + ' GB'; }
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 
+  function otherText(name) { var v = $(name + '-other').value.trim(); return v; }
+  function syncOthers() {
+    ['task', 'body', 'mod', 'note'].forEach(function (name) {
+      var on = !!form.querySelector('input[name="' + name + '"][value="other"]:checked'), box = $(name + '-other');
+      if (box.hidden === on) { box.hidden = !on; if (on && document.activeElement && document.activeElement.value === 'other') box.focus(); }
+    });
+  }
+  function chipLabel(name, v) {
+    if (v === 'other') return otherText(name) || 'Other';
+    return form.querySelector('input[name="' + name + '"][value="' + v + '"]').parentNode.textContent.trim();
+  }
+  function taskInfo(s) {
+    var t = TASKS[s.task];
+    if (s.task !== 'other') return t;
+    var txt = otherText('task');
+    return { name: t.name, label: txt || t.label, sec: t.sec, steps: t.steps, say: txt ? txt.replace(/\.?$/, '.') : t.say };
+  }
+
   function readState() {
     return {
       task: val('task'), body: val('body'), mods: vals('mod'), notes: vals('note'), format: val('format'),
@@ -41,7 +70,7 @@
   }
 
   function estimates(s) {
-    var t = TASKS[s.task];
+    var t = taskInfo(s);
     var episodes = Math.round(s.hours * 3600 / t.sec);
     var people = Math.max(Math.ceil(s.envs * 1.2), Math.ceil(s.hours / 40));
     var hardware = s.body !== 'human';
@@ -71,7 +100,7 @@
   }
 
   function buildEpisode(s) {
-    var t = TASKS[s.task], lanes = $('lanes');
+    var t = taskInfo(s), lanes = $('lanes');
     lanes.textContent = '';
     var total = t.steps.reduce(function (a, st) { return a + st[1]; }, 0);
     var actLane = el('div', 'lane');
@@ -87,7 +116,7 @@
     track.appendChild(row); actLane.appendChild(track); lanes.appendChild(actLane);
     s.mods.forEach(function (m) {
       var lane = el('div', 'lane');
-      lane.appendChild(el('div', 'lane-name', MODS[m].label));
+      lane.appendChild(el('div', 'lane-name', m === 'other' ? (otherText('mod') || MODS[m].label) : MODS[m].label));
       var tr = el('div', 'lane-track');
       tr.innerHTML = MODS[m].kind === 'frames' ? frames(400, 26) : wave(MODS[m].seed, 400, 26);
       lane.appendChild(tr); lanes.appendChild(lane);
@@ -100,7 +129,7 @@
   }
 
   function paint() {
-    var s = readState(), t = TASKS[s.task];
+    var s = readState(), t = taskInfo(s);
     var total = t.steps.reduce(function (a, st) { return a + st[1]; }, 0);
     var head = $('playhead'), lanes = $('lanes');
     if (!head) return;
@@ -139,13 +168,13 @@
 
   /* ---------- delivery preview ---------- */
   function tree(s, e) {
-    var t = TASKS[s.task], n = t.name + '_v1/', L = [];
+    var t = taskInfo(s), n = t.name + '_v1/', L = [];
     var has = function (m) { return s.mods.indexOf(m) > -1; }, note = function (a) { return s.notes.indexOf(a) > -1; };
     if (s.format === 'lerobot') {
       L.push('<b>' + n + '</b>', '  meta/', '    info.json', '    episodes.jsonl');
       if (note('language')) L.push('    tasks.jsonl');
       L.push('  data/chunk-000/', '    episode_000000.parquet', '    \u2026');
-      ['video', 'depth'].forEach(function (m) { if (has(m)) L.push('  videos/chunk-000/' + MODS[m].lerobot + '/', '    episode_000000.mp4'); });
+      ['video', 'wrist', 'depth'].forEach(function (m) { if (has(m)) L.push('  videos/chunk-000/' + MODS[m].lerobot + '/', '    episode_000000.mp4'); });
     } else if (s.format === 'rlds') {
       L.push('<b>' + n + '</b>', '  1.0.0/', '    dataset_info.json', '    features.json');
       var shards = Math.max(1, Math.ceil(e.gb / 4));
@@ -157,6 +186,8 @@
       if (note('language')) L.push('    instructions.jsonl');
       if (note('boxes')) L.push('    objects.parquet');
       if (note('success')) L.push('    outcomes.parquet');
+      if (note('masks')) L.push('    masks/');
+      if (note('keypoints')) L.push('    keypoints.parquet');
       L.push('  metadata.json');
     }
     return L.join('\n');
@@ -171,7 +202,8 @@
   /* ---------- render ---------- */
   var lastTask = null, lastMods = '', lastNotes = '';
   function render() {
-    var s = readState(), e = estimates(s);
+    syncOthers();
+    var s = readState(), e = estimates(s), ti = taskInfo(s);
     ['hours', 'envs'].forEach(function (id) {
       var r = $(id); r.style.setProperty('--fill', ((r.value - r.min) / (r.max - r.min) * 100) + '%');
     });
@@ -182,23 +214,24 @@
     $('st-first').textContent = e.firstDays + ' days';
     $('st-weeks').textContent = e.weeks + ' weeks';
     $('size').textContent = size(e.gb) + ' raw';
-    $('ep-title').textContent = TASKS[s.task].label + ' \u00B7 episode 0001';
+    $('ep-title').textContent = ti.label + ' \u00B7 episode 0001';
     $('tree').innerHTML = tree(s, e);
     $('code').innerHTML = code(s);
-    if (s.task !== lastTask || s.mods.join() !== lastMods || s.notes.join() !== lastNotes) {
-      lastTask = s.task; lastMods = s.mods.join(); lastNotes = s.notes.join();
+    var key = s.task + '|' + ti.say + '|' + otherText('mod');
+    if (key !== lastTask || s.mods.join() !== lastMods || s.notes.join() !== lastNotes) {
+      lastTask = key; lastMods = s.mods.join(); lastNotes = s.notes.join();
       buildEpisode(s);
     }
     var lines = [
       'Hi Abundance team,', '', 'I would like a dataset with this spec:',
-      '- Task: ' + TASKS[s.task].label,
-      '- Embodiment: ' + form.querySelector('input[name="body"]:checked').parentNode.textContent.trim(),
-      '- Modalities: ' + (s.mods.map(function (m) { return MODS[m].label; }).join(', ') || 'None'),
-      '- Annotations: ' + (vals('note').map(function (v) { return form.querySelector('input[name="note"][value="' + v + '"]').parentNode.textContent.trim(); }).join(', ') || 'None'),
+      '- Task: ' + chipLabel('task', s.task),
+      '- Embodiment: ' + chipLabel('body', s.body),
+      '- Modalities: ' + (s.mods.map(function (m) { return chipLabel('mod', m); }).join(', ') || 'None'),
+      '- Annotations: ' + (s.notes.map(function (v) { return chipLabel('note', v); }).join(', ') || 'None'),
       '- Volume: ' + fmt(s.hours) + ' hours across ' + s.envs + ' locations',
       '- Format: ' + form.querySelector('input[name="format"]:checked').parentNode.textContent.trim()
     ];
-    $('send-spec').href = 'mailto:hello@abundancephysical.com?subject=' + encodeURIComponent('Dataset request: ' + TASKS[s.task].label) + '&body=' + encodeURIComponent(lines.join('\n'));
+    $('send-spec').href = 'mailto:hello@abundancephysical.com?subject=' + encodeURIComponent('Dataset request: ' + ti.label) + '&body=' + encodeURIComponent(lines.join('\n'));
   }
 
   form.addEventListener('input', render);
