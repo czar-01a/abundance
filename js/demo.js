@@ -1,0 +1,209 @@
+/* Dataset builder demo: live estimates, sample episode, delivery preview */
+(function () {
+  var form = document.getElementById('builder-form');
+  if (!form) return;
+
+  var TASKS = {
+    household: { name: 'household_manip', label: 'Household manipulation', sec: 45, say: 'Fold the towel and place it in the basket.',
+      steps: [['Reach', 3], ['Grasp towel', 4], ['Fold in half', 9], ['Fold again', 8], ['Lift', 3], ['Place in basket', 5]] },
+    warehouse: { name: 'warehouse_pick', label: 'Warehouse picking', sec: 30, say: 'Pick the blue box and put it on the conveyor.',
+      steps: [['Scan shelf', 4], ['Reach', 3], ['Grasp box', 4], ['Lift', 3], ['Turn', 3], ['Place on conveyor', 4]] },
+    assembly: { name: 'assembly', label: 'Assembly', sec: 60, say: 'Insert the bracket and fasten both screws.',
+      steps: [['Pick bracket', 4], ['Align', 5], ['Insert', 4], ['Pick screwdriver', 3], ['Fasten screw 1', 7], ['Fasten screw 2', 7]] },
+    food: { name: 'food_prep', label: 'Food prep', sec: 90, say: 'Slice the cucumber and plate it.',
+      steps: [['Wash', 6], ['Pick knife', 3], ['Slice', 14], ['Transfer', 5], ['Plate', 6]] },
+    sports: { name: 'sports_motion', label: 'Sports motion', sec: 20, say: 'Shoot a free throw.',
+      steps: [['Set stance', 3], ['Dribble', 4], ['Gather', 2], ['Jump', 2], ['Release', 2], ['Land', 2]] }
+  };
+  var MODS = {
+    video: { label: 'Egocentric video', gb: 7, kind: 'frames', lerobot: 'observation.images.ego' },
+    depth: { label: 'Depth', gb: 5, kind: 'frames', lerobot: 'observation.images.depth' },
+    hands: { label: 'Hand pose', gb: 0.1, kind: 'wave', seed: 2 },
+    imu: { label: 'IMU', gb: 0.02, kind: 'wave', seed: 5 },
+    teleop: { label: 'Teleop actions', gb: 0.5, kind: 'wave', seed: 3 },
+    tactile: { label: 'Tactile', gb: 1, kind: 'wave', seed: 7 },
+    audio: { label: 'Audio', gb: 0.2, kind: 'wave', seed: 11 }
+  };
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function $(id) { return document.getElementById(id); }
+  function val(name) { var el = form.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : ''; }
+  function vals(name) { return Array.prototype.map.call(form.querySelectorAll('input[name="' + name + '"]:checked'), function (el) { return el.value; }); }
+  function fmt(n) { return n.toLocaleString('en-US'); }
+  function size(gb) { return gb >= 1000 ? (gb / 1000).toFixed(gb >= 10000 ? 0 : 1) + ' TB' : Math.max(1, Math.round(gb)) + ' GB'; }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  function readState() {
+    return {
+      task: val('task'), body: val('body'), mods: vals('mod'), notes: vals('note'), format: val('format'),
+      hours: +$('hours').value, envs: +$('envs').value
+    };
+  }
+
+  function estimates(s) {
+    var t = TASKS[s.task];
+    var episodes = Math.round(s.hours * 3600 / t.sec);
+    var people = Math.max(Math.ceil(s.envs * 1.2), Math.ceil(s.hours / 40));
+    var hardware = s.body !== 'human';
+    var firstDays = 7 + (hardware ? 7 : 0) + (s.mods.indexOf('tactile') > -1 ? 4 : 0);
+    var weeks = 2 + Math.ceil(s.hours / (people * 10)) + Math.ceil(s.hours / 500) + (hardware ? 1 : 0);
+    var gb = s.mods.reduce(function (sum, m) { return sum + MODS[m].gb; }, 0) * s.hours;
+    return { episodes: episodes, people: people, firstDays: firstDays, weeks: weeks, gb: gb };
+  }
+
+  /* ---------- sample episode ---------- */
+  var playing = !reduce, t0 = null, pos = 0, raf = null, segEls = [], cur = -1;
+  var LOOP_MS = 9000;
+
+  function wave(seed, w, h) {
+    var pts = [], n = 90;
+    for (var i = 0; i <= n; i++) {
+      var x = i / n;
+      var y = Math.sin(x * (6 + seed) + seed) * 0.45 + Math.sin(x * (17 + seed * 2)) * 0.2 + Math.sin(x * 41 + seed * 3) * 0.08;
+      pts.push((x * w).toFixed(1) + ',' + (h / 2 - y * h * 0.42).toFixed(1));
+    }
+    return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + pts.join(' ') + '" fill="none" stroke="#0A74E0" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg>';
+  }
+  function frames(w, h) {
+    var out = '', n = 28, gap = 2, fw = (w - gap * (n - 1)) / n;
+    for (var i = 0; i < n; i++) out += '<rect x="' + (i * (fw + gap)).toFixed(1) + '" y="3" width="' + fw.toFixed(1) + '" height="' + (h - 6) + '" rx="2" fill="' + (i % 2 ? '#CFE6FB' : '#B9DBFA') + '"/>';
+    return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" aria-hidden="true">' + out + '</svg>';
+  }
+
+  function buildEpisode(s) {
+    var t = TASKS[s.task], lanes = $('lanes');
+    lanes.textContent = '';
+    var total = t.steps.reduce(function (a, st) { return a + st[1]; }, 0);
+    var actLane = el('div', 'lane');
+    actLane.appendChild(el('div', 'lane-name', s.notes.indexOf('actions') > -1 ? 'Action labels' : 'Task steps'));
+    var track = el('div', 'lane-track'), row = el('div', 'seg-row');
+    segEls = t.steps.map(function (st, i) {
+      var d = el('div', null, st[0]);
+      d.style.width = (st[1] / total * 100) + '%';
+      d.style.background = i % 2 ? '#D6EBFD' : '#EAF5FF';
+      row.appendChild(d);
+      return d;
+    });
+    track.appendChild(row); actLane.appendChild(track); lanes.appendChild(actLane);
+    s.mods.forEach(function (m) {
+      var lane = el('div', 'lane');
+      lane.appendChild(el('div', 'lane-name', MODS[m].label));
+      var tr = el('div', 'lane-track');
+      tr.innerHTML = MODS[m].kind === 'frames' ? frames(400, 26) : wave(MODS[m].seed, 400, 26);
+      lane.appendChild(tr); lanes.appendChild(lane);
+    });
+    var head = el('div', 'playhead'); head.id = 'playhead'; lanes.appendChild(head);
+    $('say').hidden = s.notes.indexOf('language') < 0;
+    $('say').textContent = '\u201C' + t.say + '\u201D';
+    cur = -1;
+    paint();
+  }
+
+  function paint() {
+    var s = readState(), t = TASKS[s.task];
+    var total = t.steps.reduce(function (a, st) { return a + st[1]; }, 0);
+    var head = $('playhead'), lanes = $('lanes');
+    if (!head) return;
+    var nameW = lanes.querySelector('.lane-track').offsetLeft;
+    var trackW = lanes.clientWidth - nameW;
+    head.style.left = (nameW + pos * trackW - 1) + 'px';
+    var sec = pos * total, acc = 0, idx = t.steps.length - 1;
+    for (var i = 0; i < t.steps.length; i++) { acc += t.steps[i][1]; if (sec < acc) { idx = i; break; } }
+    if (idx !== cur) {
+      segEls.forEach(function (d, i) { d.classList.toggle('on', i === idx); });
+      $('now-step').textContent = t.steps[idx][0];
+      cur = idx;
+    }
+    $('now-time').textContent = sec.toFixed(1) + 's / ' + total + '.0s';
+  }
+
+  function tick(ts) {
+    if (t0 === null) t0 = ts - pos * LOOP_MS;
+    pos = ((ts - t0) % LOOP_MS) / LOOP_MS;
+    paint();
+    raf = requestAnimationFrame(tick);
+  }
+  function setPlaying(on) {
+    playing = on;
+    $('play').setAttribute('aria-pressed', on ? 'true' : 'false');
+    $('play-label').textContent = on ? 'Pause' : 'Play';
+    $('play-icon').innerHTML = on ? '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>' : '<path d="M7 5l12 7-12 7z"/>';
+    cancelAnimationFrame(raf); t0 = null;
+    if (on) raf = requestAnimationFrame(tick);
+  }
+  $('play').addEventListener('click', function () { setPlaying(!playing); });
+  $('lanes').addEventListener('click', function (e) {
+    var track = $('lanes').querySelector('.lane-track'), r = track.getBoundingClientRect();
+    pos = Math.min(0.999, Math.max(0, (e.clientX - r.left) / r.width)); t0 = null; paint();
+  });
+
+  /* ---------- delivery preview ---------- */
+  function tree(s, e) {
+    var t = TASKS[s.task], n = t.name + '_v1/', L = [];
+    var has = function (m) { return s.mods.indexOf(m) > -1; }, note = function (a) { return s.notes.indexOf(a) > -1; };
+    if (s.format === 'lerobot') {
+      L.push('<b>' + n + '</b>', '  meta/', '    info.json', '    episodes.jsonl');
+      if (note('language')) L.push('    tasks.jsonl');
+      L.push('  data/chunk-000/', '    episode_000000.parquet', '    \u2026');
+      ['video', 'depth'].forEach(function (m) { if (has(m)) L.push('  videos/chunk-000/' + MODS[m].lerobot + '/', '    episode_000000.mp4'); });
+    } else if (s.format === 'rlds') {
+      L.push('<b>' + n + '</b>', '  1.0.0/', '    dataset_info.json', '    features.json');
+      var shards = Math.max(1, Math.ceil(e.gb / 4));
+      L.push('    ' + t.name + '-train.tfrecord-00000-of-' + String(shards).padStart(5, '0'), '    \u2026');
+    } else {
+      L.push('<b>' + n + '</b>', '  episodes/', '    ep_0001.mcap', '    ep_0002.mcap', '    \u2026');
+      if (s.notes.length) L.push('  annotations/');
+      if (note('actions')) L.push('    actions.parquet');
+      if (note('language')) L.push('    instructions.jsonl');
+      if (note('boxes')) L.push('    objects.parquet');
+      if (note('success')) L.push('    outcomes.parquet');
+      L.push('  metadata.json');
+    }
+    return L.join('\n');
+  }
+  function code(s) {
+    var n = TASKS[s.task].name + '_v1';
+    if (s.format === 'lerobot') return '<span class="c"># pip install lerobot</span>\nfrom lerobot.datasets.lerobot_dataset import LeRobotDataset\n\nds = LeRobotDataset(<span class="s">"abundance/' + n + '"</span>)\nframe = ds[0]\nframe.keys()';
+    if (s.format === 'rlds') return '<span class="c"># pip install tensorflow-datasets</span>\nimport tensorflow_datasets as tfds\n\nds = tfds.builder_from_directory(\n    <span class="s">"' + n + '/1.0.0"</span>\n).as_dataset(split=<span class="s">"train"</span>)\nfor ep in ds.take(1):\n    steps = ep[<span class="s">"steps"</span>]';
+    return '<span class="c"># pip install mcap</span>\nfrom mcap.reader import make_reader\n\nf = open(<span class="s">"episodes/ep_0001.mcap"</span>, <span class="s">"rb"</span>)\nfor _, ch, msg in make_reader(f).iter_messages():\n    print(ch.topic, msg.log_time)';
+  }
+
+  /* ---------- render ---------- */
+  var lastTask = null, lastMods = '', lastNotes = '';
+  function render() {
+    var s = readState(), e = estimates(s);
+    ['hours', 'envs'].forEach(function (id) {
+      var r = $(id); r.style.setProperty('--fill', ((r.value - r.min) / (r.max - r.min) * 100) + '%');
+    });
+    $('hours-out').textContent = fmt(s.hours) + ' hrs';
+    $('envs-out').textContent = fmt(s.envs) + ' locations';
+    $('st-episodes').textContent = fmt(e.episodes);
+    $('st-people').textContent = fmt(e.people);
+    $('st-first').textContent = e.firstDays + ' days';
+    $('st-weeks').textContent = e.weeks + ' weeks';
+    $('size').textContent = size(e.gb) + ' raw';
+    $('ep-title').textContent = TASKS[s.task].label + ' \u00B7 episode 0001';
+    $('tree').innerHTML = tree(s, e);
+    $('code').innerHTML = code(s);
+    if (s.task !== lastTask || s.mods.join() !== lastMods || s.notes.join() !== lastNotes) {
+      lastTask = s.task; lastMods = s.mods.join(); lastNotes = s.notes.join();
+      buildEpisode(s);
+    }
+    var lines = [
+      'Hi Abundance team,', '', 'I would like a dataset with this spec:',
+      '- Task: ' + TASKS[s.task].label,
+      '- Embodiment: ' + form.querySelector('input[name="body"]:checked').parentNode.textContent.trim(),
+      '- Modalities: ' + (s.mods.map(function (m) { return MODS[m].label; }).join(', ') || 'None'),
+      '- Annotations: ' + (vals('note').map(function (v) { return form.querySelector('input[name="note"][value="' + v + '"]').parentNode.textContent.trim(); }).join(', ') || 'None'),
+      '- Volume: ' + fmt(s.hours) + ' hours across ' + s.envs + ' locations',
+      '- Format: ' + form.querySelector('input[name="format"]:checked').parentNode.textContent.trim()
+    ];
+    $('send-spec').href = 'mailto:hello@abundancephysical.com?subject=' + encodeURIComponent('Dataset request: ' + TASKS[s.task].label) + '&body=' + encodeURIComponent(lines.join('\n'));
+  }
+
+  form.addEventListener('input', render);
+  form.addEventListener('change', render);
+  window.addEventListener('resize', paint);
+  render();
+  setPlaying(playing);
+})();
