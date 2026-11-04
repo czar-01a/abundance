@@ -111,7 +111,7 @@
         (!state.actions.length || state.actions.indexOf(actionOf(j)) !== -1) &&
         (!q || (j.title + ' ' + j.product).toLowerCase().indexOf(q) !== -1);
     });
-    if (state.sort === 'high') list = list.slice().sort(function (a, b) { return b.hi - a.hi; });
+    if (state.sort === 'high') list = list.slice().sort(function (a, b) { return b.lo - a.lo; });
     if (state.sort === 'low') list = list.slice().sort(function (a, b) { return a.lo - b.lo; });
     return list;
   }
@@ -230,7 +230,7 @@
     art.appendChild(el('div', 'meta', job.mode + ' · ' + job.kind));
 
     var bottom = el('div', 'bottom');
-    bottom.appendChild(el('span', 'pay', '$' + job.lo + '–$' + job.hi + '/hr'));
+    bottom.appendChild(el('span', 'pay', '$' + job.lo + '+/hr'));
     var act = el('span', 'action', action);
     act.appendChild(svg(ARROW));
     bottom.appendChild(act);
