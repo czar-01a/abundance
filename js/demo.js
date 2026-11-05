@@ -330,7 +330,6 @@
   }
   function updateCounts() {
     document.querySelectorAll('.cart-n').forEach(function (n) { n.textContent = cart.length; });
-    $('view-cart').hidden = !cart.length;
   }
   function showToast(msg) {
     $('toast-msg').textContent = msg;
