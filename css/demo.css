@@ -99,12 +99,9 @@ textarea.other-input { resize: vertical; line-height: 1.5; min-height: 104px; }
 .disclaimer { font-size: 13px; color: var(--muted); }
 
 /* Cart */
-.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 60; display: flex; align-items: center; gap: 20px; padding: 14px 14px 14px 22px; background: var(--ink); color: #ffffff; border-radius: 999px; box-shadow: 0 18px 48px rgba(10, 22, 40, .28); font-size: 15px; animation: toastin .2s ease; max-width: calc(100vw - 32px); }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 60; display: flex; align-items: center; gap: 10px; padding: 14px 22px 14px 18px; background: var(--ink); color: #ffffff; border-radius: 999px; box-shadow: 0 18px 48px rgba(10, 22, 40, .28); font-size: 15px; animation: toastin .2s ease; max-width: calc(100vw - 32px); }
 .toast[hidden] { display: none; }
-.toast-actions { display: flex; gap: 8px; flex-shrink: 0; }
-.toast .btn { min-height: 40px; padding: 8px 16px; font-size: 14px; }
-.toast .btn-outline { background: transparent; color: #ffffff; border-color: rgba(255, 255, 255, .4); }
-.toast .btn-outline:hover { background: rgba(255, 255, 255, .1); color: #ffffff; }
+.toast-check { color: #7CC6FA; flex-shrink: 0; }
 @keyframes toastin { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
 .cart { position: fixed; inset: 0; z-index: 70; }
@@ -163,8 +160,7 @@ textarea.other-input { resize: vertical; line-height: 1.5; min-height: 104px; }
   .output { position: static; }
 }
 @media (max-width: 640px) {
-  .toast { flex-direction: column; align-items: stretch; gap: 10px; border-radius: 18px; left: 16px; right: 16px; transform: none; padding: 14px; text-align: center; animation: none; }
-  .toast-actions .btn { flex: 1; }
+  .toast { left: 16px; right: 16px; transform: none; justify-content: center; border-radius: 18px; animation: none; }
   .ref { grid-template-columns: 112px minmax(0, 1fr); }
   .ref-media img, .ref-media video { width: 112px; height: 72px; }
   .controls { padding: 24px 20px; }

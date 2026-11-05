@@ -341,7 +341,7 @@
     $('toast-msg').textContent = msg;
     $('toast').hidden = false;
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { $('toast').hidden = true; }, 6000);
+    toastTimer = setTimeout(function () { $('toast').hidden = true; }, 3000);
   }
   function hideToast() { clearTimeout(toastTimer); $('toast').hidden = true; }
   function addMore() {
@@ -371,8 +371,6 @@
   });
   $('cancel-edit').addEventListener('click', function () { setEditing(null); blank(); render(); renderCart(); });
   $('view-cart').addEventListener('click', openCart);
-  $('toast-view').addEventListener('click', openCart);
-  $('toast-more').addEventListener('click', addMore);
   $('cart-more').addEventListener('click', addMore);
 
   var lastFocus = null;
