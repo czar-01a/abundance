@@ -325,7 +325,17 @@
   function blank() {
     restore({ task: '', body: '', mods: [], notes: [], format: 'lerobot', hours: 200, envs: 25, desc: '', other: {} });
     setFiles([]);
+    setFormQty(1);
   }
+  var formQty = 1;
+  function setFormQty(n) {
+    formQty = Math.max(1, Math.min(99, n));
+    $('fq-n').textContent = formQty;
+    $('fq-minus').disabled = formQty <= 1;
+    $('fq-plus').disabled = formQty >= 99;
+  }
+  $('fq-minus').addEventListener('click', function () { setFormQty(formQty - 1); if ($('fq-minus').disabled) $('fq-plus').focus(); });
+  $('fq-plus').addEventListener('click', function () { setFormQty(formQty + 1); if ($('fq-plus').disabled) $('fq-minus').focus(); });
   function setEditing(id) {
     editingId = id;
     $('add-cart').textContent = id ? 'Update cart' : 'Add to cart';
@@ -354,19 +364,20 @@
     if (editingId) {
       var idx = cart.findIndex(function (c) { return c.id === editingId; });
       item.id = editingId;
-      if (idx > -1) item.qty = qtyOf(cart[idx]);
+      item.qty = formQty;
       if (!files.length && !memFiles[editingId] && idx > -1) item.fileNames = cart[idx].fileNames;
       if (idx > -1) cart[idx] = item; else cart.push(item);
       memFiles[item.id] = files.slice();
-      setEditing(null);
+      setEditing(null); setFormQty(1);
       saveCart(); updateCounts(); renderCart();
       showToast(item.title + ' updated in your cart.');
     } else {
-      item.id = uid(); item.qty = 1;
+      item.id = uid(); item.qty = formQty;
+      setFormQty(1);
       memFiles[item.id] = files.slice();
       cart.push(item);
       saveCart(); updateCounts(); renderCart();
-      showToast(item.title + ' added to your cart.');
+      showToast((item.qty > 1 ? item.qty + ' \u00D7 ' : '') + item.title + ' added to your cart.');
     }
   });
   $('cancel-edit').addEventListener('click', function () { setEditing(null); blank(); render(); renderCart(); });
@@ -409,7 +420,7 @@
       if (it.desc) card.appendChild(el('div', 'citem-desc', it.desc));
       var acts = el('div', 'citem-actions');
       [['Edit', function () {
-        restore(it); setFiles(memFiles[it.id] || []); setEditing(it.id); render(); closeCart();
+        restore(it); setFiles(memFiles[it.id] || []); setFormQty(qtyOf(it)); setEditing(it.id); render(); closeCart();
         window.scrollTo({ top: Math.max(0, form.getBoundingClientRect().top + window.pageYOffset - 100), behavior: reduce ? 'auto' : 'smooth' });
       }], ['Remove', function () {
         cart.splice(i, 1); delete memFiles[it.id];

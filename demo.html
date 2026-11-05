@@ -287,6 +287,14 @@
             <label><input type="radio" name="format" value="mcap"><span>MCAP</span></label>
           </div>
         </fieldset>
+        <div class="qty-row">
+          <span class="ctl-label" id="form-qty-label">Quantity</span>
+          <div class="qty" role="group" aria-labelledby="form-qty-label">
+            <button class="qty-btn" type="button" id="fq-minus" aria-label="Decrease quantity" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+            <span class="qty-n" id="fq-n" aria-live="polite">1</span>
+            <button class="qty-btn" type="button" id="fq-plus" aria-label="Increase quantity"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+          </div>
+        </div>
         <div class="cta-row">
           <button class="btn btn-primary btn-lg" type="button" id="add-cart">Add to cart</button>
           <button class="btn btn-outline btn-lg" type="button" id="view-cart"><span>View cart (<span class="cart-n">0</span>)</span></button>
