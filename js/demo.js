@@ -331,8 +331,11 @@
     $('add-cart').textContent = id ? 'Update cart' : 'Add to cart';
     $('cancel-edit').hidden = !id;
   }
+  function qtyOf(it) { return Math.max(1, Math.min(99, it.qty || 1)); }
+  function cartQty() { return cart.reduce(function (a, it) { return a + qtyOf(it); }, 0); }
   function updateCounts() {
-    document.querySelectorAll('.cart-n').forEach(function (n) { n.textContent = cart.length; });
+    var q = cartQty();
+    document.querySelectorAll('.cart-n').forEach(function (n) { n.textContent = q; });
   }
   function showToast(msg) {
     $('toast-msg').textContent = msg;
@@ -351,6 +354,7 @@
     if (editingId) {
       var idx = cart.findIndex(function (c) { return c.id === editingId; });
       item.id = editingId;
+      if (idx > -1) item.qty = qtyOf(cart[idx]);
       if (!files.length && !memFiles[editingId] && idx > -1) item.fileNames = cart[idx].fileNames;
       if (idx > -1) cart[idx] = item; else cart.push(item);
       memFiles[item.id] = files.slice();
@@ -358,7 +362,7 @@
       saveCart(); updateCounts(); renderCart();
       showToast(item.title + ' updated in your cart.');
     } else {
-      item.id = uid();
+      item.id = uid(); item.qty = 1;
       memFiles[item.id] = files.slice();
       cart.push(item);
       saveCart(); updateCounts(); renderCart();
@@ -388,6 +392,11 @@
   $('cart').addEventListener('click', function (e) { if (e.target.closest('[data-close]')) closeCart(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeCart(); });
 
+  function focusQty(id, which) {
+    var g = document.querySelector('.qty[data-id="' + id + '"]'); if (!g) return;
+    var btns = g.querySelectorAll('button'), b = btns[which];
+    (b && !b.disabled ? b : btns[1 - which]).focus();
+  }
   function renderCart() {
     var list = $('cart-items'); list.textContent = '';
     cart.forEach(function (it, i) {
@@ -404,17 +413,26 @@
       [['Edit', function () {
         restore(it); setFiles(memFiles[it.id] || []); setEditing(it.id); render(); closeCart();
         window.scrollTo({ top: Math.max(0, form.getBoundingClientRect().top + window.pageYOffset - 100), behavior: reduce ? 'auto' : 'smooth' });
-      }], ['Duplicate', function () {
-        var copy = JSON.parse(JSON.stringify(it)); copy.id = uid(); memFiles[copy.id] = (memFiles[it.id] || []).slice();
-        cart.splice(i + 1, 0, copy); saveCart(); updateCounts(); renderCart();
       }], ['Remove', function () {
         cart.splice(i, 1); delete memFiles[it.id];
         if (editingId === it.id) setEditing(null);
         saveCart(); updateCounts(); renderCart();
       }]].forEach(function (a, k) {
-        var b = el('button', k === 2 ? 'rm' : null, a[0]); b.type = 'button';
+        var b = el('button', a[0] === 'Remove' ? 'rm' : null, a[0]); b.type = 'button';
         b.setAttribute('aria-label', a[0] + ' ' + it.title); b.addEventListener('click', a[1]); acts.appendChild(b);
       });
+      var q = qtyOf(it), step = el('div', 'qty');
+      step.setAttribute('role', 'group'); step.setAttribute('aria-label', 'Quantity for ' + it.title);
+      var minus = el('button', 'qty-btn'); minus.type = 'button'; minus.setAttribute('aria-label', 'Decrease quantity'); minus.disabled = q <= 1;
+      minus.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg>';
+      var num = el('span', 'qty-n', String(q)); num.setAttribute('aria-live', 'polite');
+      var plus = el('button', 'qty-btn'); plus.type = 'button'; plus.setAttribute('aria-label', 'Increase quantity'); plus.disabled = q >= 99;
+      plus.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>';
+      minus.addEventListener('click', function () { it.qty = Math.max(1, q - 1); saveCart(); updateCounts(); renderCart(); focusQty(it.id, 0); });
+      plus.addEventListener('click', function () { it.qty = Math.min(99, q + 1); saveCart(); updateCounts(); renderCart(); focusQty(it.id, 1); });
+      step.appendChild(minus); step.appendChild(num); step.appendChild(plus);
+      step.dataset.id = it.id;
+      acts.insertBefore(step, acts.firstChild);
       card.appendChild(acts);
       list.appendChild(card);
     });
@@ -422,7 +440,7 @@
     $('cart-empty').hidden = has; $('cart-totals').hidden = !has; $('cart-contact').hidden = !has; $('cart-foot').hidden = !has;
     if (has) {
       var h = 0, ep = 0, gb = 0, wk = 0;
-      cart.forEach(function (it) { h += it.hours; ep += it.est.episodes; gb += it.est.gb; wk = Math.max(wk, it.est.weeks); });
+      cart.forEach(function (it) { var q = qtyOf(it); h += it.hours * q; ep += it.est.episodes * q; gb += it.est.gb * q; wk = Math.max(wk, it.est.weeks); });
       $('tot-hours').textContent = fmt(h);
       $('tot-episodes').textContent = fmt(ep);
       $('tot-size').textContent = gb ? size(gb) : '\u2014';
@@ -440,9 +458,11 @@
   $('send-request').addEventListener('click', function () {
     var c = contact.elements, email = c.email.value.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { c.email.setAttribute('aria-invalid', 'true'); $('cart-err').hidden = false; c.email.focus(); return; }
-    var L = ['Hi Abundance team,', '', 'I would like to request ' + cart.length + (cart.length === 1 ? ' dataset:' : ' datasets:'), ''];
+    var tq = cartQty();
+    var L = ['Hi Abundance team,', '', 'I would like to request ' + tq + (tq === 1 ? ' dataset:' : ' datasets:'), ''];
     cart.forEach(function (it, i) {
-      L.push((i + 1) + '. ' + it.title,
+      L.push((i + 1) + '. ' + it.title + (qtyOf(it) > 1 ? ' (x' + qtyOf(it) + ')' : ''),
+        '   - Quantity: ' + qtyOf(it),
         '   - Task: ' + (it.taskLabel || it.title),
         '   - Embodiment: ' + it.bodyLabel,
         '   - Modalities: ' + (it.modLabels.join(', ') || 'None'),
@@ -453,7 +473,7 @@
         '   - Format: ' + it.formatLabel, '');
     });
     L.push('Name: ' + (c.name.value.trim() || '-'), 'Email: ' + email, 'Company: ' + (c.company.value.trim() || '-'), 'Timeline: ' + c.timeline.value);
-    var subj = 'Dataset request: ' + cart.length + (cart.length === 1 ? ' dataset' : ' datasets') + (c.company.value.trim() ? ' (' + c.company.value.trim() + ')' : '');
+    var subj = 'Dataset request: ' + tq + (tq === 1 ? ' dataset' : ' datasets') + (c.company.value.trim() ? ' (' + c.company.value.trim() + ')' : '');
     window.location.href = 'mailto:hello@abundancephysical.com?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(L.join('\n'));
   });
 
