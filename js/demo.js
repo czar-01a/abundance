@@ -341,6 +341,9 @@
     $('add-cart').textContent = id ? 'Update cart' : 'Add to cart';
     $('cancel-edit').hidden = !id;
   }
+  function sig(it) {
+    return JSON.stringify([it.name || '', it.task, it.body, it.mods.slice().sort(), it.notes.slice().sort(), it.other || {}, it.desc || '', it.hours, it.envs, it.format, (it.fileNames || []).slice().sort()]);
+  }
   function qtyOf(it) { return Math.max(1, Math.min(99, it.qty || 1)); }
   function cartQty() { return cart.reduce(function (a, it) { return a + qtyOf(it); }, 0); }
   function updateCounts() {
@@ -372,12 +375,20 @@
       saveCart(); updateCounts(); renderCart();
       showToast(item.title + ' updated in your cart.');
     } else {
-      item.id = uid(); item.qty = formQty;
-      setFormQty(1);
-      memFiles[item.id] = files.slice();
-      cart.push(item);
-      saveCart(); updateCounts(); renderCart();
-      showToast((item.qty > 1 ? item.qty + ' \u00D7 ' : '') + item.title + ' added to your cart.');
+      var same = cart.find(function (c) { return sig(c) === sig(item); });
+      if (same) {
+        same.qty = Math.min(99, qtyOf(same) + formQty);
+        setFormQty(1);
+        saveCart(); updateCounts(); renderCart();
+        showToast(same.title + ' is already in your cart. Quantity is now ' + same.qty + '.');
+      } else {
+        item.id = uid(); item.qty = formQty;
+        setFormQty(1);
+        memFiles[item.id] = files.slice();
+        cart.push(item);
+        saveCart(); updateCounts(); renderCart();
+        showToast((item.qty > 1 ? item.qty + ' \u00D7 ' : '') + item.title + ' added to your cart.');
+      }
     }
   });
   $('cancel-edit').addEventListener('click', function () { setEditing(null); blank(); render(); renderCart(); });
