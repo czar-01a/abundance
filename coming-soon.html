@@ -212,15 +212,6 @@
   </div>
 </footer>
 <script src="js/site.js" defer></script>
-<script>
-  // Show which page is coming, e.g. coming-soon.html?page=Blog
-  (function () {
-    var name = new URLSearchParams(location.search).get('page');
-    if (!name) return;
-    name = name.slice(0, 40);
-    document.getElementById('soon-name').textContent = name;
-    document.title = name + ' - Coming soon - Abundance';
-  })();
-</script>
+<script src="js/coming-soon.js" defer></script>
 </body>
 </html>

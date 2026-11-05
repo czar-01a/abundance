@@ -2,6 +2,7 @@
 (function () {
   var form = document.getElementById('builder-form');
   if (!form) return;
+  form.addEventListener('submit', function (e) { e.preventDefault(); }); // Enter in a text field must not reload the page
 
   var TASKS = {
     pick: { name: 'pick_place', label: 'Pick and place', sec: 20, say: 'Put the red block in the bowl.',
@@ -54,7 +55,8 @@
   function chipLabel(name, v) {
     if (!v) return 'Not selected';
     if (v === 'other') return otherText(name) || 'Other';
-    return form.querySelector('input[name="' + name + '"][value="' + v + '"]').parentNode.textContent.trim();
+    var input = Array.prototype.find.call(form.querySelectorAll('input[name="' + name + '"]'), function (i) { return i.value === v; });
+    return input ? input.parentNode.textContent.trim() : 'Not selected';
   }
   var GENERIC = { name: 'your_dataset', label: 'Your dataset', sec: 60, say: 'Your task, described in plain language.',
     steps: [['Set up', 4], ['Reach', 3], ['Grasp', 4], ['Manipulate', 12], ['Place', 4], ['Reset', 3]] };
@@ -287,7 +289,27 @@
   }, true);
   /* ---------- cart ---------- */
   var KEY = 'abundance-cart-v1', cart = [], editingId = null, memFiles = {}, toastTimer = null;
-  try { cart = JSON.parse(localStorage.getItem(KEY) || '[]') || []; } catch (err) { cart = []; }
+  // Saved carts come from the visitor's own browser storage; keep only well-formed items so an old or edited value can't break the page
+  function cleanItem(it) {
+    if (!it || typeof it !== 'object' || typeof it.id !== 'string') return null;
+    var arr = function (v) { return Array.isArray(v) ? v.filter(function (x) { return typeof x === 'string'; }) : []; };
+    var str = function (v) { return typeof v === 'string' ? v.slice(0, 800) : ''; };
+    var num = function (v, lo, hi, d) { v = Number(v); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
+    var est = it.est && typeof it.est === 'object' ? it.est : {};
+    return {
+      id: it.id.slice(0, 40), qty: num(it.qty, 1, 99, 1),
+      task: str(it.task), body: str(it.body), mods: arr(it.mods), notes: arr(it.notes),
+      format: ['lerobot', 'rlds', 'mcap'].indexOf(it.format) > -1 ? it.format : 'lerobot',
+      hours: num(it.hours, 10, 2000, 200), envs: num(it.envs, 5, 200, 25),
+      other: it.other && typeof it.other === 'object' ? { task: str(it.other.task), body: str(it.other.body), mod: str(it.other.mod), note: str(it.other.note) } : {},
+      desc: str(it.desc), name: str(it.name), taskLabel: str(it.taskLabel), fileNames: arr(it.fileNames),
+      title: str(it.title) || 'Untitled dataset', bodyLabel: str(it.bodyLabel) || 'Not selected',
+      modLabels: arr(it.modLabels), noteLabels: arr(it.noteLabels), formatLabel: str(it.formatLabel) || 'LeRobot',
+      est: { episodes: num(est.episodes, 0, 1e9, 0), gb: num(est.gb, 0, 1e9, 0), weeks: num(est.weeks, 0, 1000, 0) }
+    };
+  }
+  try { cart = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (err) { cart = []; }
+  cart = (Array.isArray(cart) ? cart : []).map(cleanItem).filter(Boolean).slice(0, 50);
   function saveCart() { try { localStorage.setItem(KEY, JSON.stringify(cart)); } catch (err) {} }
   function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
   function snapshot() {
@@ -321,7 +343,7 @@
     $('task-desc').value = it.desc || '';
     $('ds-name').value = it.name || '';
     $('hours').value = it.hours; $('envs').value = it.envs;
-    var f = form.querySelector('input[name="format"][value="' + it.format + '"]'); if (f) f.checked = true;
+    form.querySelectorAll('input[name="format"]').forEach(function (f) { f.checked = f.value === it.format; });
   }
   function blank() {
     restore({ task: '', body: '', mods: [], notes: [], format: 'lerobot', hours: 200, envs: 25, desc: '', other: {} });
@@ -487,7 +509,7 @@
   }
 
   var contact = $('cart-contact');
-  try { var saved = JSON.parse(localStorage.getItem(KEY + '-contact') || '{}'); Object.keys(saved).forEach(function (k) { if (contact.elements[k]) contact.elements[k].value = saved[k]; }); } catch (err) {}
+  try { var saved = JSON.parse(localStorage.getItem(KEY + '-contact') || '{}'); ['name', 'email', 'company', 'timeline'].forEach(function (k) { if (typeof saved[k] === 'string') contact.elements[k].value = saved[k].slice(0, 200); }); } catch (err) {}
   contact.addEventListener('input', function () {
     var o = {}; ['name', 'email', 'company', 'timeline'].forEach(function (k) { o[k] = contact.elements[k].value; });
     try { localStorage.setItem(KEY + '-contact', JSON.stringify(o)); } catch (err) {}

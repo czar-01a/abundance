@@ -12,6 +12,9 @@ A plain static site (HTML, CSS, and JavaScript) with no build step, hosted on Cl
 | `jobs.html` | Jobs listing with tabs, filters, search, sorting, pagination, and saved jobs |
 | `signup.html` | Sign-up flow (contributor or team) |
 | `login.html` | Log-in and password reset flow |
+| `demo.html` | Dataset builder demo with cart |
+| `coming-soon.html` | Placeholder for pages not built yet (`?page=Name`) |
+| `insiders/` | Private area, meant to be locked with Cloudflare Access |
 | `404.html` | Page-not-found page |
 
 ## Folders
@@ -19,8 +22,12 @@ A plain static site (HTML, CSS, and JavaScript) with no build step, hosted on Cl
 - `css/styles.css`: all styles
 - `js/site.js`: shared header (Products and Resources menus, search, mobile menu)
 - `js/jobs-data.js`: the job listings; edit this file to add, remove, or reorder jobs
-- `js/jobs.js`, `js/signup.js`, `js/login.js`: page behavior
+- `css/demo.css`: styles for the demo page only
+- `js/jobs.js`, `js/signup.js`, `js/login.js`, `js/demo.js`, `js/coming-soon.js`: page behavior
+- `_headers`: security headers Cloudflare adds to every page (content security policy and others). Keep all JavaScript in files under `js/`: inline `<script>` blocks and `on...=""` attributes are blocked by this policy
 - `assets/`: logo and icons
+
+- `.assetsignore`: repository files that should not be served on the site
 
 ## Deploy
 

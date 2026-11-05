@@ -51,6 +51,8 @@
 
   var saved = [];
   try { saved = JSON.parse(localStorage.getItem('abundance-saved-jobs') || '[]'); } catch (e) { saved = []; }
+  if (!Array.isArray(saved)) saved = []; // ignore anything unexpected in storage
+  saved = saved.filter(function (t) { return typeof t === 'string'; });
   function persistSaved() {
     try { localStorage.setItem('abundance-saved-jobs', JSON.stringify(saved)); } catch (e) { /* storage unavailable */ }
   }
