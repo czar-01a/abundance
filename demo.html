@@ -204,8 +204,23 @@
           <label class="chip"><input type="radio" name="task" value="sports"><span>Sports motion</span></label>
           <label class="chip"><input type="radio" name="task" value="other"><span>Other</span></label>
           </div>
-          <input class="other-input" type="text" id="task-other" maxlength="80" placeholder="Describe your task" aria-label="Describe your task" hidden>
+          <input class="other-input" type="text" id="task-other" maxlength="80" placeholder="Name your task" aria-label="Name your task" hidden>
         </fieldset>
+        <div class="ctl">
+          <label class="ctl-label" for="task-desc">Task description <span class="opt">Optional</span></label>
+          <textarea class="other-input" id="task-desc" rows="4" maxlength="800" placeholder="What should the robot do, where, and with what objects? e.g. Unload mugs from a dish rack into a cabinet. Mugs vary in size and color; some are wet."></textarea>
+        </div>
+        <div class="ctl">
+          <span class="ctl-label" id="media-label">Demo media <span class="opt">Optional</span></span>
+          <input class="sr-only" type="file" id="media" accept="video/*,image/*" multiple aria-labelledby="media-label">
+          <label class="drop" id="drop" for="media">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"></path></svg>
+            <span><b>Upload a video or photo</b> of the task, or drag it here</span>
+            <span class="drop-hint">MP4, MOV, JPG, or PNG &middot; up to 5 files</span>
+          </label>
+          <div class="media-list" id="media-list"></div>
+          <div class="ctl-hint" id="media-note" hidden>Files stay on your device in this demo. Attach them when you email the spec.</div>
+        </div>
         <fieldset class="ctl">
           <legend class="ctl-label">Embodiment</legend>
           <div class="chips">
@@ -286,6 +301,7 @@
             <button class="play-btn" type="button" id="play" aria-pressed="true"><svg id="play-icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"></svg><span id="play-label">Pause</span></button>
           </div>
           <div class="player">
+            <div class="ref" id="ref" hidden><div class="ref-media" id="ref-media"></div><div class="ref-cap"><span class="dpanel-title">Your reference</span><span class="ref-name" id="ref-name"></span></div></div>
             <div class="now"><span class="now-step" id="now-step"></span><span class="now-time" id="now-time"></span></div>
             <div class="ctl-hint" id="say" style="margin-top:-8px"></div>
             <div class="lanes" id="lanes"></div>

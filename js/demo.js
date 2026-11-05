@@ -199,6 +199,55 @@
     return '<span class="c"># pip install mcap</span>\nfrom mcap.reader import make_reader\n\nf = open(<span class="s">"episodes/ep_0001.mcap"</span>, <span class="s">"rb"</span>)\nfor _, ch, msg in make_reader(f).iter_messages():\n    print(ch.topic, msg.log_time)';
   }
 
+  /* ---------- task description + demo media ---------- */
+  var files = [], MAX_FILES = 5;
+  function kb(n) { return n >= 1e9 ? (n / 1e9).toFixed(1) + ' GB' : n >= 1e6 ? (n / 1e6).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1e3)) + ' KB'; }
+  function thumb(f, cls) {
+    var m = f.file.type.indexOf('video') === 0 ? el('video') : el('img');
+    var isVid = m.tagName === 'VIDEO';
+    m.src = isVid && !cls ? f.url + '#t=0.1' : f.url;
+    if (isVid) { m.preload = 'metadata'; m.muted = true; m.playsInline = true; m.loop = true; m.setAttribute('aria-label', f.file.name); if (cls) m.autoplay = !reduce; }
+    else m.alt = f.file.name;
+    return m;
+  }
+  function renderMedia() {
+    var list = $('media-list'); list.textContent = '';
+    files.forEach(function (f, i) {
+      var row = el('div', 'mitem'), info = el('div');
+      row.appendChild(thumb(f));
+      info.appendChild(el('div', 'mname', f.file.name));
+      info.appendChild(el('div', 'msize', kb(f.file.size)));
+      row.appendChild(info);
+      var x = el('button'); x.type = 'button'; x.setAttribute('aria-label', 'Remove ' + f.file.name);
+      x.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg>';
+      x.addEventListener('click', function () { URL.revokeObjectURL(f.url); files.splice(i, 1); renderMedia(); render(); });
+      row.appendChild(x); list.appendChild(row);
+    });
+    $('media-note').hidden = !files.length;
+    $('drop').hidden = files.length >= MAX_FILES;
+    var ref = $('ref'), box = $('ref-media');
+    box.textContent = '';
+    ref.hidden = !files.length;
+    if (files.length) {
+      var v = thumb(files[0], true); box.appendChild(v);
+      if (v.tagName === 'VIDEO' && !reduce) v.play().catch(function () {});
+      $('ref-name').textContent = files[0].file.name + (files.length > 1 ? ' + ' + (files.length - 1) + ' more' : '');
+    }
+  }
+  function addFiles(list) {
+    Array.prototype.forEach.call(list, function (file) {
+      if (files.length >= MAX_FILES) return;
+      if (!/^(video|image)\//.test(file.type)) return;
+      files.push({ file: file, url: URL.createObjectURL(file) });
+    });
+    renderMedia(); render();
+  }
+  $('media').addEventListener('change', function (e) { addFiles(e.target.files); e.target.value = ''; });
+  var drop = $('drop');
+  ['dragenter', 'dragover'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('over'); }); });
+  ['dragleave', 'drop'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('over'); }); });
+  drop.addEventListener('drop', function (e) { if (e.dataTransfer) addFiles(e.dataTransfer.files); });
+
   /* ---------- render ---------- */
   var lastTask = null, lastMods = '', lastNotes = '';
   function render() {
@@ -228,6 +277,8 @@
       '- Embodiment: ' + chipLabel('body', s.body),
       '- Modalities: ' + (s.mods.map(function (m) { return chipLabel('mod', m); }).join(', ') || 'None'),
       '- Annotations: ' + (s.notes.map(function (v) { return chipLabel('note', v); }).join(', ') || 'None'),
+      '- Task description: ' + ($('task-desc').value.trim() || 'Not provided'),
+      '- Reference media: ' + (files.length ? files.map(function (f) { return f.file.name; }).join(', ') + ' (attached to this email)' : 'None'),
       '- Volume: ' + fmt(s.hours) + ' hours across ' + s.envs + ' locations',
       '- Format: ' + form.querySelector('input[name="format"]:checked').parentNode.textContent.trim()
     ];
