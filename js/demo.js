@@ -335,8 +335,15 @@
     $('fq-minus').disabled = formQty <= 1;
     $('fq-plus').disabled = formQty >= 99;
   }
-  $('fq-minus').addEventListener('click', function () { setFormQty(formQty - 1); if ($('fq-minus').disabled) $('fq-plus').focus(); });
-  $('fq-plus').addEventListener('click', function () { setFormQty(formQty + 1); if ($('fq-plus').disabled) $('fq-minus').focus(); });
+  // If this dataset is already in the cart (or being edited), the stepper changes the cart right away
+  function liveQty() {
+    var target = editingId ? cart.find(function (c) { return c.id === editingId; }) : findSame(snapshot());
+    if (!target) return;
+    target.qty = formQty;
+    saveCart(); updateCounts(); renderCart();
+  }
+  $('fq-minus').addEventListener('click', function () { setFormQty(formQty - 1); liveQty(); if ($('fq-minus').disabled) $('fq-plus').focus(); });
+  $('fq-plus').addEventListener('click', function () { setFormQty(formQty + 1); liveQty(); if ($('fq-plus').disabled) $('fq-minus').focus(); });
   function setEditing(id) {
     editingId = id;
     $('cancel-edit').hidden = !id;
