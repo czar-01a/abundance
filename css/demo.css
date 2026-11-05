@@ -148,6 +148,8 @@ textarea.other-input { resize: vertical; line-height: 1.5; min-height: 104px; }
 .cart-foot { padding: 16px 24px 20px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
 .cart-foot .disclaimer { text-align: center; }
 .cta-row [hidden] { display: none; }
+.controls .cta-row { padding-top: 24px; border-top: 1px solid var(--line); }
+.controls .cta-row .btn { flex: 1; }
 @media (prefers-reduced-motion: reduce) { .toast, .cart-scrim, .cart-panel { animation: none; } }
 
 @media (max-width: 1180px) {
