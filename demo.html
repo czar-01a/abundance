@@ -318,14 +318,66 @@
         </div>
 
         <div class="cta-row">
-          <a class="btn btn-primary btn-lg" href="signup.html?path=team">Request this dataset</a>
-          <a class="btn btn-outline btn-lg" id="send-spec" href="mailto:hello@abundancephysical.com">Email this spec to sales</a>
+          <button class="btn btn-primary btn-lg" type="button" id="add-cart">Add to cart</button>
+          <button class="btn btn-outline btn-lg" type="button" id="view-cart" hidden><span>View cart (<span class="cart-n">0</span>)</span></button>
+          <button class="btn btn-ghost btn-lg" type="button" id="cancel-edit" hidden>Cancel edit</button>
         </div>
         <p class="disclaimer">Estimates are illustrative. We confirm scope, timeline, and pricing with you before collection starts.</p>
       </div>
     </div>
   </section>
 </main>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden>
+  <span class="toast-msg" id="toast-msg"></span>
+  <div class="toast-actions">
+    <button class="btn btn-outline" type="button" id="toast-more">Add more</button>
+    <button class="btn btn-primary" type="button" id="toast-view"><span>View cart (<span class="cart-n">0</span>)</span></button>
+  </div>
+</div>
+
+<div class="cart" id="cart" hidden>
+  <div class="cart-scrim" data-close></div>
+  <aside class="cart-panel" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+    <div class="cart-head">
+      <h2 id="cart-title">Your cart <span class="cart-count">(<span class="cart-n">0</span>)</span></h2>
+      <button class="cart-x" type="button" data-close aria-label="Close cart"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg></button>
+    </div>
+    <div class="cart-body">
+      <p class="cart-empty" id="cart-empty">Your cart is empty. Spec a dataset and click <b>Add to cart</b>.</p>
+      <div class="cart-items" id="cart-items"></div>
+      <div class="cart-totals" id="cart-totals" hidden>
+        <div class="dpanel-title">Combined estimate</div>
+        <div class="totals-grid">
+          <div><span class="v" id="tot-hours"></span><span class="k">Hours</span></div>
+          <div><span class="v" id="tot-episodes"></span><span class="k">Episodes</span></div>
+          <div><span class="v" id="tot-size"></span><span class="k">Raw data</span></div>
+          <div><span class="v" id="tot-weeks"></span><span class="k">Full delivery</span></div>
+        </div>
+      </div>
+      <form class="cart-contact" id="cart-contact" hidden novalidate>
+        <div class="dpanel-title">Your details</div>
+        <label class="cfield"><span>Name</span><input type="text" name="name" autocomplete="name"></label>
+        <label class="cfield"><span>Work email</span><input type="email" name="email" autocomplete="email" required></label>
+        <label class="cfield"><span>Company</span><input type="text" name="company" autocomplete="organization"></label>
+        <label class="cfield"><span>Timeline</span>
+          <select name="timeline">
+            <option>As soon as possible</option>
+            <option>Within 1&ndash;3 months</option>
+            <option>Within 3&ndash;6 months</option>
+            <option>Just exploring</option>
+          </select>
+        </label>
+        <p class="cart-err" id="cart-err" hidden>Please enter a valid work email.</p>
+      </form>
+    </div>
+    <div class="cart-foot" id="cart-foot" hidden>
+      <button class="btn btn-primary btn-lg btn-block" type="button" id="send-request">Send request</button>
+      <button class="btn btn-outline btn-lg btn-block" type="button" id="cart-more">Add more</button>
+      <p class="disclaimer">Opens an email to hello@abundancephysical.com with your full request. Attach any demo files before sending.</p>
+    </div>
+  </aside>
+</div>
 
 <footer class="site-footer section" id="contact">
   <div class="wrap">

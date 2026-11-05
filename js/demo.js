@@ -275,18 +275,6 @@
       lastTask = key; lastMods = s.mods.join(); lastNotes = s.notes.join();
       buildEpisode(s);
     }
-    var lines = [
-      'Hi Abundance team,', '', 'I would like a dataset with this spec:',
-      '- Task: ' + chipLabel('task', s.task),
-      '- Embodiment: ' + chipLabel('body', s.body),
-      '- Modalities: ' + (s.mods.map(function (m) { return chipLabel('mod', m); }).join(', ') || 'None'),
-      '- Annotations: ' + (s.notes.map(function (v) { return chipLabel('note', v); }).join(', ') || 'None'),
-      '- Task description: ' + ($('task-desc').value.trim() || 'Not provided'),
-      '- Reference media: ' + (files.length ? files.map(function (f) { return f.file.name; }).join(', ') + ' (attached to this email)' : 'None'),
-      '- Volume: ' + fmt(s.hours) + ' hours across ' + s.envs + ' locations',
-      '- Format: ' + form.querySelector('input[name="format"]:checked').parentNode.textContent.trim()
-    ];
-    $('send-spec').href = 'mailto:hello@abundancephysical.com?subject=' + encodeURIComponent('Dataset request: ' + ti.label) + '&body=' + encodeURIComponent(lines.join('\n'));
   }
 
   // Task and Embodiment: pick one at a time, click again to unselect
@@ -296,6 +284,176 @@
       form.querySelectorAll('input[name="' + t.name + '"]').forEach(function (o) { if (o !== t) o.checked = false; });
     }
   }, true);
+  /* ---------- cart ---------- */
+  var KEY = 'abundance-cart-v1', cart = [], editingId = null, memFiles = {}, toastTimer = null;
+  try { cart = JSON.parse(localStorage.getItem(KEY) || '[]') || []; } catch (err) { cart = []; }
+  function saveCart() { try { localStorage.setItem(KEY, JSON.stringify(cart)); } catch (err) {} }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function snapshot() {
+    var s = readState(), e = estimates(s), ti = taskInfo(s);
+    return {
+      task: s.task, body: s.body, mods: s.mods, notes: s.notes, format: s.format, hours: s.hours, envs: s.envs,
+      other: { task: otherText('task'), body: otherText('body'), mod: otherText('mod'), note: otherText('note') },
+      desc: $('task-desc').value.trim(),
+      fileNames: files.map(function (f) { return f.file.name; }),
+      title: s.task ? ti.label : 'Untitled dataset',
+      bodyLabel: chipLabel('body', s.body),
+      modLabels: s.mods.map(function (m) { return chipLabel('mod', m); }),
+      noteLabels: s.notes.map(function (v) { return chipLabel('note', v); }),
+      formatLabel: form.querySelector('input[name="format"]:checked').parentNode.textContent.trim(),
+      est: { episodes: e.episodes, gb: s.mods.length ? e.gb : 0, weeks: e.weeks }
+    };
+  }
+  function setFiles(list) {
+    files.forEach(function (f) { if (!list || list.indexOf(f) < 0) URL.revokeObjectURL(f.url); });
+    files = list ? list.slice() : [];
+    renderMedia();
+  }
+  function restore(it) {
+    form.querySelectorAll('input[name="task"], input[name="body"], input[name="mod"], input[name="note"]').forEach(function (i) {
+      var v = i.value, n = i.name;
+      i.checked = n === 'task' ? it.task === v : n === 'body' ? it.body === v : n === 'mod' ? it.mods.indexOf(v) > -1 : it.notes.indexOf(v) > -1;
+    });
+    ['task', 'body', 'mod', 'note'].forEach(function (n) { $(n + '-other').value = (it.other && it.other[n]) || ''; });
+    $('task-desc').value = it.desc || '';
+    $('hours').value = it.hours; $('envs').value = it.envs;
+    var f = form.querySelector('input[name="format"][value="' + it.format + '"]'); if (f) f.checked = true;
+  }
+  function blank() {
+    restore({ task: '', body: '', mods: [], notes: [], format: 'lerobot', hours: 200, envs: 25, desc: '', other: {} });
+    setFiles([]);
+  }
+  function setEditing(id) {
+    editingId = id;
+    $('add-cart').textContent = id ? 'Update cart' : 'Add to cart';
+    $('cancel-edit').hidden = !id;
+  }
+  function updateCounts() {
+    document.querySelectorAll('.cart-n').forEach(function (n) { n.textContent = cart.length; });
+    $('view-cart').hidden = !cart.length;
+  }
+  function showToast(msg) {
+    $('toast-msg').textContent = msg;
+    $('toast').hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { $('toast').hidden = true; }, 6000);
+  }
+  function hideToast() { clearTimeout(toastTimer); $('toast').hidden = true; }
+  function addMore() {
+    hideToast(); closeCart(); setEditing(null); blank(); render();
+    var top = form.getBoundingClientRect().top + window.pageYOffset - 100;
+    window.scrollTo({ top: Math.max(0, top), behavior: reduce ? 'auto' : 'smooth' });
+  }
+  $('add-cart').addEventListener('click', function () {
+    var item = snapshot();
+    if (editingId) {
+      var idx = cart.findIndex(function (c) { return c.id === editingId; });
+      item.id = editingId;
+      if (!files.length && !memFiles[editingId] && idx > -1) item.fileNames = cart[idx].fileNames;
+      if (idx > -1) cart[idx] = item; else cart.push(item);
+      memFiles[item.id] = files.slice();
+      setEditing(null);
+      saveCart(); updateCounts(); renderCart();
+      showToast(item.title + ' updated in your cart.');
+    } else {
+      item.id = uid();
+      memFiles[item.id] = files.slice();
+      cart.push(item);
+      saveCart(); updateCounts(); renderCart();
+      showToast(item.title + ' added to your cart.');
+    }
+  });
+  $('cancel-edit').addEventListener('click', function () { setEditing(null); blank(); render(); renderCart(); });
+  $('view-cart').addEventListener('click', openCart);
+  $('toast-view').addEventListener('click', openCart);
+  $('toast-more').addEventListener('click', addMore);
+  $('cart-more').addEventListener('click', addMore);
+
+  var lastFocus = null;
+  function openCart() {
+    hideToast(); renderCart();
+    lastFocus = document.activeElement;
+    $('cart').hidden = false;
+    document.body.style.overflow = 'hidden';
+    $('cart').querySelector('.cart-x').focus();
+  }
+  function closeCart() {
+    if ($('cart').hidden) return;
+    $('cart').hidden = true;
+    document.body.style.overflow = '';
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  $('cart').addEventListener('click', function (e) { if (e.target.closest('[data-close]')) closeCart(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeCart(); });
+
+  function renderCart() {
+    var list = $('cart-items'); list.textContent = '';
+    cart.forEach(function (it, i) {
+      var card = el('div', 'citem' + (it.id === editingId ? ' editing' : ''));
+      var top = el('div', 'citem-top');
+      top.appendChild(el('div', 'citem-title', it.title));
+      top.appendChild(el('div', 'citem-num', String(i + 1).padStart(2, '0')));
+      card.appendChild(top);
+      card.appendChild(el('div', 'citem-meta', [it.bodyLabel, it.modLabels.join(', ') || 'No modalities', it.noteLabels.join(', ') || 'No annotations'].join(' \u00B7 ')));
+      card.appendChild(el('div', 'citem-meta', fmt(it.hours) + ' hrs \u00B7 ' + it.envs + ' locations \u00B7 ' + it.formatLabel + (it.fileNames.length ? ' \u00B7 ' + it.fileNames.length + (it.fileNames.length === 1 ? ' file' : ' files') : '')));
+      if (it.desc) card.appendChild(el('div', 'citem-desc', it.desc));
+      var acts = el('div', 'citem-actions');
+      [['Edit', function () {
+        restore(it); setFiles(memFiles[it.id] || []); setEditing(it.id); render(); closeCart();
+        window.scrollTo({ top: Math.max(0, form.getBoundingClientRect().top + window.pageYOffset - 100), behavior: reduce ? 'auto' : 'smooth' });
+      }], ['Duplicate', function () {
+        var copy = JSON.parse(JSON.stringify(it)); copy.id = uid(); memFiles[copy.id] = (memFiles[it.id] || []).slice();
+        cart.splice(i + 1, 0, copy); saveCart(); updateCounts(); renderCart();
+      }], ['Remove', function () {
+        cart.splice(i, 1); delete memFiles[it.id];
+        if (editingId === it.id) setEditing(null);
+        saveCart(); updateCounts(); renderCart();
+      }]].forEach(function (a, k) {
+        var b = el('button', k === 2 ? 'rm' : null, a[0]); b.type = 'button';
+        b.setAttribute('aria-label', a[0] + ' ' + it.title); b.addEventListener('click', a[1]); acts.appendChild(b);
+      });
+      card.appendChild(acts);
+      list.appendChild(card);
+    });
+    var has = cart.length > 0;
+    $('cart-empty').hidden = has; $('cart-totals').hidden = !has; $('cart-contact').hidden = !has; $('cart-foot').hidden = !has;
+    if (has) {
+      var h = 0, ep = 0, gb = 0, wk = 0;
+      cart.forEach(function (it) { h += it.hours; ep += it.est.episodes; gb += it.est.gb; wk = Math.max(wk, it.est.weeks); });
+      $('tot-hours').textContent = fmt(h);
+      $('tot-episodes').textContent = fmt(ep);
+      $('tot-size').textContent = gb ? size(gb) : '\u2014';
+      $('tot-weeks').textContent = wk + ' weeks';
+    }
+  }
+
+  var contact = $('cart-contact');
+  try { var saved = JSON.parse(localStorage.getItem(KEY + '-contact') || '{}'); Object.keys(saved).forEach(function (k) { if (contact.elements[k]) contact.elements[k].value = saved[k]; }); } catch (err) {}
+  contact.addEventListener('input', function () {
+    var o = {}; ['name', 'email', 'company', 'timeline'].forEach(function (k) { o[k] = contact.elements[k].value; });
+    try { localStorage.setItem(KEY + '-contact', JSON.stringify(o)); } catch (err) {}
+    contact.elements.email.removeAttribute('aria-invalid'); $('cart-err').hidden = true;
+  });
+  $('send-request').addEventListener('click', function () {
+    var c = contact.elements, email = c.email.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { c.email.setAttribute('aria-invalid', 'true'); $('cart-err').hidden = false; c.email.focus(); return; }
+    var L = ['Hi Abundance team,', '', 'I would like to request ' + cart.length + (cart.length === 1 ? ' dataset:' : ' datasets:'), ''];
+    cart.forEach(function (it, i) {
+      L.push((i + 1) + '. ' + it.title,
+        '   - Embodiment: ' + it.bodyLabel,
+        '   - Modalities: ' + (it.modLabels.join(', ') || 'None'),
+        '   - Annotations: ' + (it.noteLabels.join(', ') || 'None'),
+        '   - Description: ' + (it.desc || 'Not provided'),
+        '   - Reference media: ' + (it.fileNames.length ? it.fileNames.join(', ') + ' (attached)' : 'None'),
+        '   - Volume: ' + fmt(it.hours) + ' hours across ' + it.envs + ' locations',
+        '   - Format: ' + it.formatLabel, '');
+    });
+    L.push('Name: ' + (c.name.value.trim() || '-'), 'Email: ' + email, 'Company: ' + (c.company.value.trim() || '-'), 'Timeline: ' + c.timeline.value);
+    var subj = 'Dataset request: ' + cart.length + (cart.length === 1 ? ' dataset' : ' datasets') + (c.company.value.trim() ? ' (' + c.company.value.trim() + ')' : '');
+    window.location.href = 'mailto:hello@abundancephysical.com?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(L.join('\n'));
+  });
+
+  updateCounts();
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   window.addEventListener('resize', paint);
