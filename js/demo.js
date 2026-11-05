@@ -432,7 +432,7 @@
       plus.addEventListener('click', function () { it.qty = Math.min(99, q + 1); saveCart(); updateCounts(); renderCart(); focusQty(it.id, 1); });
       step.appendChild(minus); step.appendChild(num); step.appendChild(plus);
       step.dataset.id = it.id;
-      acts.insertBefore(step, acts.firstChild);
+      acts.appendChild(step);
       card.appendChild(acts);
       list.appendChild(card);
     });

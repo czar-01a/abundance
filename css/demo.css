@@ -132,10 +132,10 @@ textarea.other-input { resize: vertical; line-height: 1.5; min-height: 104px; }
 .citem-actions { display: flex; gap: 4px; margin: 2px -8px -6px; }
 .citem-actions button { border: 0; background: none; font: inherit; font-size: 13px; font-weight: 500; color: var(--blue-text); padding: 6px 8px; border-radius: 8px; cursor: pointer; }
 .citem-actions button:hover { background: var(--blue-soft); }
-.citem-actions .rm { color: var(--muted); margin-left: auto; }
+.citem-actions .rm { color: var(--muted); }
 .citem-actions .rm:hover { background: var(--tint-2); color: var(--error); }
 .citem-actions { align-items: center; }
-.qty { display: inline-flex; align-items: center; height: 36px; margin: 0 8px 0 8px; border: 1.5px solid var(--blue-light); border-radius: 999px; background: #ffffff; }
+.qty { display: inline-flex; align-items: center; height: 36px; margin: 0 0 0 auto; border: 1.5px solid var(--blue-light); border-radius: 999px; background: #ffffff; }
 .qty .qty-btn { width: 36px; height: 33px; padding: 0; border-radius: 999px; color: var(--ink-2); display: inline-flex; align-items: center; justify-content: center; }
 .qty .qty-btn:hover:not(:disabled) { background: var(--blue-soft); color: var(--blue-text); }
 .qty .qty-btn:disabled { color: var(--line-3); cursor: default; background: none; }
