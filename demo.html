@@ -207,21 +207,6 @@
           </div>
           <input class="other-input" type="text" id="task-other" maxlength="80" placeholder="Name your task" aria-label="Name your task" hidden>
         </fieldset>
-        <div class="ctl">
-          <label class="ctl-label" for="task-desc"><span>Description <span class="optional">(optional)</span></span></label>
-          <textarea class="other-input" id="task-desc" rows="4" maxlength="800" placeholder="What should the robot do, where, and with what objects? e.g. Fold T-shirts and towels from a laundry basket and stack them. Fabrics vary in size and thickness."></textarea>
-        </div>
-        <div class="ctl">
-          <span class="ctl-label" id="media-label"><span>Demo <span class="optional">(optional)</span></span></span>
-          <input class="sr-only" type="file" id="media" accept="video/*,image/*" multiple aria-labelledby="media-label">
-          <label class="drop" id="drop" for="media">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"></path></svg>
-            <span><b>Upload a video or photo</b> of the task, or drag it here</span>
-            <span class="drop-hint">MP4, MOV, JPG, or PNG &middot; up to 5 files</span>
-          </label>
-          <div class="media-list" id="media-list"></div>
-          <div class="ctl-hint" id="media-note" hidden>Files stay on your device in this demo. Attach them when you email the spec.</div>
-        </div>
         <fieldset class="ctl">
           <legend class="ctl-label">Embodiment</legend>
           <div class="chips">
@@ -266,6 +251,21 @@
           </div>
           <input class="other-input" type="text" id="note-other" maxlength="80" placeholder="Describe other labels" aria-label="Describe other labels" hidden>
         </fieldset>
+        <div class="ctl">
+          <label class="ctl-label" for="task-desc"><span>Description <span class="optional">(optional)</span></span></label>
+          <textarea class="other-input" id="task-desc" rows="4" maxlength="800" placeholder="What should the robot do, where, and with what objects? e.g. Fold T-shirts and towels from a laundry basket and stack them. Fabrics vary in size and thickness."></textarea>
+        </div>
+        <div class="ctl">
+          <span class="ctl-label" id="media-label"><span>Demo <span class="optional">(optional)</span></span></span>
+          <input class="sr-only" type="file" id="media" accept="video/*,image/*" multiple aria-labelledby="media-label">
+          <label class="drop" id="drop" for="media">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"></path></svg>
+            <span><b>Upload a video or photo</b> of the task, or drag it here</span>
+            <span class="drop-hint">MP4, MOV, JPG, or PNG &middot; up to 5 files</span>
+          </label>
+          <div class="media-list" id="media-list"></div>
+          <div class="ctl-hint" id="media-note" hidden>Files stay on your device in this demo. Attach them when you email the spec.</div>
+        </div>
         <div class="ctl">
           <label class="ctl-label" for="hours">Volume <output id="hours-out" for="hours">200 hrs</output></label>
           <input class="range" type="range" id="hours" min="10" max="2000" step="10" value="200">
