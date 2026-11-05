@@ -52,10 +52,14 @@
     });
   }
   function chipLabel(name, v) {
+    if (!v) return 'Not selected';
     if (v === 'other') return otherText(name) || 'Other';
     return form.querySelector('input[name="' + name + '"][value="' + v + '"]').parentNode.textContent.trim();
   }
+  var GENERIC = { name: 'your_dataset', label: 'Your dataset', sec: 60, say: 'Your task, described in plain language.',
+    steps: [['Set up', 4], ['Reach', 3], ['Grasp', 4], ['Manipulate', 12], ['Place', 4], ['Reset', 3]] };
   function taskInfo(s) {
+    if (!s.task) return GENERIC;
     var t = TASKS[s.task];
     if (s.task !== 'other') return t;
     var txt = otherText('task');
@@ -73,7 +77,7 @@
     var t = taskInfo(s);
     var episodes = Math.round(s.hours * 3600 / t.sec);
     var people = Math.max(Math.ceil(s.envs * 1.2), Math.ceil(s.hours / 40));
-    var hardware = s.body !== 'human';
+    var hardware = !!s.body && s.body !== 'human';
     var firstDays = 7 + (hardware ? 7 : 0) + (s.mods.indexOf('tactile') > -1 ? 4 : 0);
     var weeks = 2 + Math.ceil(s.hours / (people * 10)) + Math.ceil(s.hours / 500) + (hardware ? 1 : 0);
     var gb = s.mods.reduce(function (sum, m) { return sum + MODS[m].gb; }, 0) * s.hours;
@@ -193,7 +197,7 @@
     return L.join('\n');
   }
   function code(s) {
-    var n = TASKS[s.task].name + '_v1';
+    var n = taskInfo(s).name + '_v1';
     if (s.format === 'lerobot') return '<span class="c"># pip install lerobot</span>\nfrom lerobot.datasets.lerobot_dataset import LeRobotDataset\n\nds = LeRobotDataset(<span class="s">"abundance/' + n + '"</span>)\nframe = ds[0]\nframe.keys()';
     if (s.format === 'rlds') return '<span class="c"># pip install tensorflow-datasets</span>\nimport tensorflow_datasets as tfds\n\nds = tfds.builder_from_directory(\n    <span class="s">"' + n + '/1.0.0"</span>\n).as_dataset(split=<span class="s">"train"</span>)\nfor ep in ds.take(1):\n    steps = ep[<span class="s">"steps"</span>]';
     return '<span class="c"># pip install mcap</span>\nfrom mcap.reader import make_reader\n\nf = open(<span class="s">"episodes/ep_0001.mcap"</span>, <span class="s">"rb"</span>)\nfor _, ch, msg in make_reader(f).iter_messages():\n    print(ch.topic, msg.log_time)';
@@ -262,7 +266,7 @@
     $('st-people').textContent = fmt(e.people);
     $('st-first').textContent = e.firstDays + ' days';
     $('st-weeks').textContent = e.weeks + ' weeks';
-    $('size').textContent = size(e.gb) + ' raw';
+    $('size').textContent = s.mods.length ? size(e.gb) + ' raw' : 'Pick a modality';
     $('ep-title').textContent = ti.label + ' \u00B7 episode 0001';
     $('tree').innerHTML = tree(s, e);
     $('code').innerHTML = code(s);
@@ -285,6 +289,13 @@
     $('send-spec').href = 'mailto:hello@abundancephysical.com?subject=' + encodeURIComponent('Dataset request: ' + ti.label) + '&body=' + encodeURIComponent(lines.join('\n'));
   }
 
+  // Task and Embodiment: pick one at a time, click again to unselect
+  form.addEventListener('change', function (e) {
+    var t = e.target;
+    if ((t.name === 'task' || t.name === 'body') && t.checked) {
+      form.querySelectorAll('input[name="' + t.name + '"]').forEach(function (o) { if (o !== t) o.checked = false; });
+    }
+  }, true);
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   window.addEventListener('resize', paint);
