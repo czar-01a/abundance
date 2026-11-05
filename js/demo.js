@@ -275,6 +275,7 @@
       lastTask = key; lastMods = s.mods.join(); lastNotes = s.notes.join();
       buildEpisode(s);
     }
+    if (typeof cart !== 'undefined' && cart) syncQty(false);
   }
 
   // Task and Embodiment: pick one at a time, click again to unselect
@@ -338,7 +339,6 @@
   $('fq-plus').addEventListener('click', function () { setFormQty(formQty + 1); if ($('fq-plus').disabled) $('fq-minus').focus(); });
   function setEditing(id) {
     editingId = id;
-    $('add-cart').textContent = id ? 'Update cart' : 'Add to cart';
     $('cancel-edit').hidden = !id;
   }
   function sig(it) {
@@ -362,6 +362,18 @@
     var top = form.getBoundingClientRect().top + window.pageYOffset - 100;
     window.scrollTo({ top: Math.max(0, top), behavior: reduce ? 'auto' : 'smooth' });
   }
+  // Keep the Quantity stepper in step with the cart: if this exact dataset is already in the cart,
+  // the stepper shows its quantity and the button updates it.
+  var specKey = null;
+  function findSame(it) { var k = sig(it); return cart.find(function (c) { return sig(c) === k; }); }
+  function syncQty(force) {
+    var it = snapshot(), k = sig(it), same = findSame(it);
+    if (force || k !== specKey) {
+      specKey = k;
+      if (!editingId) setFormQty(same ? qtyOf(same) : 1);
+    }
+    $('add-cart').textContent = editingId || same ? 'Update cart' : 'Add to cart';
+  }
   $('add-cart').addEventListener('click', function () {
     var item = snapshot();
     if (editingId) {
@@ -371,24 +383,23 @@
       if (!files.length && !memFiles[editingId] && idx > -1) item.fileNames = cart[idx].fileNames;
       if (idx > -1) cart[idx] = item; else cart.push(item);
       memFiles[item.id] = files.slice();
-      setEditing(null); setFormQty(1);
-      saveCart(); updateCounts(); renderCart();
+      setEditing(null);
+      saveCart(); updateCounts(); renderCart(); syncQty(true);
       showToast(item.title + ' updated in your cart.');
+      return;
+    }
+    var same = findSame(item);
+    if (same) {
+      var before = qtyOf(same);
+      same.qty = formQty;
+      saveCart(); updateCounts(); renderCart(); syncQty(true);
+      showToast(before === formQty ? same.title + ' is already in your cart (quantity ' + formQty + ').' : same.title + ' quantity updated to ' + formQty + '.');
     } else {
-      var same = cart.find(function (c) { return sig(c) === sig(item); });
-      if (same) {
-        same.qty = Math.min(99, qtyOf(same) + formQty);
-        setFormQty(1);
-        saveCart(); updateCounts(); renderCart();
-        showToast(same.title + ' is already in your cart. Quantity is now ' + same.qty + '.');
-      } else {
-        item.id = uid(); item.qty = formQty;
-        setFormQty(1);
-        memFiles[item.id] = files.slice();
-        cart.push(item);
-        saveCart(); updateCounts(); renderCart();
-        showToast((item.qty > 1 ? item.qty + ' \u00D7 ' : '') + item.title + ' added to your cart.');
-      }
+      item.id = uid(); item.qty = formQty;
+      memFiles[item.id] = files.slice();
+      cart.push(item);
+      saveCart(); updateCounts(); renderCart(); syncQty(true);
+      showToast((item.qty > 1 ? item.qty + ' \u00D7 ' : '') + item.title + ' added to your cart.');
     }
   });
   $('cancel-edit').addEventListener('click', function () { setEditing(null); blank(); render(); renderCart(); });
@@ -436,7 +447,7 @@
       }], ['Remove', function () {
         cart.splice(i, 1); delete memFiles[it.id];
         if (editingId === it.id) setEditing(null);
-        saveCart(); updateCounts(); renderCart();
+        saveCart(); updateCounts(); renderCart(); syncQty(true);
       }]].forEach(function (a, k) {
         var b = el('button', a[0] === 'Remove' ? 'rm' : null, a[0]); b.type = 'button';
         b.setAttribute('aria-label', a[0] + ' ' + it.title); b.addEventListener('click', a[1]); acts.appendChild(b);
@@ -448,8 +459,8 @@
       var num = el('span', 'qty-n', String(q)); num.setAttribute('aria-live', 'polite');
       var plus = el('button', 'qty-btn'); plus.type = 'button'; plus.setAttribute('aria-label', 'Increase quantity'); plus.disabled = q >= 99;
       plus.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>';
-      minus.addEventListener('click', function () { it.qty = Math.max(1, q - 1); saveCart(); updateCounts(); renderCart(); focusQty(it.id, 0); });
-      plus.addEventListener('click', function () { it.qty = Math.min(99, q + 1); saveCart(); updateCounts(); renderCart(); focusQty(it.id, 1); });
+      minus.addEventListener('click', function () { it.qty = Math.max(1, q - 1); saveCart(); updateCounts(); renderCart(); syncQty(true); focusQty(it.id, 0); });
+      plus.addEventListener('click', function () { it.qty = Math.min(99, q + 1); saveCart(); updateCounts(); renderCart(); syncQty(true); focusQty(it.id, 1); });
       step.appendChild(minus); step.appendChild(num); step.appendChild(plus);
       step.dataset.id = it.id;
       acts.appendChild(step);
