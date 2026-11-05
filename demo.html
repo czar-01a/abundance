@@ -192,6 +192,10 @@
   <section class="builder section" aria-label="Dataset builder">
     <div class="wrap">
       <form class="controls" id="builder-form" onsubmit="return false">
+        <div class="ctl">
+          <label class="ctl-label" for="ds-name"><span>Dataset name <span class="optional">(optional)</span></span></label>
+          <input class="other-input" type="text" id="ds-name" maxlength="80" placeholder="e.g. Laundry folding v1" autocomplete="off">
+        </div>
         <fieldset class="ctl">
           <!-- Hidden options (hidden attribute) are kept for later; remove "hidden" to show them again. -->
           <legend class="ctl-label">Task</legend>

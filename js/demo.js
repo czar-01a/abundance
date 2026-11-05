@@ -295,8 +295,10 @@
       task: s.task, body: s.body, mods: s.mods, notes: s.notes, format: s.format, hours: s.hours, envs: s.envs,
       other: { task: otherText('task'), body: otherText('body'), mod: otherText('mod'), note: otherText('note') },
       desc: $('task-desc').value.trim(),
+      name: $('ds-name').value.trim(),
+      taskLabel: s.task ? ti.label : 'No task selected',
       fileNames: files.map(function (f) { return f.file.name; }),
-      title: s.task ? ti.label : 'Untitled dataset',
+      title: $('ds-name').value.trim() || (s.task ? ti.label : 'Untitled dataset'),
       bodyLabel: chipLabel('body', s.body),
       modLabels: s.mods.map(function (m) { return chipLabel('mod', m); }),
       noteLabels: s.notes.map(function (v) { return chipLabel('note', v); }),
@@ -316,6 +318,7 @@
     });
     ['task', 'body', 'mod', 'note'].forEach(function (n) { $(n + '-other').value = (it.other && it.other[n]) || ''; });
     $('task-desc').value = it.desc || '';
+    $('ds-name').value = it.name || '';
     $('hours').value = it.hours; $('envs').value = it.envs;
     var f = form.querySelector('input[name="format"][value="' + it.format + '"]'); if (f) f.checked = true;
   }
@@ -393,6 +396,7 @@
       top.appendChild(el('div', 'citem-title', it.title));
       top.appendChild(el('div', 'citem-num', String(i + 1).padStart(2, '0')));
       card.appendChild(top);
+      if (it.name && it.taskLabel) card.appendChild(el('div', 'citem-meta', it.taskLabel));
       card.appendChild(el('div', 'citem-meta', [it.bodyLabel, it.modLabels.join(', ') || 'No modalities', it.noteLabels.join(', ') || 'No annotations'].join(' \u00B7 ')));
       card.appendChild(el('div', 'citem-meta', fmt(it.hours) + ' hrs \u00B7 ' + it.envs + ' locations \u00B7 ' + it.formatLabel + (it.fileNames.length ? ' \u00B7 ' + it.fileNames.length + (it.fileNames.length === 1 ? ' file' : ' files') : '')));
       if (it.desc) card.appendChild(el('div', 'citem-desc', it.desc));
@@ -439,6 +443,7 @@
     var L = ['Hi Abundance team,', '', 'I would like to request ' + cart.length + (cart.length === 1 ? ' dataset:' : ' datasets:'), ''];
     cart.forEach(function (it, i) {
       L.push((i + 1) + '. ' + it.title,
+        '   - Task: ' + (it.taskLabel || it.title),
         '   - Embodiment: ' + it.bodyLabel,
         '   - Modalities: ' + (it.modLabels.join(', ') || 'None'),
         '   - Annotations: ' + (it.noteLabels.join(', ') || 'None'),
