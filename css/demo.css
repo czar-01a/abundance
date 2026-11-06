@@ -117,7 +117,7 @@ textarea.other-input { resize: vertical; line-height: 1.5; min-height: 104px; }
 .cart-x:hover { background: var(--tint-2); }
 .cart-body { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 20px 24px; display: flex; flex-direction: column; gap: 24px; }
 .cart-empty { color: var(--muted); font-size: 15px; line-height: 1.6; }
-.cart-empty[hidden], .cart-totals[hidden], .cart-contact[hidden], .cart-foot[hidden], .cart-err[hidden] { display: none; }
+.cart-empty[hidden], .cart-totals[hidden], .cart-foot[hidden] { display: none; }
 .cart-items { display: flex; flex-direction: column; gap: 12px; }
 .citem { border: 1px solid var(--line-2); border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
 .citem.editing { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
@@ -142,12 +142,6 @@ textarea.other-input { resize: vertical; line-height: 1.5; min-height: 104px; }
 .totals-grid div { display: flex; flex-direction: column; gap: 2px; }
 .totals-grid .v { font-size: 20px; font-weight: 500; letter-spacing: -0.02em; }
 .totals-grid .k { font-size: 12px; color: var(--muted); }
-.cart-contact { display: flex; flex-direction: column; gap: 12px; }
-.cfield { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; }
-.cfield input, .cfield select { min-height: 44px; padding: 10px 14px; border: 1px solid var(--line-3); border-radius: 12px; font: inherit; font-size: 15px; font-weight: 400; color: var(--ink); background: #ffffff; }
-.cfield input:focus, .cfield select:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
-.cfield input[aria-invalid="true"] { border-color: var(--error); }
-.cart-err { font-size: 13px; color: var(--error); }
 .cart-foot { padding: 16px 24px 20px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
 .cart-foot .disclaimer { text-align: center; }
 .cta-row [hidden] { display: none; }

@@ -497,7 +497,7 @@
       list.appendChild(card);
     });
     var has = cart.length > 0;
-    $('cart-empty').hidden = has; $('cart-totals').hidden = !has; $('cart-contact').hidden = !has; $('cart-foot').hidden = !has;
+    $('cart-empty').hidden = has; $('cart-totals').hidden = !has; $('cart-foot').hidden = !has;
     if (has) {
       var h = 0, ep = 0, gb = 0, wk = 0;
       cart.forEach(function (it) { var q = qtyOf(it); h += it.hours * q; ep += it.est.episodes * q; gb += it.est.gb * q; wk = Math.max(wk, it.est.weeks); });
@@ -508,16 +508,7 @@
     }
   }
 
-  var contact = $('cart-contact');
-  try { var saved = JSON.parse(localStorage.getItem(KEY + '-contact') || '{}'); ['name', 'email', 'company', 'timeline'].forEach(function (k) { if (typeof saved[k] === 'string') contact.elements[k].value = saved[k].slice(0, 200); }); } catch (err) {}
-  contact.addEventListener('input', function () {
-    var o = {}; ['name', 'email', 'company', 'timeline'].forEach(function (k) { o[k] = contact.elements[k].value; });
-    try { localStorage.setItem(KEY + '-contact', JSON.stringify(o)); } catch (err) {}
-    contact.elements.email.removeAttribute('aria-invalid'); $('cart-err').hidden = true;
-  });
   $('send-request').addEventListener('click', function () {
-    var c = contact.elements, email = c.email.value.trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { c.email.setAttribute('aria-invalid', 'true'); $('cart-err').hidden = false; c.email.focus(); return; }
     var tq = cartQty();
     var L = ['Hi Abundance team,', '', 'I would like to request ' + tq + (tq === 1 ? ' dataset:' : ' datasets:'), ''];
     cart.forEach(function (it, i) {
@@ -532,8 +523,7 @@
         '   - Volume: ' + fmt(it.hours) + ' hours across ' + it.envs + ' locations',
         '   - Format: ' + it.formatLabel, '');
     });
-    L.push('Name: ' + (c.name.value.trim() || '-'), 'Email: ' + email, 'Company: ' + (c.company.value.trim() || '-'), 'Timeline: ' + c.timeline.value);
-    var subj = 'Dataset request: ' + tq + (tq === 1 ? ' dataset' : ' datasets') + (c.company.value.trim() ? ' (' + c.company.value.trim() + ')' : '');
+    var subj = 'Dataset request: ' + tq + (tq === 1 ? ' dataset' : ' datasets');
     window.location.href = 'mailto:hello@abundancephysical.com?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(L.join('\n'));
   });
 
