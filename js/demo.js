@@ -47,7 +47,7 @@
 
   function otherText(name) { var v = $(name + '-other').value.trim(); return v; }
   function syncOthers() {
-    ['task', 'body', 'mod', 'note'].forEach(function (name) {
+    ['task', 'body', 'mod', 'equip', 'note'].forEach(function (name) {
       var on = !!form.querySelector('input[name="' + name + '"][value="other"]:checked'), box = $(name + '-other');
       if (box.hidden === on) { box.hidden = !on; if (on && document.activeElement && document.activeElement.value === 'other') box.focus(); }
     });
@@ -70,7 +70,7 @@
 
   function readState() {
     return {
-      task: val('task'), body: val('body'), mods: vals('mod'), notes: vals('note'), format: val('format'),
+      task: val('task'), body: val('body'), mods: vals('mod'), equip: vals('equip'), notes: vals('note'), format: val('format'),
       hours: +$('hours').value, envs: +$('envs').value
     };
   }
@@ -298,13 +298,13 @@
     var est = it.est && typeof it.est === 'object' ? it.est : {};
     return {
       id: it.id.slice(0, 40), qty: num(it.qty, 1, 99, 1),
-      task: str(it.task), body: str(it.body), mods: arr(it.mods), notes: arr(it.notes),
+      task: str(it.task), body: str(it.body), mods: arr(it.mods), equip: arr(it.equip), notes: arr(it.notes),
       format: ['lerobot', 'rlds', 'mcap'].indexOf(it.format) > -1 ? it.format : 'lerobot',
       hours: num(it.hours, 10, 2000, 200), envs: num(it.envs, 5, 200, 25),
-      other: it.other && typeof it.other === 'object' ? { task: str(it.other.task), body: str(it.other.body), mod: str(it.other.mod), note: str(it.other.note) } : {},
+      other: it.other && typeof it.other === 'object' ? { task: str(it.other.task), body: str(it.other.body), mod: str(it.other.mod), equip: str(it.other.equip), note: str(it.other.note) } : {},
       desc: str(it.desc), name: str(it.name), taskLabel: str(it.taskLabel), fileNames: arr(it.fileNames),
       title: str(it.title) || 'Untitled dataset', bodyLabel: str(it.bodyLabel) || 'Not selected',
-      modLabels: arr(it.modLabels), noteLabels: arr(it.noteLabels), formatLabel: str(it.formatLabel) || 'LeRobot',
+      modLabels: arr(it.modLabels), equipLabels: arr(it.equipLabels), noteLabels: arr(it.noteLabels), formatLabel: str(it.formatLabel) || 'LeRobot',
       est: { episodes: num(est.episodes, 0, 1e9, 0), gb: num(est.gb, 0, 1e9, 0), weeks: num(est.weeks, 0, 1000, 0) }
     };
   }
@@ -315,8 +315,8 @@
   function snapshot() {
     var s = readState(), e = estimates(s), ti = taskInfo(s);
     return {
-      task: s.task, body: s.body, mods: s.mods, notes: s.notes, format: s.format, hours: s.hours, envs: s.envs,
-      other: { task: otherText('task'), body: otherText('body'), mod: otherText('mod'), note: otherText('note') },
+      task: s.task, body: s.body, mods: s.mods, equip: s.equip, notes: s.notes, format: s.format, hours: s.hours, envs: s.envs,
+      other: { task: otherText('task'), body: otherText('body'), mod: otherText('mod'), equip: otherText('equip'), note: otherText('note') },
       desc: $('task-desc').value.trim(),
       name: $('ds-name').value.trim(),
       taskLabel: s.task ? ti.label : 'No task selected',
@@ -324,6 +324,7 @@
       title: $('ds-name').value.trim() || (s.task ? ti.label : 'Untitled dataset'),
       bodyLabel: chipLabel('body', s.body),
       modLabels: s.mods.map(function (m) { return chipLabel('mod', m); }),
+      equipLabels: s.equip.map(function (v) { return chipLabel('equip', v); }),
       noteLabels: s.notes.map(function (v) { return chipLabel('note', v); }),
       formatLabel: form.querySelector('input[name="format"]:checked').parentNode.textContent.trim(),
       est: { episodes: e.episodes, gb: s.mods.length ? e.gb : 0, weeks: e.weeks }
@@ -335,18 +336,18 @@
     renderMedia();
   }
   function restore(it) {
-    form.querySelectorAll('input[name="task"], input[name="body"], input[name="mod"], input[name="note"]').forEach(function (i) {
+    form.querySelectorAll('input[name="task"], input[name="body"], input[name="mod"], input[name="equip"], input[name="note"]').forEach(function (i) {
       var v = i.value, n = i.name;
-      i.checked = n === 'task' ? it.task === v : n === 'body' ? it.body === v : n === 'mod' ? it.mods.indexOf(v) > -1 : it.notes.indexOf(v) > -1;
+      i.checked = n === 'task' ? it.task === v : n === 'body' ? it.body === v : n === 'mod' ? it.mods.indexOf(v) > -1 : n === 'equip' ? (it.equip || []).indexOf(v) > -1 : it.notes.indexOf(v) > -1;
     });
-    ['task', 'body', 'mod', 'note'].forEach(function (n) { $(n + '-other').value = (it.other && it.other[n]) || ''; });
+    ['task', 'body', 'mod', 'equip', 'note'].forEach(function (n) { $(n + '-other').value = (it.other && it.other[n]) || ''; });
     $('task-desc').value = it.desc || '';
     $('ds-name').value = it.name || '';
     $('hours').value = it.hours; $('envs').value = it.envs;
     form.querySelectorAll('input[name="format"]').forEach(function (f) { f.checked = f.value === it.format; });
   }
   function blank() {
-    restore({ task: '', body: '', mods: [], notes: [], format: 'lerobot', hours: 200, envs: 25, desc: '', other: {} });
+    restore({ task: '', body: '', mods: [], equip: [], notes: [], format: 'lerobot', hours: 200, envs: 25, desc: '', other: {} });
     setFiles([]);
     setFormQty(1);
   }
@@ -371,7 +372,7 @@
     $('cancel-edit').hidden = !id;
   }
   function sig(it) {
-    return JSON.stringify([it.name || '', it.task, it.body, it.mods.slice().sort(), it.notes.slice().sort(), it.other || {}, it.desc || '', it.hours, it.envs, it.format, (it.fileNames || []).slice().sort()]);
+    return JSON.stringify([it.name || '', it.task, it.body, it.mods.slice().sort(), (it.equip || []).slice().sort(), it.notes.slice().sort(), it.other || {}, it.desc || '', it.hours, it.envs, it.format, (it.fileNames || []).slice().sort()]);
   }
   function qtyOf(it) { return Math.max(1, Math.min(99, it.qty || 1)); }
   function cartQty() { return cart.reduce(function (a, it) { return a + qtyOf(it); }, 0); }
@@ -467,6 +468,7 @@
       card.appendChild(top);
       if (it.name && it.taskLabel) card.appendChild(el('div', 'citem-meta', it.taskLabel));
       card.appendChild(el('div', 'citem-meta', [it.bodyLabel, it.modLabels.join(', ') || 'No modalities', it.noteLabels.join(', ') || 'No annotations'].join(' \u00B7 ')));
+      if (it.equipLabels.length) card.appendChild(el('div', 'citem-meta', 'Equipment: ' + it.equipLabels.join(', ')));
       card.appendChild(el('div', 'citem-meta', fmt(it.hours) + ' hrs \u00B7 ' + it.envs + ' locations \u00B7 ' + it.formatLabel + (it.fileNames.length ? ' \u00B7 ' + it.fileNames.length + (it.fileNames.length === 1 ? ' file' : ' files') : '')));
       if (it.desc) card.appendChild(el('div', 'citem-desc', it.desc));
       var acts = el('div', 'citem-actions');
@@ -517,6 +519,7 @@
         '   - Task: ' + (it.taskLabel || it.title),
         '   - Embodiment: ' + it.bodyLabel,
         '   - Modalities: ' + (it.modLabels.join(', ') || 'None'),
+        '   - Equipment: ' + (it.equipLabels.join(', ') || 'None'),
         '   - Annotations: ' + (it.noteLabels.join(', ') || 'None'),
         '   - Description: ' + (it.desc || 'Not provided'),
         '   - Reference media: ' + (it.fileNames.length ? it.fileNames.join(', ') + ' (attached)' : 'None'),

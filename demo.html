@@ -243,6 +243,22 @@
           <input class="other-input" type="text" id="mod-other" maxlength="80" placeholder="Describe other sensors" aria-label="Describe other sensors" hidden>
         </fieldset>
         <fieldset class="ctl">
+          <legend class="ctl-label">Equipment</legend>
+          <div class="chips">
+          <label class="chip"><input type="checkbox" name="equip" value="headcam"><span>Head-mounted camera</span></label>
+          <label class="chip"><input type="checkbox" name="equip" value="glasses"><span>Smart glasses</span></label>
+          <label class="chip"><input type="checkbox" name="equip" value="wristcam"><span>Wrist camera</span></label>
+          <label class="chip"><input type="checkbox" name="equip" value="depthcam"><span>Depth camera</span></label>
+          <label class="chip"><input type="checkbox" name="equip" value="gloves"><span>Data gloves</span></label>
+          <label class="chip"><input type="checkbox" name="equip" value="mocap"><span>Motion capture suit</span></label>
+          <label class="chip"><input type="checkbox" name="equip" value="vr"><span>VR (Virtual Reality) teleoperation rig</span></label>
+          <label class="chip"><input type="checkbox" name="equip" value="leader"><span>Leader arms</span></label>
+          <label class="chip"><input type="checkbox" name="equip" value="lidar"><span>LiDAR scanner</span></label>
+          <label class="chip"><input type="checkbox" name="equip" value="other"><span>Other</span></label>
+          </div>
+          <input class="other-input" type="text" id="equip-other" maxlength="80" placeholder="Describe your equipment" aria-label="Describe your equipment" hidden>
+        </fieldset>
+        <fieldset class="ctl">
           <legend class="ctl-label">Annotations</legend>
           <div class="chips">
           <label class="chip" hidden><input type="checkbox" name="note" value="language"><span>Language instructions</span></label>
