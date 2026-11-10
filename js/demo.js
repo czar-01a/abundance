@@ -535,5 +535,6 @@
   form.addEventListener('change', render);
   window.addEventListener('resize', paint);
   render();
+  if ($('lanes').closest('[hidden]')) playing = false; // sample episode is hidden: don't animate it in the background
   setPlaying(playing);
 })();
