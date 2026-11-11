@@ -256,9 +256,51 @@
 
   /* ---------- render ---------- */
   var lastTask = null, lastMods = '', lastNotes = '';
+  /* ---------- selection summary (right column) ---------- */
+  var ICONS = {
+    task: '<path d="M12 3v4"></path><path d="M12 17v4"></path><path d="M3 12h4"></path><path d="M17 12h4"></path><circle cx="12" cy="12" r="5"></circle><circle cx="12" cy="12" r="1.5"></circle>',
+    body: '<path d="M5 21h8"></path><path d="M9 21v-6l4-6"></path><circle cx="13" cy="8" r="2"></circle><path d="M15 7l4-2"></path><path d="M19 5l1 3"></path><path d="M19 5l-1-2"></path>',
+    mod: '<path d="M12 3l9 5-9 5-9-5 9-5z"></path><path d="M3 13l9 5 9-5"></path>',
+    equip: '<rect x="3" y="7" width="13" height="11" rx="2"></rect><path d="M16 11l5-3v9l-5-3"></path><path d="M7 7l1.5-3h4L14 7"></path>',
+    note: '<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9-9-9z"></path><circle cx="8" cy="8" r="1.5"></circle>'
+  };
+  function renderSummary(s) {
+    var rows = [
+      ['task', 'Task', s.task ? [chipLabel('task', s.task)] : []],
+      ['body', 'Embodiment', s.body ? [chipLabel('body', s.body)] : []],
+      ['mod', 'Modalities', s.mods.map(function (v) { return chipLabel('mod', v); })],
+      ['equip', 'Equipment', s.equip.map(function (v) { return chipLabel('equip', v); })],
+      ['note', 'Annotations', s.notes.map(function (v) { return chipLabel('note', v); })]
+    ];
+    var box = $('spec-rows'), picked = 0;
+    box.textContent = '';
+    rows.forEach(function (r) {
+      if (r[2].length) picked++;
+      var row = el('div', 'spec-row' + (r[2].length ? ' on' : ''));
+      var ic = el('div', 'spec-ic');
+      ic.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[r[0]] + '</svg>';
+      row.appendChild(ic);
+      row.appendChild(el('div', 'spec-k', r[1]));
+      var v = el('div', 'spec-v');
+      if (r[2].length) r[2].forEach(function (t) { var pill = el('span', 'spec-pill', t); pill.title = t; v.appendChild(pill); });
+      else v.appendChild(el('span', 'spec-none', 'Not selected'));
+      row.appendChild(v);
+      box.appendChild(row);
+    });
+    $('spec-title').textContent = $('ds-name').value.trim() || 'Your dataset';
+    $('spec-count').textContent = picked + ' of 5 picked';
+    var foot = $('spec-foot'); foot.textContent = '';
+    [[fmt(s.hours) + ' hrs', 'Volume'], [fmt(s.envs), 'Locations'],
+     [form.querySelector('input[name="format"]:checked').parentNode.textContent.trim(), 'Format'],
+     [files.length ? files.length + (files.length === 1 ? ' file' : ' files') : 'None', 'Demo']].forEach(function (f) {
+      var d = el('div'); d.appendChild(el('span', 'v', f[0])); d.appendChild(el('span', 'k', f[1])); foot.appendChild(d);
+    });
+  }
+
   function render() {
     syncOthers();
     var s = readState(), e = estimates(s), ti = taskInfo(s);
+    renderSummary(s);
     ['hours', 'envs'].forEach(function (id) {
       var r = $(id); r.style.setProperty('--fill', ((r.value - r.min) / (r.max - r.min) * 100) + '%');
     });
