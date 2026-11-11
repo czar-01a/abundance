@@ -68,19 +68,10 @@
     return { name: t.name, label: txt || t.label, sec: t.sec, steps: t.steps, say: txt ? txt.replace(/\.?$/, '.') : t.say };
   }
 
-  // Sliders step through industry-scale stops (1-2-5 steps) instead of a straight line:
-  // hours go from a 10-hour pilot to a 100,000-hour pretraining corpus; locations from 1 site to 10,000 scenes.
-  var HOURS = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000];
-  var ENVS = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000];
-  function stopIndex(list, v) {
-    var best = 0;
-    list.forEach(function (x, i) { if (Math.abs(Math.log(x) - Math.log(v)) < Math.abs(Math.log(list[best]) - Math.log(v))) best = i; });
-    return best;
-  }
   function readState() {
     return {
       task: val('task'), body: val('body'), mods: vals('mod'), equip: vals('equip'), notes: vals('note'), format: val('format'),
-      hours: HOURS[+$('hours').value] || 200, envs: ENVS[+$('envs').value] || 20
+      hours: +$('hours').value, envs: +$('envs').value
     };
   }
 
@@ -332,9 +323,7 @@
       var r = $(id); r.style.setProperty('--fill', ((r.value - r.min) / (r.max - r.min) * 100) + '%');
     });
     $('hours-out').textContent = fmt(s.hours) + ' hrs';
-    $('envs-out').textContent = fmt(s.envs) + (s.envs === 1 ? ' location' : ' locations');
-    $('hours').setAttribute('aria-valuetext', fmt(s.hours) + ' hours');
-    $('envs').setAttribute('aria-valuetext', $('envs-out').textContent);
+    $('envs-out').textContent = fmt(s.envs) + ' locations';
     $('st-episodes').textContent = fmt(e.episodes);
     $('st-people').textContent = fmt(e.people);
     $('st-first').textContent = e.firstDays + ' days';
@@ -371,7 +360,7 @@
       id: it.id.slice(0, 40), qty: num(it.qty, 1, 99, 1),
       task: str(it.task), body: str(it.body), mods: arr(it.mods), equip: arr(it.equip), notes: arr(it.notes),
       format: ['lerobot', 'rlds', 'mcap'].indexOf(it.format) > -1 ? it.format : 'lerobot',
-      hours: num(it.hours, 10, 100000, 200), envs: num(it.envs, 1, 10000, 20),
+      hours: num(it.hours, 10, 2000, 200), envs: num(it.envs, 5, 200, 25),
       other: it.other && typeof it.other === 'object' ? { task: str(it.other.task), body: str(it.other.body), mod: str(it.other.mod), equip: str(it.other.equip), note: str(it.other.note) } : {},
       desc: str(it.desc), name: str(it.name), taskLabel: str(it.taskLabel), fileNames: arr(it.fileNames),
       title: str(it.title) || 'Untitled dataset', bodyLabel: str(it.bodyLabel) || 'Not selected',
@@ -414,11 +403,11 @@
     ['task', 'body', 'mod', 'equip', 'note'].forEach(function (n) { $(n + '-other').value = (it.other && it.other[n]) || ''; });
     $('task-desc').value = it.desc || '';
     $('ds-name').value = it.name || '';
-    $('hours').value = stopIndex(HOURS, it.hours); $('envs').value = stopIndex(ENVS, it.envs);
+    $('hours').value = it.hours; $('envs').value = it.envs;
     form.querySelectorAll('input[name="format"]').forEach(function (f) { f.checked = f.value === it.format; });
   }
   function blank() {
-    restore({ task: '', body: '', mods: [], equip: [], notes: [], format: 'lerobot', hours: 200, envs: 20, desc: '', other: {} });
+    restore({ task: '', body: '', mods: [], equip: [], notes: [], format: 'lerobot', hours: 200, envs: 25, desc: '', other: {} });
     setFiles([]);
     setFormQty(1);
   }
