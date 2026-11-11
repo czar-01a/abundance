@@ -75,6 +75,7 @@ textarea.other-input { resize: vertical; line-height: 1.5; min-height: 104px; }
 .spec-v { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
 .spec-pill { display: inline-flex; align-items: center; min-height: 28px; padding: 4px 12px; border-radius: 999px; background: var(--blue-soft); color: var(--blue-deep); font-size: 13px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; animation: pillin .18s ease; }
 .spec-none { font-size: 13px; color: var(--faint); }
+.spec-none[hidden] { display: none; }
 @keyframes pillin { from { opacity: 0; transform: scale(.9); } }
 .spec-foot { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line); }
 .spec-foot > div { padding: 14px 24px; display: flex; flex-direction: column; gap: 2px; border-right: 1px solid var(--line); min-width: 0; }

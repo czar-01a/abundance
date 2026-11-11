@@ -273,19 +273,37 @@
       ['note', 'Annotations', s.notes.map(function (v) { return chipLabel('note', v); })]
     ];
     var box = $('spec-rows'), picked = 0;
-    box.textContent = '';
+    // Build the five rows once, then update only the row whose choices changed,
+    // adding or removing just the affected tags so nothing else re-animates.
+    if (!box.children.length) {
+      rows.forEach(function (r) {
+        var row = el('div', 'spec-row'); row.dataset.key = r[0];
+        var ic = el('div', 'spec-ic');
+        ic.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[r[0]] + '</svg>';
+        row.appendChild(ic);
+        row.appendChild(el('div', 'spec-k', r[1]));
+        var v = el('div', 'spec-v'); v.appendChild(el('span', 'spec-none', 'Not selected'));
+        row.appendChild(v);
+        box.appendChild(row);
+      });
+    }
     rows.forEach(function (r) {
       if (r[2].length) picked++;
-      var row = el('div', 'spec-row' + (r[2].length ? ' on' : ''));
-      var ic = el('div', 'spec-ic');
-      ic.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[r[0]] + '</svg>';
-      row.appendChild(ic);
-      row.appendChild(el('div', 'spec-k', r[1]));
-      var v = el('div', 'spec-v');
-      if (r[2].length) r[2].forEach(function (t) { var pill = el('span', 'spec-pill', t); pill.title = t; v.appendChild(pill); });
-      else v.appendChild(el('span', 'spec-none', 'Not selected'));
-      row.appendChild(v);
-      box.appendChild(row);
+      var row = box.querySelector('[data-key="' + r[0] + '"]'), v = row.querySelector('.spec-v');
+      row.classList.toggle('on', r[2].length > 0);
+      var pills = Array.prototype.slice.call(v.querySelectorAll('.spec-pill'));
+      var have = pills.map(function (p) { return p.textContent; });
+      if (have.join('\n') === r[2].join('\n')) return; // unchanged: leave this row alone
+      pills.forEach(function (p) { if (r[2].indexOf(p.textContent) < 0) p.remove(); });
+      var none = v.querySelector('.spec-none');
+      r[2].forEach(function (t, i) {
+        var existing = Array.prototype.find.call(v.querySelectorAll('.spec-pill'), function (p) { return p.textContent === t; });
+        var pill = existing || el('span', 'spec-pill', t);
+        pill.title = t;
+        var at = v.querySelectorAll('.spec-pill')[i];
+        if (at !== pill) v.insertBefore(pill, at || none);
+      });
+      none.hidden = r[2].length > 0;
     });
     $('spec-title').textContent = $('ds-name').value.trim() || 'Your dataset';
     $('spec-count').textContent = picked + ' of 5 picked';
