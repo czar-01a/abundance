@@ -290,11 +290,11 @@
         </div>
         <div class="ctl">
           <label class="ctl-label" for="hours">Volume <output id="hours-out" for="hours">200 hrs</output></label>
-          <input class="range" type="range" id="hours" min="10" max="2000" step="10" value="200">
+          <input class="range" type="range" id="hours" min="0" max="12" step="1" value="4" aria-valuetext="200 hours">
         </div>
         <div class="ctl">
-          <label class="ctl-label" for="envs">Environments <output id="envs-out" for="envs">25 locations</output></label>
-          <input class="range" type="range" id="envs" min="5" max="200" step="5" value="25">
+          <label class="ctl-label" for="envs">Environments <output id="envs-out" for="envs">20 locations</output></label>
+          <input class="range" type="range" id="envs" min="0" max="12" step="1" value="4" aria-valuetext="20 locations">
           <div class="ctl-hint">More real-world locations means better generalization.</div>
         </div>
         <fieldset class="ctl">
