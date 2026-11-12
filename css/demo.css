@@ -63,6 +63,10 @@ textarea.other-input { resize: vertical; line-height: 1.5; min-height: 104px; }
 .range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #ffffff; border: 2px solid var(--blue); cursor: pointer; }
 .range:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--blue); outline-offset: 2px; }
 
+/* While the right column is hidden, the form sits alone in a centered column */
+.builder .wrap:has(> .output[hidden]) { grid-template-columns: minmax(0, 720px); justify-content: center; }
+body:has(.output[hidden]) .demo-hero .wrap { max-width: 720px; }
+.output[hidden] { display: none; }
 .output { position: sticky; top: 112px; display: flex; flex-direction: column; gap: 16px; }
 .dpanel { border: 1px solid var(--line-2); border-radius: 20px; background: #ffffff; }
 .dpanel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px 24px; border-bottom: 1px solid var(--line); }
