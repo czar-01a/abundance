@@ -199,3 +199,10 @@ textarea.other-input { resize: vertical; line-height: 1.5; min-height: 104px; }
   .dpanel-head, .player, .stat, .dtree, .code { padding-left: 18px; padding-right: 18px; }
   .seg { display: grid; width: 100%; }
 }
+
+/* Phones and touch screens: selections change instantly (no fades or pop-ins) */
+@media (hover: none), (max-width: 640px) {
+  .chip span, .seg span, .spec-ic, .qty .qty-btn { transition: none; }
+  .spec-pill { animation: none; }
+  .chip span, .seg span, .qty .qty-btn { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+}
