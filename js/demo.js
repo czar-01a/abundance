@@ -464,7 +464,22 @@
     }
     $('add-cart').textContent = editingId || same ? 'Update cart' : 'Add to cart';
   }
+  // Description is required before anything goes into the cart
+  function descOk() {
+    var box = $('task-desc'), ok = !!box.value.trim();
+    box.setAttribute('aria-invalid', ok ? 'false' : 'true');
+    $('desc-err').hidden = ok;
+    if (!ok) {
+      box.focus({ preventScroll: true });
+      window.scrollTo({ top: Math.max(0, box.getBoundingClientRect().top + window.pageYOffset - 140), behavior: reduce ? 'auto' : 'smooth' });
+    }
+    return ok;
+  }
+  $('task-desc').addEventListener('input', function () {
+    if ($('task-desc').value.trim()) { $('task-desc').setAttribute('aria-invalid', 'false'); $('desc-err').hidden = true; }
+  });
   $('add-cart').addEventListener('click', function () {
+    if (!descOk()) return;
     var item = snapshot();
     if (editingId) {
       var idx = cart.findIndex(function (c) { return c.id === editingId; });

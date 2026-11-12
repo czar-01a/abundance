@@ -24,6 +24,9 @@
 .other-input { width: 100%; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-3); border-radius: 12px; font: inherit; font-size: 15px; color: var(--ink); background: #ffffff; }
 .other-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
 .other-input[hidden] { display: none; }
+.other-input[aria-invalid="true"], .other-input[aria-invalid="true"]:focus { border-color: var(--error); box-shadow: 0 0 0 3px rgba(180, 35, 24, .12); }
+.field-err { font-size: 13px; color: var(--error); margin-top: -4px; }
+.field-err[hidden] { display: none; }
 
 .optional { font-size: 13px; font-weight: 400; color: var(--faint); }
 textarea.other-input { resize: vertical; line-height: 1.5; min-height: 104px; }

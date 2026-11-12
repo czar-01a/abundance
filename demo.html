@@ -193,8 +193,9 @@
     <div class="wrap">
       <form class="controls" id="builder-form">
         <div class="ctl">
-          <label class="ctl-label" for="task-desc"><span>Description <span class="optional">(optional)</span></span></label>
-          <textarea class="other-input" id="task-desc" rows="4" maxlength="800" placeholder="Describe your dataset"></textarea>
+          <label class="ctl-label" for="task-desc"><span>Description</span></label>
+          <textarea class="other-input" id="task-desc" rows="4" maxlength="800" placeholder="Describe your dataset" required aria-required="true" aria-describedby="desc-err"></textarea>
+          <p class="field-err" id="desc-err" hidden>Please describe your dataset before adding it to your cart.</p>
         </div>
         <fieldset class="ctl">
           <!-- Hidden options (hidden attribute) are kept for later; remove "hidden" to show them again. -->
