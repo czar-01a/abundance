@@ -44,9 +44,9 @@
   $('co-weeks').textContent = wk + ' weeks';
 
   var form = $('co-form'), f = form.elements, CKEY = KEY + '-contact';
-  try { var saved = JSON.parse(localStorage.getItem(CKEY) || '{}'); ['name', 'email', 'company', 'timeline', 'notes'].forEach(function (k) { if (typeof saved[k] === 'string') f[k].value = saved[k].slice(0, 1000); }); } catch (e) {}
+  try { var saved = JSON.parse(localStorage.getItem(CKEY) || '{}'); ['name', 'email', 'company', 'notes'].forEach(function (k) { if (typeof saved[k] === 'string') f[k].value = saved[k].slice(0, 1000); }); } catch (e) {}
   form.addEventListener('input', function () {
-    var o = {}; ['name', 'email', 'company', 'timeline', 'notes'].forEach(function (k) { o[k] = f[k].value; });
+    var o = {}; ['name', 'email', 'company', 'notes'].forEach(function (k) { o[k] = f[k].value; });
     try { localStorage.setItem(CKEY, JSON.stringify(o)); } catch (e) {}
     f.email.setAttribute('aria-invalid', 'false'); $('co-err').hidden = true;
   });
@@ -68,7 +68,7 @@
         '   - Volume: ' + fmt(it.hours) + ' hours across ' + it.envs + ' locations',
         '   - Format: ' + it.formatLabel, '');
     });
-    L.push('Name: ' + (f.name.value.trim() || '-'), 'Email: ' + email, 'Company: ' + (f.company.value.trim() || '-'), 'Timeline: ' + f.timeline.value);
+    L.push('Name: ' + (f.name.value.trim() || '-'), 'Email: ' + email, 'Company: ' + (f.company.value.trim() || '-'));
     if (f.notes.value.trim()) L.push('', 'Notes:', f.notes.value.trim());
     var subj = 'Dataset request: ' + tq + (tq === 1 ? ' dataset' : ' datasets') + (f.company.value.trim() ? ' (' + f.company.value.trim() + ')' : '');
     return 'mailto:hello@abundancephysical.com?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(L.join('\n'));

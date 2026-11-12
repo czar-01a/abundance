@@ -203,15 +203,7 @@
         <div class="co-fields">
           <label class="cfield"><span>Name</span><input type="text" name="name" autocomplete="name" maxlength="120"></label>
           <label class="cfield"><span>Work email</span><input type="email" name="email" autocomplete="email" maxlength="200" required aria-required="true" aria-describedby="co-err"></label>
-          <label class="cfield"><span>Company</span><input type="text" name="company" autocomplete="organization" maxlength="120"></label>
-          <label class="cfield"><span>Timeline</span>
-            <select name="timeline">
-              <option>As soon as possible</option>
-              <option>Within 1&ndash;3 months</option>
-              <option>Within 3&ndash;6 months</option>
-              <option>Just exploring</option>
-            </select>
-          </label>
+          <label class="cfield co-wide"><span>Company</span><input type="text" name="company" autocomplete="organization" maxlength="120"></label>
           <label class="cfield co-wide"><span>Notes <span class="optional">(optional)</span></span><textarea name="notes" rows="3" maxlength="1000" placeholder="Budget, deadlines, compliance needs, anything else"></textarea></label>
           <p class="field-err co-wide" id="co-err" hidden>Please enter a valid work email.</p>
         </div>
@@ -228,7 +220,7 @@
           <div><span class="k">Datasets</span><span class="v" id="co-count"></span></div>
           <div><span class="k">Total hours</span><span class="v" id="co-hours"></span></div>
           <div><span class="k">Episodes</span><span class="v" id="co-episodes"></span></div>
-          <div><span class="k">Full delivery</span><span class="v" id="co-weeks"></span></div>
+          <div><span class="k">Estimated delivery</span><span class="v" id="co-weeks"></span></div>
         </div>
         <p class="disclaimer co-note">Estimates are illustrative. We confirm scope, timeline, and pricing with you before collection starts.</p>
       </aside>
