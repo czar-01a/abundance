@@ -1,4 +1,4 @@
-/* Checkout page: reads the cart saved by the demo page, collects contact details, opens a pre-filled email */
+/* Checkout page: reads the cart saved by the demo page, places the order and shows the confirmation page */
 (function () {
   var KEY = 'abundance-cart-v1';
   function $(id) { return document.getElementById(id); }
@@ -64,27 +64,10 @@
     f.email.setAttribute('aria-invalid', 'false'); $('co-err').hidden = true;
   });
 
-  var mailto = '';
-  function build() {
-    var email = f.email.value.trim();
-    var L = ['Hi Abundance team,', '', 'I would like to request ' + tq + (tq === 1 ? ' dataset:' : ' datasets:'), ''];
-    cart.forEach(function (it, i) {
-      L.push((i + 1) + '. ' + it.title + (it.qty > 1 ? ' (x' + it.qty + ')' : ''),
-        '   - Quantity: ' + it.qty,
-        '   - Task: ' + (it.taskLabel || it.title),
-        '   - Embodiment: ' + it.bodyLabel,
-        '   - Modalities: ' + (it.modLabels.join(', ') || 'None'),
-        '   - Equipment: ' + (it.equipLabels.join(', ') || 'None'),
-        '   - Annotations: ' + (it.noteLabels.join(', ') || 'None'),
-        '   - Description: ' + (it.desc || 'Not provided'),
-        '   - Reference media: ' + (it.fileNames.length ? it.fileNames.join(', ') + ' (attached)' : 'None'),
-        '   - Volume: ' + fmt(it.hours) + ' hours across ' + it.envs + ' locations',
-        '   - Format: ' + it.formatLabel, '');
-    });
-    if (!form.hidden) L.push('Name: ' + (f.name.value.trim() || '-'), 'Email: ' + email, 'Company: ' + (f.company.value.trim() || '-'));
-    if (!form.hidden && f.notes.value.trim()) L.push('', 'Notes:', f.notes.value.trim());
-    var subj = 'Dataset request: ' + tq + (tq === 1 ? ' dataset' : ' datasets') + (!form.hidden && f.company.value.trim() ? ' (' + f.company.value.trim() + ')' : '');
-    return 'mailto:hello@abundancephysical.com?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(L.join('\n'));
+  // Checkout places the order: clear the cart and go to the confirmation page
+  function finish() {
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    window.location.href = 'order-placed.html';
   }
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -93,19 +76,8 @@
     }
     finish();
   });
-  function finish() {
-    mailto = build();
-    window.location.href = mailto;
-    form.hidden = true; $('co-summary').hidden = true; $('co-done').hidden = false;
-    var h = $('co-done').querySelector('h2'); h.setAttribute('tabindex', '-1'); h.focus();
-  }
   $('co-checkout').addEventListener('click', function () {
     if (!form.hidden) { if (form.requestSubmit) form.requestSubmit(); else form.dispatchEvent(new Event('submit', { cancelable: true })); return; }
     finish();
-  });
-  $('co-again').addEventListener('click', function () { if (mailto) window.location.href = mailto; });
-  $('co-clear').addEventListener('click', function () {
-    try { localStorage.removeItem(KEY); } catch (e) {}
-    window.location.href = 'demo.html';
   });
 })();

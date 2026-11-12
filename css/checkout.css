@@ -56,3 +56,8 @@ body:has(.co-form[data-off]) .co-summary { position: static; }
   .co-actions { padding: 0 18px 18px; }
   .co-items, .co-totals, .co-note { padding-left: 18px; padding-right: 18px; }
 }
+/* Order placed page */
+.placed { padding-top: clamp(64px, 12vh, 140px); }
+.placed .wrap { grid-template-columns: minmax(0, 720px); justify-content: center; }
+.placed .co-done { padding: 72px 32px; }
+.placed h1 { font-size: clamp(32px, 4.4vw, 48px); line-height: 1.08; letter-spacing: -0.04em; font-weight: 400; }
