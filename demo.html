@@ -193,8 +193,8 @@
     <div class="wrap">
       <form class="controls" id="builder-form">
         <div class="ctl">
-          <label class="ctl-label" for="ds-name"><span>Dataset name <span class="optional">(optional)</span></span></label>
-          <input class="other-input" type="text" id="ds-name" maxlength="80" placeholder="e.g. Laundry folding v1" autocomplete="off">
+          <label class="ctl-label" for="task-desc"><span>Description <span class="optional">(optional)</span></span></label>
+          <textarea class="other-input" id="task-desc" rows="4" maxlength="800" placeholder="Describe your dataset"></textarea>
         </div>
         <fieldset class="ctl">
           <!-- Hidden options (hidden attribute) are kept for later; remove "hidden" to show them again. -->
@@ -274,10 +274,6 @@
           <input class="other-input" type="text" id="note-other" maxlength="80" placeholder="Describe other labels" aria-label="Describe other labels" hidden>
         </fieldset>
         <div class="ctl">
-          <label class="ctl-label" for="task-desc"><span>Description <span class="optional">(optional)</span></span></label>
-          <textarea class="other-input" id="task-desc" rows="4" maxlength="800" placeholder="e.g. Fold T-shirts from a laundry basket and stack them."></textarea>
-        </div>
-        <div class="ctl">
           <span class="ctl-label" id="media-label"><span>Demo <span class="optional">(optional)</span></span></span>
           <input class="sr-only" type="file" id="media" accept="video/*,image/*" multiple aria-labelledby="media-label">
           <label class="drop" id="drop" for="media">
@@ -305,6 +301,10 @@
             <label><input type="radio" name="format" value="mcap"><span>MCAP</span></label>
           </div>
         </fieldset>
+        <div class="ctl">
+          <label class="ctl-label" for="ds-name"><span>Dataset name <span class="optional">(optional)</span></span></label>
+          <input class="other-input" type="text" id="ds-name" maxlength="80" placeholder="e.g. Laundry folding v1" autocomplete="off">
+        </div>
         <div class="qty-row">
           <span class="ctl-label" id="form-qty-label">Quantity</span>
           <div class="qty" role="group" aria-labelledby="form-qty-label">
