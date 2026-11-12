@@ -16,6 +16,11 @@
 .co-actions { padding: 0 24px 24px; display: flex; flex-direction: column; gap: 10px; }
 .co-actions .disclaimer { text-align: center; }
 .co-summary { position: sticky; top: 112px; }
+/* While Your details is hidden, the summary sits alone in a centered column */
+.co .wrap:has(.co-form[data-off]) { grid-template-columns: minmax(0, 720px); justify-content: center; }
+body:has(.co-form[data-off]) .co-hero .wrap { max-width: 720px; }
+body:has(.co-form[data-off]) .co-summary { position: static; }
+.co-summary-actions { padding-top: 4px; }
 .co-edit { font-size: 14px; font-weight: 500; }
 .co-items { padding: 8px 24px; display: flex; flex-direction: column; }
 .co-item { padding: 14px 0; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; }

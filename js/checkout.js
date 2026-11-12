@@ -22,7 +22,8 @@
   });
 
   if (!cart.length) { $('co-empty').hidden = false; return; }
-  $('co-form').hidden = false; $('co-summary').hidden = false;
+  if (!$('co-form').hasAttribute('data-off')) $('co-form').hidden = false;
+  $('co-summary').hidden = false;
 
   var tq = 0, h = 0, ep = 0, gb = 0, wk = 0;
   cart.forEach(function (it) {
@@ -68,9 +69,9 @@
         '   - Volume: ' + fmt(it.hours) + ' hours across ' + it.envs + ' locations',
         '   - Format: ' + it.formatLabel, '');
     });
-    L.push('Name: ' + (f.name.value.trim() || '-'), 'Email: ' + email, 'Company: ' + (f.company.value.trim() || '-'));
-    if (f.notes.value.trim()) L.push('', 'Notes:', f.notes.value.trim());
-    var subj = 'Dataset request: ' + tq + (tq === 1 ? ' dataset' : ' datasets') + (f.company.value.trim() ? ' (' + f.company.value.trim() + ')' : '');
+    if (!form.hidden) L.push('Name: ' + (f.name.value.trim() || '-'), 'Email: ' + email, 'Company: ' + (f.company.value.trim() || '-'));
+    if (!form.hidden && f.notes.value.trim()) L.push('', 'Notes:', f.notes.value.trim());
+    var subj = 'Dataset request: ' + tq + (tq === 1 ? ' dataset' : ' datasets') + (!form.hidden && f.company.value.trim() ? ' (' + f.company.value.trim() + ')' : '');
     return 'mailto:hello@abundancephysical.com?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(L.join('\n'));
   }
   form.addEventListener('submit', function (e) {
@@ -78,10 +79,17 @@
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.value.trim())) {
       f.email.setAttribute('aria-invalid', 'true'); $('co-err').hidden = false; f.email.focus(); return;
     }
+    finish();
+  });
+  function finish() {
     mailto = build();
     window.location.href = mailto;
     form.hidden = true; $('co-summary').hidden = true; $('co-done').hidden = false;
-    $('co-done').querySelector('h2').setAttribute('tabindex', '-1'); $('co-done').querySelector('h2').focus();
+    var h = $('co-done').querySelector('h2'); h.setAttribute('tabindex', '-1'); h.focus();
+  }
+  $('co-checkout').addEventListener('click', function () {
+    if (!form.hidden) { if (form.requestSubmit) form.requestSubmit(); else form.dispatchEvent(new Event('submit', { cancelable: true })); return; }
+    finish();
   });
   $('co-again').addEventListener('click', function () { if (mailto) window.location.href = mailto; });
   $('co-clear').addEventListener('click', function () {

@@ -186,7 +186,7 @@
   <section class="co-hero section">
     <div class="wrap">
       <a class="co-back" href="demo.html#cart"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>Back to cart</a>
-      <h1>Checkout</h1>
+      <h1>Order summary</h1>
     </div>
   </section>
 
@@ -198,7 +198,8 @@
         <a class="btn btn-primary btn-lg" href="demo.html">Go to demo</a>
       </div>
 
-      <form class="co-form dpanel" id="co-form" novalidate hidden>
+      <!-- Your details: hidden for now (remove data-off to bring it back) -->
+      <form class="co-form dpanel" id="co-form" novalidate hidden data-off>
         <div class="dpanel-head"><span class="dpanel-title">Your details</span></div>
         <div class="co-fields">
           <label class="cfield"><span>Name</span><input type="text" name="name" autocomplete="name" maxlength="120"></label>
@@ -208,13 +209,13 @@
           <p class="field-err co-wide" id="co-err" hidden>Please enter a valid work email.</p>
         </div>
         <div class="co-actions">
-          <button class="btn btn-primary btn-lg btn-block" type="submit">Submit request</button>
+          <button class="btn btn-primary btn-lg btn-block" type="submit">Checkout</button>
           <p class="disclaimer">Opens an email to hello@abundancephysical.com with your full request. Attach any demo files before sending.</p>
         </div>
       </form>
 
       <aside class="co-summary dpanel" id="co-summary" hidden>
-        <div class="dpanel-head"><span class="dpanel-title">Order summary</span><a class="co-edit" href="demo.html#cart">Edit cart</a></div>
+        <div class="dpanel-head"><span class="dpanel-title">Your cart</span><a class="co-edit" href="demo.html#cart">Edit cart</a></div>
         <div class="co-items" id="co-items"></div>
         <div class="co-totals">
           <div><span class="k">Datasets</span><span class="v" id="co-count"></span></div>
@@ -223,6 +224,10 @@
           <div><span class="k">Estimated delivery</span><span class="v" id="co-weeks"></span></div>
         </div>
         <p class="disclaimer co-note">Estimates are illustrative. We confirm scope, timeline, and pricing with you before collection starts.</p>
+        <div class="co-actions co-summary-actions">
+          <button class="btn btn-primary btn-lg btn-block" type="button" id="co-checkout">Checkout</button>
+          <p class="disclaimer">Opens an email to hello@abundancephysical.com with your full request. Attach any demo files before sending.</p>
+        </div>
       </aside>
 
       <div class="co-done dpanel" id="co-done" hidden>
