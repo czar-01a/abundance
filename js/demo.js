@@ -4,7 +4,7 @@
   if (!form) return;
   form.addEventListener('submit', function (e) { e.preventDefault(); }); // Enter in a text field must not reload the page
 
-  // Categories (Category field). Each sets a typical episode length for the estimate.
+  // Task options. Each sets a typical episode length for the estimate.
   var TASKS = {
     manip: { name: 'manipulation', label: 'Manipulation', sec: 45, say: 'Pick up the item and put it where it belongs.',
       steps: [['Reach', 3], ['Grasp', 4], ['Manipulate', 14], ['Place', 4], ['Release', 2]] },
@@ -277,7 +277,7 @@
   };
   function renderSummary(s) {
     var rows = [
-      ['task', 'Category', s.task ? [chipLabel('task', s.task)] : []],
+      ['task', 'Task', s.task ? [chipLabel('task', s.task)] : []],
       ['body', 'Embodiment', s.body ? [chipLabel('body', s.body)] : []],
       ['mod', 'Modalities', s.mods.map(function (v) { return chipLabel('mod', v); })],
       ['equip', 'Equipment', s.equip.map(function (v) { return chipLabel('equip', v); })],
@@ -390,7 +390,7 @@
       other: { task: otherText('task'), body: otherText('body'), mod: otherText('mod'), equip: otherText('equip'), note: otherText('note') },
       desc: $('task-desc').value.trim(),
       name: $('ds-name').value.trim(),
-      taskLabel: s.task ? ti.label : 'No category selected',
+      taskLabel: s.task ? ti.label : 'No task selected',
       fileNames: files.map(function (f) { return f.file.name; }),
       title: $('ds-name').value.trim() || (s.task ? ti.label : 'Untitled dataset'),
       bodyLabel: chipLabel('body', s.body),
@@ -602,7 +602,7 @@
     cart.forEach(function (it, i) {
       L.push((i + 1) + '. ' + it.title + (qtyOf(it) > 1 ? ' (x' + qtyOf(it) + ')' : ''),
         '   - Quantity: ' + qtyOf(it),
-        '   - Category: ' + (it.taskLabel || it.title),
+        '   - Task: ' + (it.taskLabel || it.title),
         '   - Embodiment: ' + it.bodyLabel,
         '   - Modalities: ' + (it.modLabels.join(', ') || 'None'),
         '   - Equipment: ' + (it.equipLabels.join(', ') || 'None'),
