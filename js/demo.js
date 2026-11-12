@@ -456,11 +456,6 @@
     toastTimer = setTimeout(function () { $('toast').hidden = true; }, 3000);
   }
   function hideToast() { clearTimeout(toastTimer); $('toast').hidden = true; }
-  function addMore() {
-    hideToast(); closeCart(); setEditing(null); blank(); render();
-    var top = form.getBoundingClientRect().top + window.pageYOffset - 100;
-    window.scrollTo({ top: Math.max(0, top), behavior: reduce ? 'auto' : 'smooth' });
-  }
   // Keep the Quantity stepper in step with the cart: if this exact dataset is already in the cart,
   // the stepper shows its quantity and the button updates it.
   var specKey = null;
@@ -518,7 +513,6 @@
   });
   $('cancel-edit').addEventListener('click', function () { setEditing(null); blank(); render(); renderCart(); });
   $('view-cart').addEventListener('click', openCart);
-  $('cart-more').addEventListener('click', addMore);
 
   var lastFocus = null;
   function openCart() {
