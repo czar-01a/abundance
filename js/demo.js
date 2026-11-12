@@ -596,27 +596,11 @@
     }
   }
 
-  $('send-request').addEventListener('click', function () {
-    var tq = cartQty();
-    var L = ['Hi Abundance team,', '', 'I would like to request ' + tq + (tq === 1 ? ' dataset:' : ' datasets:'), ''];
-    cart.forEach(function (it, i) {
-      L.push((i + 1) + '. ' + it.title + (qtyOf(it) > 1 ? ' (x' + qtyOf(it) + ')' : ''),
-        '   - Quantity: ' + qtyOf(it),
-        '   - Task: ' + (it.taskLabel || it.title),
-        '   - Embodiment: ' + it.bodyLabel,
-        '   - Modalities: ' + (it.modLabels.join(', ') || 'None'),
-        '   - Equipment: ' + (it.equipLabels.join(', ') || 'None'),
-        '   - Annotations: ' + (it.noteLabels.join(', ') || 'None'),
-        '   - Description: ' + (it.desc || 'Not provided'),
-        '   - Reference media: ' + (it.fileNames.length ? it.fileNames.join(', ') + ' (attached)' : 'None'),
-        '   - Volume: ' + fmt(it.hours) + ' hours across ' + it.envs + ' locations',
-        '   - Format: ' + it.formatLabel, '');
-    });
-    var subj = 'Dataset request: ' + tq + (tq === 1 ? ' dataset' : ' datasets');
-    window.location.href = 'mailto:hello@abundancephysical.com?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(L.join('\n'));
-  });
+  // Checkout goes to its own page; the cart is read there from browser storage
+  $('send-request').addEventListener('click', function () { saveCart(); window.location.href = 'checkout.html'; });
 
   updateCounts();
+  if (location.hash === '#cart') setTimeout(openCart, 0); // "Edit cart" from the checkout page
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   window.addEventListener('resize', paint);
