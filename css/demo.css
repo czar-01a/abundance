@@ -182,7 +182,6 @@ textarea.other-input { resize: vertical; line-height: 1.5; min-height: 104px; }
 .controls .cta-row .btn { flex: 1; }
 @media (prefers-reduced-motion: reduce) { .toast, .cart-scrim, .cart-panel { animation: none; } }
 
-@media (max-height: 860px) { .output { position: static; } } /* short screens: let the taller right column scroll normally */
 @media (max-width: 1180px) {
   .builder .wrap { grid-template-columns: minmax(0, 1fr); }
   .output { position: static; }
