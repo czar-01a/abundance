@@ -32,11 +32,23 @@
     top.appendChild(el('span', 'co-item-title', it.title));
     top.appendChild(el('span', 'co-qty', '× ' + it.qty));
     row.appendChild(top);
-    if (it.taskLabel && it.taskLabel !== it.title) row.appendChild(el('div', 'meta', it.taskLabel));
-    row.appendChild(el('div', 'meta', [it.bodyLabel, it.modLabels.join(', ') || 'No modalities', it.noteLabels.join(', ') || 'No annotations'].join(' · ')));
-    if (it.equipLabels.length) row.appendChild(el('div', 'meta', 'Equipment: ' + it.equipLabels.join(', ')));
-    row.appendChild(el('div', 'meta', fmt(it.hours) + ' hrs · ' + it.envs + ' locations · ' + it.formatLabel + (it.fileNames.length ? ' · ' + it.fileNames.length + (it.fileNames.length === 1 ? ' file' : ' files') : '')));
-    if (it.desc) row.appendChild(el('div', 'desc', it.desc));
+    // Specs as a labeled list so each one reads on its own
+    var specs = el('dl', 'co-specs');
+    [['Task', it.taskLabel && it.taskLabel !== 'No task selected' ? it.taskLabel : ''],
+     ['Embodiment', it.bodyLabel !== 'Not selected' ? it.bodyLabel : ''],
+     ['Modalities', it.modLabels.join(', ')],
+     ['Equipment', it.equipLabels.join(', ')],
+     ['Annotations', it.noteLabels.join(', ')],
+     ['Volume', fmt(it.hours) + ' hours'],
+     ['Locations', fmt(it.envs)],
+     ['Format', it.formatLabel],
+     ['Demo files', it.fileNames.join(', ')],
+     ['Description', it.desc]].forEach(function (s) {
+      if (!s[1]) return;
+      specs.appendChild(el('dt', null, s[0]));
+      specs.appendChild(el('dd', s[0] === 'Description' ? 'co-desc' : null, s[1]));
+    });
+    row.appendChild(specs);
     $('co-items').appendChild(row);
   });
   $('co-count').textContent = fmt(tq);
