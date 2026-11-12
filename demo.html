@@ -193,13 +193,18 @@
     <div class="wrap">
       <form class="controls" id="builder-form">
         <fieldset class="ctl">
+          <!-- Hidden options (hidden attribute) are kept for later; remove "hidden" to show them again. -->
           <legend class="ctl-label">Task</legend>
           <div class="chips">
-          <label class="chip"><input type="checkbox" name="task" value="manip"><span>Manipulation</span></label>
-          <label class="chip"><input type="checkbox" name="task" value="mobile"><span>Mobile manipulation</span></label>
-          <label class="chip"><input type="checkbox" name="task" value="nav"><span>Navigation</span></label>
-          <label class="chip"><input type="checkbox" name="task" value="motion"><span>Human motion</span></label>
-          <label class="chip"><input type="checkbox" name="task" value="other"><span>Other</span></label>
+          <!-- temporarily first; original order: by how common each option is -->
+          <label class="chip"><input type="checkbox" name="task" value="folding"><span>Cloth folding</span></label>
+          <label class="chip"><input type="checkbox" name="task" value="pick"><span>Pick and place</span></label>
+          <label class="chip"><input type="checkbox" name="task" value="household"><span>Household manipulation</span></label>
+          <label class="chip" hidden><input type="checkbox" name="task" value="warehouse"><span>Warehouse picking</span></label>
+          <label class="chip" hidden><input type="checkbox" name="task" value="assembly"><span>Assembly</span></label>
+          <label class="chip" hidden><input type="checkbox" name="task" value="food"><span>Food prep</span></label>
+          <label class="chip" hidden><input type="checkbox" name="task" value="sports"><span>Sports motion</span></label>
+          <label class="chip" hidden><input type="checkbox" name="task" value="other"><span>Other</span></label>
           </div>
           <input class="other-input" type="text" id="task-other" maxlength="80" placeholder="Name your task" aria-label="Name your task" hidden>
         </fieldset>

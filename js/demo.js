@@ -4,7 +4,7 @@
   if (!form) return;
   form.addEventListener('submit', function (e) { e.preventDefault(); }); // Enter in a text field must not reload the page
 
-  // Task options. Each sets a typical episode length for the estimate.
+  // Broad task categories (Scratch option C), not shown right now; kept for later
   var TASKS = {
     manip: { name: 'manipulation', label: 'Manipulation', sec: 45, say: 'Pick up the item and put it where it belongs.',
       steps: [['Reach', 3], ['Grasp', 4], ['Manipulate', 14], ['Place', 4], ['Release', 2]] },
@@ -14,7 +14,7 @@
       steps: [['Start', 5], ['Explore', 30], ['Avoid obstacle', 10], ['Reach goal', 15]] },
     motion: { name: 'human_motion', label: 'Human motion', sec: 30, say: 'Lift the box from the floor to the shelf.',
       steps: [['Stance', 4], ['Bend', 4], ['Lift', 5], ['Turn', 4], ['Place', 4]] },
-    // Previous task options, kept for later
+    // Task options shown on the page
 
     pick: { name: 'pick_place', label: 'Pick and place', sec: 20, say: 'Put the red block in the bowl.',
       steps: [['Reach', 3], ['Grasp block', 3], ['Lift', 2], ['Move', 4], ['Place in bowl', 3], ['Release', 2]] },
@@ -30,7 +30,7 @@
       steps: [['Wash', 6], ['Pick knife', 3], ['Slice', 14], ['Transfer', 5], ['Plate', 6]] },
     sports: { name: 'sports_motion', label: 'Sports motion', sec: 20, say: 'Shoot a free throw.',
       steps: [['Set stance', 3], ['Dribble', 4], ['Gather', 2], ['Jump', 2], ['Release', 2], ['Land', 2]] },
-    other: { name: 'custom_category', label: 'Other', sec: 60, say: 'Your task, described in plain language.',
+    other: { name: 'custom_task', label: 'Custom task', sec: 60, say: 'Your task, described in plain language.',
       steps: [['Set up', 4], ['Reach', 3], ['Grasp', 4], ['Manipulate', 12], ['Place', 4], ['Reset', 3]] }
   };
   var MODS = {
