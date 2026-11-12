@@ -206,9 +206,21 @@ textarea.other-input { resize: vertical; line-height: 1.5; min-height: 104px; }
 /* No gray tap box on phones: the option's own blue state shows what was tapped */
 html { -webkit-tap-highlight-color: transparent; }
 
-/* Phones and touch screens: selections change instantly (no fades or pop-ins) */
+/* Phones and touch screens: no double-tap delay */
 @media (hover: none), (max-width: 640px) {
-  .chip span, .seg span, .spec-ic, .qty .qty-btn { transition: none; }
-  .spec-pill { animation: none; }
   .chip, .chip span, .seg label, .seg span, .qty .qty-btn, .drop { touch-action: manipulation; }
+}
+
+/* Gentle feedback on select and deselect (desktop and mobile) */
+.chip span { transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .2s ease; }
+.chip input:checked + span { animation: chippop .22s ease-out; }
+@keyframes chippop { 0% { transform: scale(.96); } 60% { transform: scale(1.03); } 100% { transform: none; } }
+.seg span { transition: background-color .2s ease, color .2s ease, box-shadow .2s ease; }
+.spec-pill.out { animation: pillout .16s ease-in forwards; }
+@keyframes pillout { to { opacity: 0; transform: scale(.9); } }
+.other-input:not([hidden]) { animation: fieldin .2s ease-out; }
+@keyframes fieldin { from { opacity: 0; transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) {
+  .chip input:checked + span, .spec-pill.out, .other-input:not([hidden]) { animation: none; }
+  .chip span, .seg span { transition: none; }
 }

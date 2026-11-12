@@ -302,16 +302,21 @@
       if (r[2].length) picked++;
       var row = box.querySelector('[data-key="' + r[0] + '"]'), v = row.querySelector('.spec-v');
       row.classList.toggle('on', r[2].length > 0);
-      var pills = Array.prototype.slice.call(v.querySelectorAll('.spec-pill'));
+      var pills = Array.prototype.slice.call(v.querySelectorAll('.spec-pill:not(.out)'));
       var have = pills.map(function (p) { return p.textContent; });
       if (have.join('\n') === r[2].join('\n')) return; // unchanged: leave this row alone
-      pills.forEach(function (p) { if (r[2].indexOf(p.textContent) < 0) p.remove(); });
+      pills.forEach(function (p) {
+        if (r[2].indexOf(p.textContent) > -1) return;
+        if (reduce) { p.remove(); return; }
+        p.classList.add('out'); // fade out, then remove
+        setTimeout(function () { p.remove(); }, 170);
+      });
       var none = v.querySelector('.spec-none');
       r[2].forEach(function (t, i) {
-        var existing = Array.prototype.find.call(v.querySelectorAll('.spec-pill'), function (p) { return p.textContent === t; });
+        var existing = Array.prototype.find.call(v.querySelectorAll('.spec-pill:not(.out)'), function (p) { return p.textContent === t; });
         var pill = existing || el('span', 'spec-pill', t);
         pill.title = t;
-        var at = v.querySelectorAll('.spec-pill')[i];
+        var at = v.querySelectorAll('.spec-pill:not(.out)')[i];
         if (at !== pill) v.insertBefore(pill, at || none);
       });
       none.hidden = r[2].length > 0;
