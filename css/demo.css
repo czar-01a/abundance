@@ -79,7 +79,7 @@ textarea.other-input { resize: vertical; line-height: 1.5; min-height: 104px; }
 .spec-pill { display: inline-flex; align-items: center; min-height: 28px; padding: 4px 12px; border-radius: 999px; background: var(--blue-soft); color: var(--blue-deep); font-size: 13px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; animation: pillin .18s ease; }
 .spec-none { font-size: 13px; color: var(--faint); }
 .spec-none[hidden] { display: none; }
-@keyframes pillin { from { opacity: 0; transform: scale(.9); } }
+@keyframes pillin { from { opacity: 0; } }
 .spec-foot { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line); }
 .spec-foot > div { padding: 14px 24px; display: flex; flex-direction: column; gap: 2px; border-right: 1px solid var(--line); min-width: 0; }
 .spec-foot > div:last-child { border-right: 0; }
@@ -212,15 +212,11 @@ html { -webkit-tap-highlight-color: transparent; }
 }
 
 /* Gentle feedback on select and deselect (desktop and mobile) */
-.chip span { transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .2s ease; }
-.chip input:checked + span { animation: chippop .22s ease-out; }
-@keyframes chippop { 0% { transform: scale(.96); } 60% { transform: scale(1.03); } 100% { transform: none; } }
+.chip span { transition: background-color .2s ease, border-color .2s ease, color .2s ease; }
 .seg span { transition: background-color .2s ease, color .2s ease, box-shadow .2s ease; }
-.spec-pill.out { animation: pillout .16s ease-in forwards; }
-@keyframes pillout { to { opacity: 0; transform: scale(.9); } }
 .other-input:not([hidden]) { animation: fieldin .2s ease-out; }
 @keyframes fieldin { from { opacity: 0; transform: translateY(-4px); } }
 @media (prefers-reduced-motion: reduce) {
-  .chip input:checked + span, .spec-pill.out, .other-input:not([hidden]) { animation: none; }
+  .other-input:not([hidden]) { animation: none; }
   .chip span, .seg span { transition: none; }
 }
