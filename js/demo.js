@@ -549,7 +549,25 @@
     cart.forEach(function (it, i) {
       var card = el('div', 'citem' + (it.id === editingId ? ' editing' : ''));
       var top = el('div', 'citem-top');
-      top.appendChild(el('div', 'citem-title', it.title));
+      // Dataset name is editable right in the cart
+      var nameIn = el('input', 'citem-name'); nameIn.type = 'text'; nameIn.maxLength = 80;
+      nameIn.value = it.title; nameIn.placeholder = it.taskLabel && it.taskLabel !== 'No task selected' ? it.taskLabel : 'Untitled dataset';
+      nameIn.setAttribute('aria-label', 'Dataset name');
+      var fit = function () { nameIn.size = Math.max(6, Math.min(40, (nameIn.value || nameIn.placeholder).length + 1)); }; // width follows the text in every browser
+      fit(); nameIn.addEventListener('input', fit);
+      nameIn.addEventListener('change', function () {
+        var v = nameIn.value.trim().slice(0, 80);
+        it.name = v;
+        it.title = v || (it.taskLabel && it.taskLabel !== 'No task selected' ? it.taskLabel : 'Untitled dataset');
+        nameIn.value = it.title; fit();
+        saveCart(); syncQty(true);
+      });
+      nameIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); nameIn.blur(); } });
+      top.appendChild(nameIn);
+      var pen = el('button', 'citem-pen'); pen.type = 'button'; pen.setAttribute('aria-label', 'Rename ' + it.title);
+      pen.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"></path><path d="M13.5 6.5l4 4"></path></svg>';
+      pen.addEventListener('click', function () { nameIn.focus(); nameIn.select(); });
+      top.appendChild(pen);
       top.appendChild(el('div', 'citem-num', String(i + 1).padStart(2, '0')));
       card.appendChild(top);
       if (it.name && it.taskLabel) card.appendChild(el('div', 'citem-meta', it.taskLabel));
