@@ -4,7 +4,6 @@
   function $(id) { return document.getElementById(id); }
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
   function fmt(n) { return Number(n).toLocaleString('en-US'); }
-  function size(gb) { return gb >= 1000 ? (gb / 1000).toFixed(gb >= 10000 ? 0 : 1) + ' TB' : Math.max(1, Math.round(gb)) + ' GB'; }
   function str(v, n) { return typeof v === 'string' ? v.slice(0, n || 800) : ''; }
   function arr(v) { return Array.isArray(v) ? v.filter(function (x) { return typeof x === 'string'; }) : []; }
   function num(v, lo, hi, d) { v = Number(v); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; }
@@ -42,7 +41,6 @@
   $('co-count').textContent = fmt(tq);
   $('co-hours').textContent = fmt(h);
   $('co-episodes').textContent = fmt(ep);
-  $('co-size').textContent = gb ? size(gb) : '—';
   $('co-weeks').textContent = wk + ' weeks';
 
   var form = $('co-form'), f = form.elements, CKEY = KEY + '-contact';

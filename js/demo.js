@@ -53,7 +53,6 @@
   function val(name) { var el = form.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : ''; }
   function vals(name) { return Array.prototype.map.call(form.querySelectorAll('input[name="' + name + '"]:checked'), function (el) { return el.value; }); }
   function fmt(n) { return n.toLocaleString('en-US'); }
-  function size(gb) { return gb >= 1000 ? (gb / 1000).toFixed(gb >= 10000 ? 0 : 1) + ' TB' : Math.max(1, Math.round(gb)) + ' GB'; }
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 
   function otherText(name) { var v = $(name + '-other').value.trim(); return v; }
@@ -339,7 +338,6 @@
     $('st-people').textContent = fmt(e.people);
     $('st-first').textContent = e.firstDays + ' days';
     $('st-weeks').textContent = e.weeks + ' weeks';
-    $('size').textContent = s.mods.length ? size(e.gb) + ' raw' : 'Pick a modality';
     $('ep-title').textContent = ti.label + ' \u00B7 episode 0001';
     $('tree').innerHTML = tree(s, e);
     $('code').innerHTML = code(s);
@@ -609,7 +607,6 @@
       cart.forEach(function (it) { var q = qtyOf(it); h += it.hours * q; ep += it.est.episodes * q; gb += it.est.gb * q; wk = Math.max(wk, it.est.weeks); });
       $('tot-hours').textContent = fmt(h);
       $('tot-episodes').textContent = fmt(ep);
-      $('tot-size').textContent = gb ? size(gb) : '\u2014';
       $('tot-weeks').textContent = wk + ' weeks';
     }
   }
