@@ -4,7 +4,18 @@
   if (!form) return;
   form.addEventListener('submit', function (e) { e.preventDefault(); }); // Enter in a text field must not reload the page
 
+  // Categories (Category field). Each sets a typical episode length for the estimate.
   var TASKS = {
+    manip: { name: 'manipulation', label: 'Manipulation', sec: 45, say: 'Pick up the item and put it where it belongs.',
+      steps: [['Reach', 3], ['Grasp', 4], ['Manipulate', 14], ['Place', 4], ['Release', 2]] },
+    mobile: { name: 'mobile_manipulation', label: 'Mobile manipulation', sec: 90, say: 'Go to the counter, pick up the cup, and bring it to the table.',
+      steps: [['Navigate', 20], ['Approach', 6], ['Grasp', 5], ['Carry', 18], ['Place', 5]] },
+    nav: { name: 'navigation', label: 'Navigation', sec: 120, say: 'Walk from the entrance to the kitchen.',
+      steps: [['Start', 5], ['Explore', 30], ['Avoid obstacle', 10], ['Reach goal', 15]] },
+    motion: { name: 'human_motion', label: 'Human motion', sec: 30, say: 'Lift the box from the floor to the shelf.',
+      steps: [['Stance', 4], ['Bend', 4], ['Lift', 5], ['Turn', 4], ['Place', 4]] },
+    // Previous task options, kept for later
+
     pick: { name: 'pick_place', label: 'Pick and place', sec: 20, say: 'Put the red block in the bowl.',
       steps: [['Reach', 3], ['Grasp block', 3], ['Lift', 2], ['Move', 4], ['Place in bowl', 3], ['Release', 2]] },
     household: { name: 'household_manip', label: 'Household manipulation', sec: 45, say: 'Fold the towel and place it in the basket.',
@@ -19,7 +30,7 @@
       steps: [['Wash', 6], ['Pick knife', 3], ['Slice', 14], ['Transfer', 5], ['Plate', 6]] },
     sports: { name: 'sports_motion', label: 'Sports motion', sec: 20, say: 'Shoot a free throw.',
       steps: [['Set stance', 3], ['Dribble', 4], ['Gather', 2], ['Jump', 2], ['Release', 2], ['Land', 2]] },
-    other: { name: 'custom_task', label: 'Custom task', sec: 60, say: 'Your task, described in plain language.',
+    other: { name: 'custom_category', label: 'Other', sec: 60, say: 'Your task, described in plain language.',
       steps: [['Set up', 4], ['Reach', 3], ['Grasp', 4], ['Manipulate', 12], ['Place', 4], ['Reset', 3]] }
   };
   var MODS = {
@@ -266,7 +277,7 @@
   };
   function renderSummary(s) {
     var rows = [
-      ['task', 'Task', s.task ? [chipLabel('task', s.task)] : []],
+      ['task', 'Category', s.task ? [chipLabel('task', s.task)] : []],
       ['body', 'Embodiment', s.body ? [chipLabel('body', s.body)] : []],
       ['mod', 'Modalities', s.mods.map(function (v) { return chipLabel('mod', v); })],
       ['equip', 'Equipment', s.equip.map(function (v) { return chipLabel('equip', v); })],
@@ -379,7 +390,7 @@
       other: { task: otherText('task'), body: otherText('body'), mod: otherText('mod'), equip: otherText('equip'), note: otherText('note') },
       desc: $('task-desc').value.trim(),
       name: $('ds-name').value.trim(),
-      taskLabel: s.task ? ti.label : 'No task selected',
+      taskLabel: s.task ? ti.label : 'No category selected',
       fileNames: files.map(function (f) { return f.file.name; }),
       title: $('ds-name').value.trim() || (s.task ? ti.label : 'Untitled dataset'),
       bodyLabel: chipLabel('body', s.body),
@@ -591,7 +602,7 @@
     cart.forEach(function (it, i) {
       L.push((i + 1) + '. ' + it.title + (qtyOf(it) > 1 ? ' (x' + qtyOf(it) + ')' : ''),
         '   - Quantity: ' + qtyOf(it),
-        '   - Task: ' + (it.taskLabel || it.title),
+        '   - Category: ' + (it.taskLabel || it.title),
         '   - Embodiment: ' + it.bodyLabel,
         '   - Modalities: ' + (it.modLabels.join(', ') || 'None'),
         '   - Equipment: ' + (it.equipLabels.join(', ') || 'None'),
