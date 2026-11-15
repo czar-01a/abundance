@@ -200,7 +200,11 @@
             <label class="sopt"><input type="radio" name="topic" value="jobs"><span>Jobs and applications</span></label>
             <label class="sopt"><input type="radio" name="topic" value="account"><span>Account and login</span></label>
             <label class="sopt"><input type="radio" name="topic" value="privacy"><span>Privacy and data requests</span></label>
-            <label class="sopt"><input type="radio" name="topic" value="other"><span>Something else</span></label>
+            <label class="sopt"><input type="radio" name="topic" value="other"><span>Others</span></label>
+            <div class="sother" id="sup-other-wrap" hidden>
+              <label class="sr-only" for="sup-other">Tell us what you need</label>
+              <textarea id="sup-other" class="sother-in" rows="3" maxlength="1000" placeholder="Tell us what you need"></textarea>
+            </div>
             </div>
           </fieldset>
           <p class="sup-err" id="sup-err" role="alert" hidden>Choose one to continue.</p>

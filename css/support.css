@@ -42,3 +42,9 @@
 @media (max-width: 900px) { .sup .wrap { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 640px) { .sopt { font-size: 16px; } #sup-form .btn { width: 100%; } .sup-actions .btn { width: 100%; } }
 @media (prefers-reduced-motion: reduce) { .sup-answer { animation: none; } .sopt, .sopt input, .sopt input::after { transition: none; } }
+.sother { padding: 4px 0 6px 36px; animation: supin .25s ease-out; }
+.sother-in { width: 100%; box-sizing: border-box; min-height: 96px; padding: 12px 16px; border: 1px solid var(--line-3); border-radius: 12px; background: #ffffff; font: inherit; font-size: 16px; line-height: 1.5; color: var(--ink); resize: vertical; outline: none; transition: border-color .15s ease, box-shadow .15s ease; }
+.sother-in::placeholder { color: var(--faint); }
+.sother-in:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
+@media (max-width: 640px) { .sother { padding-left: 0; } }
+@media (prefers-reduced-motion: reduce) { .sother { animation: none; } }

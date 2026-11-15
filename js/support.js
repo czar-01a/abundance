@@ -8,24 +8,33 @@
     jobs: ['Jobs and applications', 'See open jobs, or email us about an application you’ve sent.', [['Browse jobs', 'jobs.html'], ['Email us', 'Job application']]],
     account: ['Account and login', 'Email us from the address on your account and tell us what’s happening.', [['Email us', 'Account help']]],
     privacy: ['Privacy and data requests', 'Email us to ask about, access, or delete data connected to you.', [['Email us', 'Privacy request']]],
-    other: ['Something else', 'Email us and tell us what you need.', [['Email us', 'Support']]]
+    other: ['Others', 'Email us and we\u2019ll get back to you. Your note is already in the email.', [['Email us', 'Support']]]
   };
   var form = document.getElementById('sup-form'), err = document.getElementById('sup-err');
   var ans = document.getElementById('sup-answer'), acts = document.getElementById('sup-actions');
-  form.addEventListener('change', function () { err.hidden = true; });
+  var otherWrap = document.getElementById('sup-other-wrap'), other = document.getElementById('sup-other');
+  // Show the text box only when Others is picked
+  form.addEventListener('change', function (e) {
+    err.hidden = true;
+    if (e.target.name !== 'topic') return;
+    var show = e.target.value === 'other';
+    otherWrap.hidden = !show;
+    if (show) other.focus();
+  });
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var picked = form.querySelector('input[name="topic"]:checked');
     if (!picked) { err.hidden = false; form.querySelector('input[name="topic"]').focus(); return; }
     var t = TOPICS[picked.value];
     document.getElementById('sup-title').textContent = t[0];
-    document.getElementById('sup-text').textContent = t[1];
+    document.getElementById('sup-text').textContent = picked.value === 'other' && !other.value.trim() ? 'Email us and tell us what you need.' : t[1];
     acts.textContent = '';
     t[2].forEach(function (a, i) {
       var link = document.createElement('a');
       link.className = 'btn btn-lg ' + (i === 0 ? 'btn-primary' : 'btn-outline');
       link.textContent = a[0];
-      link.href = /\.html$/.test(a[1]) ? a[1] : 'mailto:' + MAIL + '?subject=' + encodeURIComponent(a[1]);
+      var note = picked.value === 'other' ? other.value.trim() : '';
+      link.href = /\.html$/.test(a[1]) ? a[1] : 'mailto:' + MAIL + '?subject=' + encodeURIComponent(a[1]) + (note ? '&body=' + encodeURIComponent(note) : '');
       acts.appendChild(link);
     });
     form.hidden = true; ans.hidden = false; ans.focus();
