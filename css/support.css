@@ -4,7 +4,7 @@
 .sup-hero h1 { font-size: clamp(40px, 6vw, 72px); line-height: 1.04; font-weight: 400; letter-spacing: -0.04em; }
 .sup-hero p { font-size: clamp(16px, 1.4vw, 19px); line-height: 1.6; color: var(--ink-2); font-weight: 300; max-width: 560px; }
 .sup { padding-top: 28px; padding-bottom: clamp(96px, 14vh, 160px); }
-.sup .wrap { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 32px; align-items: start; }
+.sup .wrap { display: grid; grid-template-columns: minmax(0, 760px); gap: 32px; align-items: start; }
 .sup-card, .sup-contact { border: 1px solid var(--line-2); border-radius: 20px; background: #ffffff; }
 .sup-card { padding: clamp(24px, 4vw, 48px); }
 .sup fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
