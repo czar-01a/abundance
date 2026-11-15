@@ -18,12 +18,18 @@
 .tgroup-head h2 { font-size: clamp(24px, 2.6vw, 32px); font-weight: 400; letter-spacing: -0.03em; }
 .tcount { font-family: var(--mono); font-size: 13px; color: var(--muted); white-space: nowrap; }
 .tgrid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
-.tcard { border: 1px solid var(--line-2); border-radius: 16px; background: #ffffff; padding: 18px 20px; font-size: 16px; line-height: 1.45; color: var(--ink); min-height: 76px; display: flex; align-items: center; }
+.tgrid > li { display: flex; }
+.tcard { flex: 1; border: 1px solid var(--line-2); border-radius: 16px; background: #ffffff; padding: 18px 20px 16px; font-size: 16px; line-height: 1.45; color: var(--ink); min-height: 112px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; text-decoration: none; transition: border-color .2s ease, background-color .2s ease; -webkit-tap-highlight-color: transparent; }
+.tcard:hover { border-color: var(--blue-light); background: var(--tint); color: var(--ink); }
+.tcard:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.tgo { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; color: var(--blue-text); }
+.tgo svg { transition: transform .2s ease; }
+.tcard:hover .tgo svg { transform: translateX(3px); }
 .tgroup:not([hidden]) { animation: tfade .25s ease-out; }
 @keyframes tfade { from { opacity: 0; } to { opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .tgroup:not([hidden]) { animation: none; } .tchip { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .tgroup:not([hidden]) { animation: none; } .tchip, .tcard, .tgo svg { transition: none; } .tcard:hover .tgo svg { transform: none; } }
 @media (max-width: 640px) {
   .tgrid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-  .tcard { min-height: 0; padding: 16px 18px; font-size: 15px; }
+  .tcard { min-height: 0; padding: 16px 18px 14px; font-size: 15px; gap: 10px; }
   .tasks .wrap { gap: 40px; }
 }
