@@ -48,3 +48,17 @@
 .sother-in:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
 @media (max-width: 640px) { .sother { padding-left: 0; } }
 @media (prefers-reduced-motion: reduce) { .sother { animation: none; } }
+/* Your details step */
+.sup-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 8px; }
+.sup-field { display: flex; flex-direction: column; gap: 8px; font-size: 15px; font-weight: 500; color: var(--ink); }
+.sup-field small { font-size: 13px; font-weight: 400; color: var(--faint); }
+.sup-wide { grid-column: 1 / -1; }
+.sup-field input, .sup-field textarea { width: 100%; box-sizing: border-box; min-height: 48px; padding: 10px 16px; border: 1px solid var(--line-3); border-radius: 12px; background: #ffffff; font: inherit; font-size: 16px; font-weight: 400; color: var(--ink); outline: none; transition: border-color .15s ease, box-shadow .15s ease; }
+.sup-field textarea { min-height: 112px; line-height: 1.5; resize: vertical; }
+.sup-field input::placeholder, .sup-field textarea::placeholder { color: var(--faint); }
+.sup-field input:focus, .sup-field textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
+.sup-field input[aria-invalid="true"] { border-color: #B42318; }
+.sup-sent { align-items: center; text-align: center; padding: 24px 0; }
+.sup-sent p { margin: 0 auto; }
+.sup-sent .sup-actions { justify-content: center; }
+@media (max-width: 640px) { .sup-fields { grid-template-columns: minmax(0, 1fr); } }

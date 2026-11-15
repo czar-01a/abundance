@@ -1,18 +1,28 @@
-/* Support page: pick a topic, Submit, and see the right way to get help */
+/* Support page: pick a topic, Submit, then fill in your details and Send */
 (function () {
-  var MAIL = 'support@abundancephysical.com';
+  // Topic label and a hint for the message box
   var TOPICS = {
-    sales: ['Order a dataset', 'Spec your dataset in the demo, or email our team to talk it through.', [['Spec your dataset', 'demo.html'], ['Email sales', 'Sales inquiry']]],
-    order: ['Check on an order', 'Email us with the name of your dataset and we’ll follow up on its status.', [['Email us', 'Order question']]],
-    record: ['Recording a task', 'Browse the tasks you can record, or email us if something isn’t working.', [['Browse tasks', 'tasks.html'], ['Email us', 'Recording help']]],
-    jobs: ['Jobs and applications', 'See open jobs, or email us about an application you’ve sent.', [['Browse jobs', 'jobs.html'], ['Email us', 'Job application']]],
-    account: ['Account and login', 'Email us from the address on your account and tell us what’s happening.', [['Email us', 'Account help']]],
-    privacy: ['Privacy and data requests', 'Email us to ask about, access, or delete data connected to you.', [['Email us', 'Privacy request']]],
-    other: ['Others', 'Email us and we\u2019ll get back to you. Your note is already in the email.', [['Email us', 'Support']]]
+    sales: ['Order a dataset', 'What do you need? Task, robot, volume, timeline'],
+    order: ['Check on an order', 'Which dataset is it about?'],
+    record: ['Recording a task', 'Which task, and what happened?'],
+    jobs: ['Jobs and applications', 'Which job is it about?'],
+    account: ['Account and login', 'What’s happening with your account?'],
+    privacy: ['Privacy and data requests', 'What would you like us to do with your data?'],
+    other: ['Others', 'Tell us what you need']
   };
-  var form = document.getElementById('sup-form'), err = document.getElementById('sup-err');
-  var ans = document.getElementById('sup-answer'), acts = document.getElementById('sup-actions');
-  var otherWrap = document.getElementById('sup-other-wrap'), other = document.getElementById('sup-other');
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var $ = function (id) { return document.getElementById(id); };
+  var form = $('sup-form'), err = $('sup-err'), details = $('sup-details'), sent = $('sup-sent');
+  var otherWrap = $('sup-other-wrap'), other = $('sup-other');
+  var picked = null;
+  // Bring the card into view below the sticky header after each step
+  function reveal(el) {
+    var card = el.closest('.sup-card'), head = document.getElementById('site-header');
+    var top = card.getBoundingClientRect().top + window.pageYOffset - (head ? head.offsetHeight : 0) - 16;
+    if (card.getBoundingClientRect().top < (head ? head.offsetHeight : 0)) window.scrollTo(0, top);
+    el.focus({ preventScroll: true });
+  }
+
   // Show the text box only when Others is picked
   form.addEventListener('change', function (e) {
     err.hidden = true;
@@ -21,27 +31,36 @@
     otherWrap.hidden = !show;
     if (show) other.focus();
   });
+
+  // Step 1: pick a topic
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    var picked = form.querySelector('input[name="topic"]:checked');
-    if (!picked) { err.hidden = false; form.querySelector('input[name="topic"]').focus(); return; }
-    var t = TOPICS[picked.value];
-    document.getElementById('sup-title').textContent = t[0];
-    document.getElementById('sup-text').textContent = picked.value === 'other' && !other.value.trim() ? 'Email us and tell us what you need.' : t[1];
-    acts.textContent = '';
-    t[2].forEach(function (a, i) {
-      var link = document.createElement('a');
-      link.className = 'btn btn-lg ' + (i === 0 ? 'btn-primary' : 'btn-outline');
-      link.textContent = a[0];
-      var note = picked.value === 'other' ? other.value.trim() : '';
-      link.href = /\.html$/.test(a[1]) ? a[1] : 'mailto:' + MAIL + '?subject=' + encodeURIComponent(a[1]) + (note ? '&body=' + encodeURIComponent(note) : '');
-      acts.appendChild(link);
-    });
-    form.hidden = true; ans.hidden = false; ans.focus();
+    var r = form.querySelector('input[name="topic"]:checked');
+    if (!r) { err.hidden = false; form.querySelector('input[name="topic"]').focus(); return; }
+    picked = r.value;
+    $('sup-topic').textContent = TOPICS[picked][0];
+    $('sup-msg').placeholder = TOPICS[picked][1];
+    if (picked === 'other' && other.value.trim() && !$('sup-msg').value.trim()) $('sup-msg').value = other.value.trim();
+    form.hidden = true; details.hidden = false;
+    reveal($('sup-name'));
   });
-  document.getElementById('sup-back').addEventListener('click', function () {
-    ans.hidden = true; form.hidden = false;
-    var picked = form.querySelector('input[name="topic"]:checked');
-    (picked || form.querySelector('input[name="topic"]')).focus();
+
+  // Step 2: your details
+  var derr = $('sup-derr');
+  ['sup-name', 'sup-email'].forEach(function (id) {
+    $(id).addEventListener('input', function () { $(id).removeAttribute('aria-invalid'); derr.hidden = true; });
+  });
+  details.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = $('sup-name').value.trim(), email = $('sup-email').value.trim();
+    var bad = !name ? ['sup-name', 'Please enter your name.'] : !EMAIL_RE.test(email) ? ['sup-email', 'Please enter a valid business email.'] : null;
+    if (bad) { $(bad[0]).setAttribute('aria-invalid', 'true'); derr.textContent = bad[1]; derr.hidden = false; $(bad[0]).focus(); return; }
+    $('sup-sent-title').textContent = 'Thanks, ' + name.split(/\s+/)[0] + '.';
+    $('sup-sent-text').textContent = 'We’ll get back to you at ' + email + '.';
+    details.hidden = true; sent.hidden = false; reveal(sent);
+  });
+  $('sup-back').addEventListener('click', function () {
+    details.hidden = true; form.hidden = false;
+    (form.querySelector('input[name="topic"]:checked') || form.querySelector('input[name="topic"]')).focus();
   });
 })();

@@ -210,12 +210,27 @@
           <p class="sup-err" id="sup-err" role="alert" hidden>Choose one to continue.</p>
           <button class="btn btn-primary btn-lg" type="submit">Submit</button>
         </form>
-        <div class="sup-answer" id="sup-answer" tabindex="-1" hidden>
-          <div class="sup-answer-label">Here&rsquo;s how to get help</div>
-          <h2 id="sup-title"></h2>
-          <p id="sup-text"></p>
-          <div class="sup-actions" id="sup-actions"></div>
+        <form class="sup-answer" id="sup-details" tabindex="-1" novalidate hidden>
+          <div class="sup-answer-label" id="sup-topic"></div>
+          <h2>Your details</h2>
+          <p>Tell us how to reach you and we&rsquo;ll get back to you.</p>
+          <div class="sup-fields">
+            <label class="sup-field"><span>Name</span><input type="text" id="sup-name" name="name" autocomplete="name" maxlength="100" required></label>
+            <label class="sup-field"><span>Business email</span><input type="email" id="sup-email" name="email" autocomplete="email" maxlength="200" required></label>
+            <label class="sup-field sup-wide"><span>Company <small>(optional)</small></span><input type="text" id="sup-company" name="company" autocomplete="organization" maxlength="120"></label>
+            <label class="sup-field sup-wide"><span>Message <small>(optional)</small></span><textarea id="sup-msg" name="message" rows="4" maxlength="2000"></textarea></label>
+          </div>
+          <p class="sup-err" id="sup-derr" role="alert" hidden></p>
+          <div class="sup-actions">
+            <button class="btn btn-primary btn-lg" type="submit">Send</button>
+          </div>
           <button class="sup-back" type="button" id="sup-back">Choose a different topic</button>
+        </form>
+        <div class="sup-answer sup-sent" id="sup-sent" tabindex="-1" hidden>
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#0058C7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M8 12.5l2.6 2.6L16 9.5"></path></svg>
+          <h2 id="sup-sent-title">Thanks, we got it</h2>
+          <p id="sup-sent-text"></p>
+          <div class="sup-actions"><a class="btn btn-outline btn-lg" href="index.html">Back to home</a></div>
         </div>
       </div>
 
