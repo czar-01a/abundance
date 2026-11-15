@@ -1,6 +1,6 @@
 /* Support page: pick a topic, Submit, and see the right way to get help */
 (function () {
-  var MAIL = 'hello@abundancephysical.com';
+  var MAIL = 'support@abundancephysical.com';
   var TOPICS = {
     sales: ['Order a dataset', 'Spec your dataset in the demo, or email our team to talk it through.', [['Spec your dataset', 'demo.html'], ['Email sales', 'Sales inquiry']]],
     order: ['Check on an order', 'Email us with the name of your dataset and we’ll follow up on its status.', [['Email us', 'Order question']]],
