@@ -43,6 +43,12 @@
     page: 0,
     filtersOpen: window.matchMedia('(min-width: 1200px)').matches
   };
+  // Work mode and commitment can come from the address too (the Help me choose quiz links here)
+  function listParam(name, allowed) {
+    return (params.get(name) || '').split(',').filter(function (v) { return allowed.indexOf(v) !== -1; });
+  }
+  state.modes = listParam('mode', MODES);
+  state.kinds = listParam('kind', KINDS);
   var requested = params.get('product');
   if (requested && catOf[requested]) {
     state.products = [requested];

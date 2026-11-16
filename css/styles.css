@@ -254,6 +254,9 @@ h1, h2, h3, p { margin: 0; }
 .tab:hover { color: var(--ink); }
 .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
 .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 40px; }
+.toolbar-left { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.choose-link { display: inline-flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 500; color: var(--blue-text); }
+.choose-link:hover { color: var(--blue-deep); text-decoration: underline; text-underline-offset: 3px; }
 .filter-toggle { display: inline-flex; align-items: center; gap: 12px; min-height: 52px; padding: 14px 24px; border: 1.5px solid var(--ink); border-radius: 999px; background: #ffffff; font-size: 16px; font-weight: 500; color: var(--ink); cursor: pointer; }
 .filter-toggle:hover { background: var(--tint-2); }
 .results { font-family: var(--mono); font-size: 15px; letter-spacing: 0.1em; text-transform: uppercase; }
