@@ -40,3 +40,9 @@
   .tcard { min-height: 150px; }
   .tasks .wrap { gap: 40px; }
 }
+
+/* Hide Record until the card is hovered (devices with a mouse only; touch screens always show it) */
+@media (hover: hover) {
+  .tgo { opacity: 0; transition: opacity .15s ease, color .15s ease; }
+  .tcard:hover .tgo, .tcard:focus-visible .tgo { opacity: 1; }
+}

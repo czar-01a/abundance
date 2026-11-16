@@ -475,3 +475,9 @@ textarea.field { height: 120px; padding: 14px 16px; resize: vertical; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* Job cards: hide Apply/Reserve until the card is hovered (devices with a mouse only; touch screens always show it) */
+@media (hover: hover) {
+  .job .action { opacity: 0; transition: opacity .15s ease, color .15s ease; }
+  .job:hover .action, .job:focus-within .action { opacity: 1; }
+}
