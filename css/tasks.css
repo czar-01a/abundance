@@ -21,19 +21,27 @@
 /* Task cards match the job cards on the Jobs page */
 .tgrid > li { display: flex; }
 .tcard { flex: 1; position: relative; display: flex; flex-direction: column; gap: 8px; min-height: 180px; padding: 24px; box-sizing: border-box; border: 1px solid var(--line-2); border-radius: 16px; background: #ffffff; color: var(--ink); text-decoration: none; transition: border-color .15s ease, box-shadow .15s ease; -webkit-tap-highlight-color: transparent; }
-.tcard:hover, .tcard:focus-visible { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); color: var(--ink); }
-.tcard:focus-visible { outline: none; }
+.tcard { cursor: pointer; }
+.tcard:hover, .tcard:focus-within { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); color: var(--ink); }
+.tcover { position: absolute; inset: 0; border-radius: 16px; z-index: 1; }
+.tcover:focus-visible { outline: none; }
+.ttop { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.tsave { position: relative; z-index: 2; width: 36px; height: 36px; margin: -7px -7px -7px 0; border: none; background: none; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ink); -webkit-tap-highlight-color: transparent; }
+.tsave:hover { background: var(--tint-2); }
+.tsave:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+.tsave[aria-pressed="true"] svg { fill: var(--blue); stroke: var(--blue); }
+.tsave.pop svg { animation: heartpop .38s ease-out; }
 .tcat { font-size: 13px; color: var(--faint); }
 .tname { font-size: 18px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.4; }
 .tbottom { margin-top: auto; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .trate { font-size: 16px; font-weight: 500; }
 .tgo { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 500; color: var(--ink); transition: color .15s ease; }
 .tgo svg { opacity: 0; transform: translate(-4px, 4px); transition: opacity .15s ease, transform .15s ease; }
-.tcard:hover .tgo, .tcard:focus-visible .tgo { color: var(--blue); }
-.tcard:hover .tgo svg, .tcard:focus-visible .tgo svg { opacity: 1; transform: none; }
+.tcard:hover .tgo, .tcard:focus-within .tgo { color: var(--blue); }
+.tcard:hover .tgo svg, .tcard:focus-within .tgo svg { opacity: 1; transform: none; }
 .tgroup:not([hidden]) { animation: tfade .25s ease-out; }
 @keyframes tfade { from { opacity: 0; } to { opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .tgroup:not([hidden]) { animation: none; } .tchip, .tcard, .tgo, .tgo svg { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .tgroup:not([hidden]) { animation: none; } .tchip, .tcard, .tgo, .tgo svg { transition: none; } .tsave.pop svg { animation: none; } }
 @media (max-width: 1180px) { .tgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) {
   .tgrid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
@@ -44,5 +52,5 @@
 /* Hide Record until the card is hovered (devices with a mouse only; touch screens always show it) */
 @media (hover: hover) {
   .tgo { opacity: 0; transition: opacity .15s ease, color .15s ease; }
-  .tcard:hover .tgo, .tcard:focus-visible .tgo { opacity: 1; }
+  .tcard:hover .tgo, .tcard:focus-within .tgo { opacity: 1; }
 }
