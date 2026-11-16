@@ -25,7 +25,8 @@
 .tcard:focus-visible { outline: none; }
 .tcat { font-size: 13px; color: var(--faint); }
 .tname { font-size: 18px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.4; }
-.tbottom { margin-top: auto; display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
+.tbottom { margin-top: auto; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.trate { font-size: 16px; font-weight: 500; }
 .tgo { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 500; color: var(--ink); transition: color .15s ease; }
 .tgo svg { opacity: 0; transform: translate(-4px, 4px); transition: opacity .15s ease, transform .15s ease; }
 .tcard:hover .tgo, .tcard:focus-visible .tgo { color: var(--blue); }
