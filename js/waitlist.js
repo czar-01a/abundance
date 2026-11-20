@@ -17,7 +17,7 @@
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
       email.setAttribute('aria-invalid', 'true'); err.textContent = 'Please enter a valid email address.'; err.hidden = false; email.focus(); return;
     }
-    $('wl-done-text').textContent = 'We’ll email ' + v + ' when a spot opens up.';
+    $('wl-done-text').textContent = 'We’ll email ' + v + ' when ' + (type === 'task' ? 'tasks' : 'jobs') + ' open up.';
     $('wl-form').hidden = true; $('wl-done').hidden = false; $('wl-done').focus();
   });
 })();
