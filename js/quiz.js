@@ -121,7 +121,7 @@
   function card(j) {
     var action = CAT_OF[j.product] === 'industrial' || j.title === 'Line Cook' ? 'Waitlist' : 'Reserve';
     var art = el('article', 'job');
-    var cover = el('a', 'cover'); cover.href = 'signup.html'; cover.setAttribute('aria-label', action + ' ' + j.title);
+    var cover = el('a', 'cover'); cover.href = action === 'Waitlist' ? 'waitlist.html?type=job&item=' + encodeURIComponent(j.title) : 'signup.html'; cover.setAttribute('aria-label', action + ' ' + j.title);
     art.appendChild(cover);
     var top = el('div', 'top'); top.appendChild(el('span', 'product', j.product)); art.appendChild(top);
     art.appendChild(el('h3', 'title', j.title));

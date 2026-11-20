@@ -210,7 +210,7 @@
     var art = el('article', 'job');
 
     var cover = el('a', 'cover');
-    cover.href = 'signup.html';
+    cover.href = action === 'Waitlist' ? 'waitlist.html?type=job&item=' + encodeURIComponent(job.title) : 'signup.html';
     cover.setAttribute('aria-label', action + ' ' + job.title);
     art.appendChild(cover);
 
