@@ -119,7 +119,7 @@
 
   var ARROW = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"></path><path d="M8 7h9v9"></path></svg>';
   function card(j) {
-    var action = CAT_OF[j.product] === 'industrial' || j.title === 'Line Cook' ? 'Apply' : 'Reserve';
+    var action = CAT_OF[j.product] === 'industrial' || j.title === 'Line Cook' ? 'Waitlist' : 'Reserve';
     var art = el('article', 'job');
     var cover = el('a', 'cover'); cover.href = 'signup.html'; cover.setAttribute('aria-label', action + ' ' + j.title);
     art.appendChild(cover);

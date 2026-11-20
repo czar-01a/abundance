@@ -15,15 +15,15 @@
   ];
   var MODES = ['Remote', 'On-site'];
   var KINDS = ['Full-time', 'Part-time', 'Contract', 'Flexible'];
-  var ACTIONS = ['Apply', 'Reserve'];
+  var ACTIONS = ['Waitlist', 'Reserve'];
   var PER_PAGE = 12;
 
   var catOf = {};
   PRODUCTS.forEach(function (p) { catOf[p.name] = p.cat; });
 
-  // Industrial & Manufacturing jobs (and the Line Cook demo) use "Apply"; everything else uses "Reserve".
+  // Industrial & Manufacturing jobs (and the Line Cook demo) use "Waitlist"; everything else uses "Reserve".
   function actionOf(job) {
-    return catOf[job.product] === 'industrial' || job.title === 'Line Cook' ? 'Apply' : 'Reserve';
+    return catOf[job.product] === 'industrial' || job.title === 'Line Cook' ? 'Waitlist' : 'Reserve';
   }
 
   var JOBS = (window.ABUNDANCE_JOBS || []).map(function (r, i) {
