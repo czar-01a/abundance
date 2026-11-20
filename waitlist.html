@@ -186,15 +186,17 @@
       <a class="wl-back" id="wl-back" href="jobs.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg><span id="wl-back-label">All jobs</span></a>
       <div class="wl-card">
         <form id="wl-form" novalidate>
-          <div class="wl-label" id="wl-kind">Waitlist</div>
-          <h1 id="wl-title">Join the waitlist</h1>
+          <h1>Join the waitlist</h1>
           <p>Leave your email and we&rsquo;ll let you know as soon as a spot opens.</p>
-          <label class="wl-field" for="wl-email"><span>Email</span></label>
-          <div class="wl-row">
-            <input type="email" id="wl-email" name="email" autocomplete="email" maxlength="200" placeholder="you@example.com" required>
-            <button class="btn btn-primary btn-lg" type="submit">Join waitlist</button>
+          <div class="wl-fields">
+            <label class="wl-f"><span>Email</span><input type="email" id="wl-email" name="email" autocomplete="email" maxlength="200" placeholder="you@example.com" required></label>
+            <label class="wl-f"><span>Industry</span><span class="wl-sel"><select id="wl-ind" name="industry" required></select><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></span></label>
+            <input type="text" class="wl-other" id="wl-ind-other" maxlength="80" placeholder="Name your industry" aria-label="Name your industry" hidden>
+            <label class="wl-f"><span id="wl-item-label">Job</span><span class="wl-sel"><select id="wl-item" name="item" required></select><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></span></label>
+            <input type="text" class="wl-other" id="wl-item-other" maxlength="120" placeholder="Name the job" aria-label="Name the job" hidden>
           </div>
-          <p class="wl-err" id="wl-err" role="alert" hidden>Please enter a valid email address.</p>
+          <p class="wl-err" id="wl-err" role="alert" hidden></p>
+          <button class="btn btn-primary btn-lg wl-submit" type="submit">Join waitlist</button>
         </form>
         <div class="wl-done" id="wl-done" tabindex="-1" hidden>
           <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#0058C7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M8 12.5l2.6 2.6L16 9.5"></path></svg>
@@ -228,6 +230,8 @@
   </div>
 </footer>
 <script src="js/site.js" defer></script>
+<script src="js/jobs-data.js" defer></script>
+<script src="js/tasks-data.js" defer></script>
 <script src="js/waitlist.js" defer></script>
 </body>
 </html>
