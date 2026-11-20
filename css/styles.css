@@ -484,3 +484,9 @@ textarea.field { height: 120px; padding: 14px 16px; resize: vertical; }
   .job .action { opacity: 0; transition: opacity .15s ease, color .15s ease; }
   .job:hover .action, .job:focus-within .action { opacity: 1; }
 }
+
+/* Pay disclaimer above the footer (Jobs and Tasks) */
+.pay-note { padding-top: 0; }
+.pay-note p { font-size: 13px; line-height: 1.5; color: var(--muted); }
+.join:has(+ .pay-note), .tasks:has(+ .pay-note) { padding-bottom: 40px; }
+.pay-note { padding-bottom: clamp(80px, 12vh, 140px); }
