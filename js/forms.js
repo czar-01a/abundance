@@ -13,9 +13,7 @@ window.sendForm = function (form, fields) {
     return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok || !d.ok) throw new Error(d.error || 'send'); return d; });
   });
 };
-/* Shows "Sending…" on a button while waiting, and puts the label back afterwards */
+/* Turns a button off while a form is sending, so it can't be clicked twice. The label stays the same. */
 window.busyButton = function (btn, on) {
-  if (!btn) return;
-  if (on) { btn.dataset.label = btn.textContent; btn.textContent = 'Sending…'; btn.disabled = true; }
-  else { btn.textContent = btn.dataset.label || btn.textContent; btn.disabled = false; }
+  if (btn) btn.disabled = !!on;
 };
