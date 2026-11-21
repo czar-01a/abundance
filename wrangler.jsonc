@@ -2,7 +2,7 @@
 // The Worker serves the static site and passes form submissions to Google Apps Script (see worker/index.js).
 // FORMS_URL and FORMS_SECRET are set as secrets in the Cloudflare dashboard, not here.
 {
-  "name": "WORKER_NAME",             // must match the Worker's name in the Cloudflare dashboard
+  "name": "abundance",            // must match the Worker's name in the Cloudflare dashboard
   "main": "worker/index.js",
   "compatibility_date": "2026-11-01",
   "assets": {
