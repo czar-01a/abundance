@@ -1,12 +1,14 @@
 /*
  * Abundance site Worker.
- * Serves the static site, and handles POST /api/forms: checks the submission
- * and emails it to the inbox verified in Cloudflare Email Routing.
+ * Serves the static site, and handles POST /api/forms: checks the submission,
+ * then hands it to the Google Apps Script in the team's Workspace, which emails it
+ * to team@abundancephysical.com (see worker/apps-script.gs).
  * Every other request goes straight to the static files.
+ *
+ * Secrets set in Cloudflare (Worker > Settings > Variables and secrets):
+ *   FORMS_URL     the Apps Script web app address
+ *   FORMS_SECRET  the secret printed by setup() in the Apps Script
  */
-import { EmailMessage } from 'cloudflare:email';
-
-const FROM = 'forms@abundancephysical.com';            // must be on a domain with Email Routing turned on
 const SITE_HOSTS = ['abundancephysical.com', 'www.abundancephysical.com'];
 
 // Which fields each form may send, and how long each may be
@@ -69,10 +71,17 @@ async function handleForm(request, env) {
 
   const subject = clean(spec.subject(fields)).slice(0, 150);
   const replyTo = fields.email && EMAIL_RE.test(fields.email) ? clean(fields.email) : '';
-  const mime = buildMime({ from: FROM, to: env.FORMS_TO, replyTo, subject, text: lines.join('\n') });
+  if (!env.FORMS_URL || !env.FORMS_SECRET) { console.error('FORMS_URL or FORMS_SECRET not set'); return json({ ok: false, error: 'config' }, 500); }
 
   try {
-    await env.FORMS.send(new EmailMessage(FROM, env.FORMS_TO, mime));
+    const res = await fetch(env.FORMS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ secret: env.FORMS_SECRET, subject, text: lines.join('\n'), replyTo }),
+      redirect: 'follow'
+    });
+    const out = await res.json().catch(() => ({}));
+    if (!res.ok || !out.ok) throw new Error('apps script: ' + res.status + ' ' + (out.error || ''));
   } catch (e) {
     console.error('send failed', e && e.message);
     return json({ ok: false, error: 'send' }, 502);
@@ -82,29 +91,6 @@ async function handleForm(request, env) {
 
 // Remove line breaks so nothing can be slipped into the email headers
 function clean(s) { return String(s).replace(/[\r\n]+/g, ' ').trim(); }
-
-function b64(s) {
-  const bytes = new TextEncoder().encode(s);
-  let bin = '';
-  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
-  return btoa(bin);
-}
-
-function buildMime({ from, to, replyTo, subject, text }) {
-  const body = b64(text).replace(/.{76}/g, '$&\r\n');
-  const head = [
-    'From: Abundance website <' + from + '>',
-    'To: <' + to + '>',
-    replyTo ? 'Reply-To: <' + replyTo + '>' : '',
-    'Subject: =?UTF-8?B?' + b64(subject) + '?=',
-    'Date: ' + new Date().toUTCString(),
-    'Message-ID: <' + crypto.randomUUID() + '@abundancephysical.com>',
-    'MIME-Version: 1.0',
-    'Content-Type: text/plain; charset=UTF-8',
-    'Content-Transfer-Encoding: base64'
-  ].filter(Boolean);
-  return head.join('\r\n') + '\r\n\r\n' + body + '\r\n';
-}
 
 function json(obj, status) {
   return new Response(JSON.stringify(obj), { status: status || 200, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
