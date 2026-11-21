@@ -90,8 +90,9 @@ async function handleForm(request, env) {
   const replyTo = fields.email && EMAIL_RE.test(fields.email) ? clean(fields.email) : '';
   if (!env.FORMS_URL || !env.FORMS_SECRET) { console.error('FORMS_URL or FORMS_SECRET not set'); return json({ ok: false, error: 'config' }, 500); }
 
-  // Waitlist: also record it in the Google Form (best effort; the email is what decides success)
-  const saved = body.form === 'waitlist' ? saveToWaitlistForm(fields) : Promise.resolve();
+  // Waitlist: also record it in the Google Form. A waitlist signup succeeds if either the
+  // form save or the email works, so a person is never told it failed when it was recorded.
+  const saved = body.form === 'waitlist' ? saveToWaitlistForm(fields) : Promise.resolve(false);
 
   try {
     const res = await fetch(env.FORMS_URL, {
@@ -104,7 +105,7 @@ async function handleForm(request, env) {
     if (!res.ok || !out.ok) throw new Error('apps script: ' + res.status + ' ' + (out.error || ''));
   } catch (e) {
     console.error('send failed', e && e.message);
-    await saved;
+    if (await saved) return json({ ok: true, emailed: false });
     return json({ ok: false, error: 'send' }, 502);
   }
   await saved;
@@ -131,9 +132,11 @@ async function saveToWaitlistForm(fields) {
   }
   try {
     const res = await fetch(WAITLIST_FORM, { method: 'POST', body: data, redirect: 'manual' });
-    if (res.status >= 400) console.error('waitlist form failed', res.status);
+    if (res.status >= 400) { console.error('waitlist form failed', res.status); return false; }
+    return true;
   } catch (e) {
     console.error('waitlist form failed', e && e.message);
+    return false;
   }
 }
 
