@@ -33,6 +33,6 @@
     busyButton(btn, true);
     sendForm('waitlist', { email: v, kind: type, group: groupOf(item), item: item, about: $('wl-about').value })
       .then(function () { busyButton(btn, false); $('wl-form').hidden = true; $('wl-done').hidden = false; $('wl-done').focus(); })
-      .catch(function () { busyButton(btn, false); err.textContent = 'Sorry, that didn\u2019t send. Please try again in a moment.'; err.hidden = false; });
+      .catch(function (e) { busyButton(btn, false); err.textContent = sendError(e); err.hidden = false; });
   });
 })();

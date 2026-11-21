@@ -100,11 +100,18 @@ async function handleForm(request, env) {
       body: JSON.stringify({ secret: env.FORMS_SECRET, subject, text: lines.join('\n'), replyTo }),
       redirect: 'follow'
     });
-    const out = await res.json().catch(() => ({}));
-    if (!res.ok || !out.ok) throw new Error('apps script: ' + res.status + ' ' + (out.error || ''));
+    const raw = await res.text();
+    let out = null;
+    try { out = JSON.parse(raw); } catch (e) {}
+    // Short codes shown on the page so problems can be traced:
+    //   auth   = FORMS_SECRET doesn't match the script's SECRET
+    //   script = the script ran into an error (see Apps Script > Executions)
+    //   access = Google sent a sign-in or error page (check FORMS_URL and "Who has access: Anyone")
+    if (!out) { console.error('send failed: not JSON', res.status, raw.slice(0, 200)); return json({ ok: false, error: res.status >= 400 ? 'access' : 'script' }, 502); }
+    if (!out.ok) { console.error('send failed:', out.error); return json({ ok: false, error: out.error === 'auth' ? 'auth' : 'script' }, 502); }
   } catch (e) {
     console.error('send failed', e && e.message);
-    return json({ ok: false, error: 'send' }, 502);
+    return json({ ok: false, error: 'network' }, 502);
   }
   return json({ ok: true });
 }

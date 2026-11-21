@@ -88,9 +88,9 @@
         try { localStorage.removeItem(KEY); } catch (e) {}
         window.location.href = 'order-placed.html';
       })
-      .catch(function () {
+      .catch(function (x) {
         sending = false; busyButton(btn, false);
-        var e = $('co-send-err'); e.textContent = 'Sorry, that didn\u2019t send. Please try again in a moment.'; e.hidden = false;
+        var e = $('co-send-err'); e.textContent = sendError(x); e.hidden = false;
       });
   }
   form.addEventListener('submit', function (e) {

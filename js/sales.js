@@ -23,7 +23,7 @@
     busyButton(btn, true);
     sendForm('contact-sales', { name: $('cs-name').value, email: $('cs-email').value, company: $('cs-company').value, need: $('cs-need').value, message: $('cs-msg').value })
       .then(function () { busyButton(btn, false); done(); })
-      .catch(function () { busyButton(btn, false); err.textContent = 'Sorry, that didn\u2019t send. Please try again in a moment.'; err.hidden = false; });
+      .catch(function (e) { busyButton(btn, false); err.textContent = sendError(e); err.hidden = false; });
   });
   function done() {
     form.hidden = true; $('cs-done').hidden = false;

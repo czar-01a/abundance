@@ -1,4 +1,9 @@
 /* Sends a form to the site's email handler. Resolves on success, rejects on any failure. */
+/* Error message with a short code (e.g. "auth") so problems can be traced */
+window.sendError = function (e) {
+  var code = e && e.message && e.message !== 'send' ? ' (code: ' + e.message + ')' : '';
+  return 'Sorry, that didn\u2019t send. Please try again in a moment.' + code;
+};
 window.sendForm = function (form, fields) {
   return fetch('/api/forms', {
     method: 'POST',

@@ -64,7 +64,7 @@
         $('sup-sent-text').textContent = 'We’ll get back to you at ' + email + '.';
         details.hidden = true; sent.hidden = false; reveal(sent);
       })
-      .catch(function () { busyButton(btn, false); derr.textContent = 'Sorry, that didn\u2019t send. Please try again in a moment.'; derr.hidden = false; });
+      .catch(function (e) { busyButton(btn, false); derr.textContent = sendError(e); derr.hidden = false; });
   });
   $('sup-back').addEventListener('click', function () {
     details.hidden = true; form.hidden = false;
