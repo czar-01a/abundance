@@ -15,11 +15,23 @@ const SITE_HOSTS = ['abundancephysical.com', 'www.abundancephysical.com'];
 const FORMS = {
   'contact-sales': { title: 'Contact sales', fields: { name: 100, email: 200, company: 120, need: 60, message: 2000 }, required: ['name', 'email', 'company', 'need'], subject: (f) => 'Contact sales: ' + f.company },
   support:         { title: 'Support', fields: { topic: 60, note: 1000, name: 100, email: 200, company: 120, message: 2000 }, required: ['topic', 'name', 'email'], subject: (f) => 'Support: ' + f.topic },
-  waitlist:        { title: 'Waitlist', fields: { email: 200, kind: 10, item: 120, about: 1000 }, required: ['email'], subject: (f) => 'Waitlist: ' + (f.item || f.kind || 'general') },
+  waitlist:        { title: 'Waitlist', fields: { email: 200, kind: 10, group: 60, item: 120, about: 1000 }, required: ['email'], subject: (f) => 'Waitlist: ' + (f.item || f.kind || 'general') },
   order:           { title: 'Order', fields: { summary: 20000, totals: 500 }, required: ['summary'], subject: () => 'New dataset order' }
 };
-const LABELS = { name: 'Name', email: 'Email', company: 'Company', need: 'Interested in', message: 'Message', topic: 'Topic', note: 'Note', kind: 'From', item: 'Job or task', about: 'About their work', summary: 'Order', totals: 'Totals' };
+const LABELS = { name: 'Name', email: 'Email', company: 'Company', need: 'Interested in', message: 'Message', topic: 'Topic', note: 'Note', kind: 'From', group: 'Industry or category', item: 'Job or task', about: 'About their work', summary: 'Order', totals: 'Totals' };
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Waitlist signups are also saved to the "Abundance waitlist" Google Form (for its Summary charts)
+const WAITLIST_FORM = 'https://docs.google.com/forms/d/e/1FAIpQLSeCW81aD4clQB4A--co9xqFYp-e1WSyRv-Cj2zDsPj-ZbNYAg/formResponse';
+const WAITLIST_FIELDS = { email: 'entry.1738039988', kind: 'entry.91900747', group: 'entry.1422138126', item: 'entry.917258326', about: 'entry.115331503' };
+// Multiple-choice answers must match the form's options exactly
+const FORM_GROUPS = {
+  'Factory': 'Factory', '3D Printer': '3D Printer', 'Energy': 'Energy', 'Build': 'Build', 'Intelligence': 'Intelligence',
+  'Home': 'Home', 'Food': 'Food', 'Sports': 'Sports', 'Research': 'Research', 'Medicine': 'Medicine', 'Beyond': 'Beyond',
+  'Kitchen and food': 'Kitchen and food', 'Laundry and clothing': 'Laundry and clothing',
+  'Stacking, building, and play': 'Stacking building and play', 'Just one, precisely': 'Just one precisely',
+  'Devices and household': 'Devices and household'
+};
 
 export default {
   async fetch(request, env) {
@@ -73,6 +85,9 @@ async function handleForm(request, env) {
   const replyTo = fields.email && EMAIL_RE.test(fields.email) ? clean(fields.email) : '';
   if (!env.FORMS_URL || !env.FORMS_SECRET) { console.error('FORMS_URL or FORMS_SECRET not set'); return json({ ok: false, error: 'config' }, 500); }
 
+  // Waitlist: also record it in the Google Form (best effort; the email is what decides success)
+  const saved = body.form === 'waitlist' ? saveToWaitlistForm(fields) : Promise.resolve();
+
   try {
     const res = await fetch(env.FORMS_URL, {
       method: 'POST',
@@ -84,9 +99,29 @@ async function handleForm(request, env) {
     if (!res.ok || !out.ok) throw new Error('apps script: ' + res.status + ' ' + (out.error || ''));
   } catch (e) {
     console.error('send failed', e && e.message);
+    await saved;
     return json({ ok: false, error: 'send' }, 502);
   }
+  await saved;
   return json({ ok: true });
+}
+
+async function saveToWaitlistForm(fields) {
+  const data = new URLSearchParams();
+  const values = {
+    email: fields.email,
+    kind: fields.kind === 'task' ? 'Tasks' : fields.kind === 'job' ? 'Jobs' : '',
+    group: FORM_GROUPS[fields.group] || '',
+    item: fields.item || '',
+    about: fields.about || ''
+  };
+  for (const [key, entry] of Object.entries(WAITLIST_FIELDS)) if (values[key]) data.append(entry, values[key]);
+  try {
+    const res = await fetch(WAITLIST_FORM, { method: 'POST', body: data, redirect: 'manual' });
+    if (res.status >= 400) console.error('waitlist form failed', res.status);
+  } catch (e) {
+    console.error('waitlist form failed', e && e.message);
+  }
 }
 
 // Remove line breaks so nothing can be slipped into the email headers
