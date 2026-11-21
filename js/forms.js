@@ -8,6 +8,7 @@ window.sendForm = function (form, fields) {
   return fetch('/api/forms', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    keepalive: true, // finishes sending even if the visitor leaves the page
     body: JSON.stringify({ form: form, fields: fields, website: '' })
   }).then(function (r) {
     return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok || !d.ok) throw new Error(d.error || 'send'); return d; });

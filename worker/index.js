@@ -25,7 +25,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Reply to the visitor first and send in the background (with one retry), so the thank-you is instant.
 // The waitlist is on. Emailed forms stay off until the team@ email path is confirmed working;
 // while off, they wait for the real result and show an error code if sending fails.
-const BACKGROUND = { waitlist: true, email: false };
+const BACKGROUND = { waitlist: true, email: true };
 
 // Waitlist signups are saved to the "Abundance waitlist" Google Form (and nowhere else)
 const WAITLIST_FORM = 'https://docs.google.com/forms/d/e/1FAIpQLSeCW81aD4clQB4A--co9xqFYp-e1WSyRv-Cj2zDsPj-ZbNYAg/formResponse';
@@ -101,7 +101,7 @@ async function handleForm(request, env, ctx) {
 
 
   const send = () => sendEmail(env, subject, lines.join('\n'), replyTo);
-  if (BACKGROUND.email && ctx) { ctx.waitUntil(withRetry(send, spec.title)); return json({ ok: true }); }
+  if (BACKGROUND.email && ctx) { ctx.waitUntil(withRetry(send, spec.title, subject + '\n' + lines.join('\n'))); return json({ ok: true }); }
   const error = await send();
   return error ? json({ ok: false, error }, 502) : json({ ok: true });
 }
@@ -131,13 +131,14 @@ async function sendEmail(env, subject, text, replyTo) {
   }
 }
 
-// Runs a background job, trying once more after 3 seconds if it fails. Failures are logged in Cloudflare.
-async function withRetry(job, label) {
+// Runs a background job, trying once more after 3 seconds if it fails. If both tries fail, the whole
+// submission is written to the Worker's logs (Cloudflare > Workers > abundance > Logs) so it can be recovered.
+async function withRetry(job, label, record) {
   let error = await job();
   if (!error) return;
   await new Promise((r) => setTimeout(r, 3000));
   error = await job();
-  if (error) console.error('LOST ' + label + ' submission after retry:', error);
+  if (error) console.error('LOST ' + label + ' submission after retry (' + error + ')' + (record ? ':\n' + record : ''));
 }
 
 async function saveToWaitlistForm(fields) {

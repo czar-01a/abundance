@@ -1,4 +1,4 @@
-/* Contact sales: check the required fields, then show a thank-you */
+/* Contact sales: check the required fields, show the thank-you right away, and send in the background */
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var form = $('cs-form'), err = $('cs-err');
@@ -19,11 +19,10 @@
     for (var i = 0; i < checks.length; i++) {
       if (checks[i][1]) { var el = $(checks[i][0]); el.setAttribute('aria-invalid', 'true'); err.textContent = checks[i][2]; err.hidden = false; el.focus(); return; }
     }
-    var btn = form.querySelector('button[type="submit"]');
-    busyButton(btn, true);
+    // Show the thank-you right away; the details are sent in the background
     sendForm('contact-sales', { name: $('cs-name').value, email: $('cs-email').value, company: $('cs-company').value, need: $('cs-need').value, message: $('cs-msg').value })
-      .then(function () { busyButton(btn, false); done(); })
-      .catch(function (e) { busyButton(btn, false); err.textContent = sendError(e); err.hidden = false; });
+      .catch(function () {});
+    done();
   });
   function done() {
     form.hidden = true; $('cs-done').hidden = false;
