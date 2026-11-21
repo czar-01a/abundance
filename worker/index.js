@@ -24,7 +24,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Waitlist signups are also saved to the "Abundance waitlist" Google Form (for its Summary charts)
 const WAITLIST_FORM = 'https://docs.google.com/forms/d/e/1FAIpQLSeCW81aD4clQB4A--co9xqFYp-e1WSyRv-Cj2zDsPj-ZbNYAg/formResponse';
 const WAITLIST_FIELDS = { email: 'entry.1738039988', kind: 'entry.91900747', group: 'entry.1422138126', item: 'entry.917258326', about: 'entry.115331503' };
-// Multiple-choice answers must match the form's options exactly
+// Multiple-choice answers that match the form's options exactly (anything else goes to "Other")
 const FORM_GROUPS = {
   'Factory': 'Factory', '3D Printer': '3D Printer', 'Energy': 'Energy', 'Build': 'Build', 'Intelligence': 'Intelligence',
   'Home': 'Home', 'Food': 'Food', 'Sports': 'Sports', 'Research': 'Research', 'Medicine': 'Medicine', 'Beyond': 'Beyond',
@@ -113,6 +113,9 @@ async function handleForm(request, env) {
 
 async function saveToWaitlistForm(fields) {
   const data = new URLSearchParams();
+  const others = {};
+  if (fields.kind && fields.kind !== 'Tasks' && fields.kind !== 'Jobs') others.kind = fields.kind;
+  if (fields.group && !FORM_GROUPS[fields.group]) others.group = fields.group;
   const values = {
     email: fields.email,
     kind: fields.kind === 'Tasks' || fields.kind === 'Jobs' ? fields.kind : '',
@@ -121,6 +124,11 @@ async function saveToWaitlistForm(fields) {
     about: fields.about || ''
   };
   for (const [key, entry] of Object.entries(WAITLIST_FIELDS)) if (values[key]) data.append(entry, values[key]);
+  // Multiple-choice answers that aren't one of the form's options go to its "Other" choice, with the text kept
+  for (const [key, raw] of Object.entries(others)) {
+    data.append(WAITLIST_FIELDS[key], '__other_option__');
+    data.append(WAITLIST_FIELDS[key] + '.other_option_response', raw);
+  }
   try {
     const res = await fetch(WAITLIST_FORM, { method: 'POST', body: data, redirect: 'manual' });
     if (res.status >= 400) console.error('waitlist form failed', res.status);
