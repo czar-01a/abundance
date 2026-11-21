@@ -15,7 +15,7 @@ const SITE_HOSTS = ['abundancephysical.com', 'www.abundancephysical.com'];
 const FORMS = {
   'contact-sales': { title: 'Contact sales', fields: { name: 100, email: 200, company: 120, need: 60, message: 2000 }, required: ['name', 'email', 'company', 'need'], subject: (f) => 'Contact sales: ' + f.company },
   support:         { title: 'Support', fields: { topic: 60, note: 1000, name: 100, email: 200, company: 120, message: 2000 }, required: ['topic', 'name', 'email'], subject: (f) => 'Support: ' + f.topic },
-  waitlist:        { title: 'Waitlist', fields: { email: 200, kind: 10, group: 60, item: 120, about: 1000 }, required: ['email'], subject: (f) => 'Waitlist: ' + (f.item || f.kind || 'general') },
+  waitlist:        { title: 'Waitlist', fields: { email: 200, about: 1000, kind: 10, group: 60, item: 120 }, required: ['email'], subject: (f) => 'Waitlist: ' + (f.item || f.kind || 'general') },
   order:           { title: 'Order', fields: { summary: 20000, totals: 500 }, required: ['summary'], subject: () => 'New dataset order' }
 };
 const LABELS = { name: 'Name', email: 'Email', company: 'Company', need: 'Interested in', message: 'Message', topic: 'Topic', note: 'Note', kind: 'From', group: 'Industry or category', item: 'Job or task', about: 'About their work', summary: 'Order', totals: 'Totals' };
@@ -73,11 +73,16 @@ async function handleForm(request, env) {
   for (const key of spec.required) if (!fields[key]) return json({ ok: false, error: 'missing', field: key }, 400);
   if (fields.email && !EMAIL_RE.test(fields.email)) return json({ ok: false, error: 'email' }, 400);
 
+  // Waitlist emails use the same wording and order as the Google Form
+  if (body.form === 'waitlist' && fields.kind) fields.kind = fields.kind === 'task' ? 'Tasks' : 'Jobs';
+  const labels = body.form === 'waitlist'
+    ? Object.assign({}, LABELS, { about: 'Tell us about your work', kind: 'Joined from', group: 'Industry' })
+    : LABELS;
   const lines = ['New ' + spec.title + ' submission from abundancephysical.com', ''];
   for (const key of Object.keys(spec.fields)) {
     if (!fields[key]) continue;
     const v = fields[key];
-    lines.push(v.indexOf('\n') === -1 ? LABELS[key] + ': ' + v : LABELS[key] + ':\n' + v, '');
+    lines.push(v.indexOf('\n') === -1 ? labels[key] + ': ' + v : labels[key] + ':\n' + v, '');
   }
   lines.push('Sent ' + new Date().toUTCString());
 
@@ -110,7 +115,7 @@ async function saveToWaitlistForm(fields) {
   const data = new URLSearchParams();
   const values = {
     email: fields.email,
-    kind: fields.kind === 'task' ? 'Tasks' : fields.kind === 'job' ? 'Jobs' : '',
+    kind: fields.kind === 'Tasks' || fields.kind === 'Jobs' ? fields.kind : '',
     group: FORM_GROUPS[fields.group] || '',
     item: fields.item || '',
     about: fields.about || ''
