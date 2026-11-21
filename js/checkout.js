@@ -22,7 +22,6 @@
   });
 
   if (!cart.length) { $('co-empty').hidden = false; return; }
-  if (!$('co-form').hasAttribute('data-off')) $('co-form').hidden = false;
   $('co-summary').hidden = false;
 
   var tq = 0, h = 0, ep = 0, gb = 0, wk = 0;
@@ -56,13 +55,7 @@
   $('co-episodes').textContent = fmt(ep);
   $('co-weeks').textContent = wk + ' weeks';
 
-  var form = $('co-form'), f = form.elements, CKEY = KEY + '-contact';
-  try { var saved = JSON.parse(localStorage.getItem(CKEY) || '{}'); ['name', 'email', 'company', 'notes'].forEach(function (k) { if (typeof saved[k] === 'string') f[k].value = saved[k].slice(0, 1000); }); } catch (e) {}
-  form.addEventListener('input', function () {
-    var o = {}; ['name', 'email', 'company', 'notes'].forEach(function (k) { o[k] = f[k].value; });
-    try { localStorage.setItem(CKEY, JSON.stringify(o)); } catch (e) {}
-    f.email.setAttribute('aria-invalid', 'false'); $('co-err').hidden = true;
-  });
+  try { localStorage.removeItem(KEY + '-contact'); } catch (e) {} // details form was removed; clear any old saved copy
 
   // Checkout places the order: clear the cart and go to the confirmation page
   function orderText() {
@@ -93,15 +86,5 @@
         var e = $('co-send-err'); e.textContent = sendError(x); e.hidden = false;
       });
   }
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.value.trim())) {
-      f.email.setAttribute('aria-invalid', 'true'); $('co-err').hidden = false; f.email.focus(); return;
-    }
-    finish();
-  });
-  $('co-checkout').addEventListener('click', function () {
-    if (!form.hidden) { if (form.requestSubmit) form.requestSubmit(); else form.dispatchEvent(new Event('submit', { cancelable: true })); return; }
-    finish();
-  });
+  $('co-checkout').addEventListener('click', finish);
 })();

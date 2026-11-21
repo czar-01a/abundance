@@ -1,52 +1,20 @@
-/* Dataset builder demo: live estimates, sample episode, delivery preview */
+/* Dataset builder demo: the form, demo media, and the cart */
 (function () {
   var form = document.getElementById('builder-form');
   if (!form) return;
   form.addEventListener('submit', function (e) { e.preventDefault(); }); // Enter in a text field must not reload the page
 
-  // Broad task categories (Scratch option C), not shown right now; kept for later
+  // Task options on the page: label, and seconds per episode (used for the cart's episode estimate)
   var TASKS = {
-    manip: { name: 'manipulation', label: 'Manipulation', sec: 45, say: 'Pick up the item and put it where it belongs.',
-      steps: [['Reach', 3], ['Grasp', 4], ['Manipulate', 14], ['Place', 4], ['Release', 2]] },
-    mobile: { name: 'mobile_manipulation', label: 'Mobile manipulation', sec: 90, say: 'Go to the counter, pick up the cup, and bring it to the table.',
-      steps: [['Navigate', 20], ['Approach', 6], ['Grasp', 5], ['Carry', 18], ['Place', 5]] },
-    nav: { name: 'navigation', label: 'Navigation', sec: 120, say: 'Walk from the entrance to the kitchen.',
-      steps: [['Start', 5], ['Explore', 30], ['Avoid obstacle', 10], ['Reach goal', 15]] },
-    motion: { name: 'human_motion', label: 'Human motion', sec: 30, say: 'Lift the box from the floor to the shelf.',
-      steps: [['Stance', 4], ['Bend', 4], ['Lift', 5], ['Turn', 4], ['Place', 4]] },
-    // Task options shown on the page
-
-    pick: { name: 'pick_place', label: 'Pick and place', sec: 20, say: 'Put the red block in the bowl.',
-      steps: [['Reach', 3], ['Grasp block', 3], ['Lift', 2], ['Move', 4], ['Place in bowl', 3], ['Release', 2]] },
-    household: { name: 'household_manip', label: 'Household manipulation', sec: 45, say: 'Fold the towel and place it in the basket.',
-      steps: [['Reach', 3], ['Grasp towel', 4], ['Fold in half', 9], ['Fold again', 8], ['Lift', 3], ['Place in basket', 5]] },
-    warehouse: { name: 'warehouse_pick', label: 'Warehouse picking', sec: 30, say: 'Pick the blue box and put it on the conveyor.',
-      steps: [['Scan shelf', 4], ['Reach', 3], ['Grasp box', 4], ['Lift', 3], ['Turn', 3], ['Place on conveyor', 4]] },
-    assembly: { name: 'assembly', label: 'Assembly', sec: 60, say: 'Insert the bracket and fasten both screws.',
-      steps: [['Pick bracket', 4], ['Align', 5], ['Insert', 4], ['Pick screwdriver', 3], ['Fasten screw 1', 7], ['Fasten screw 2', 7]] },
-    folding: { name: 'cloth_folding', label: 'Cloth folding', sec: 60, say: 'Fold the T-shirt and stack it.',
-      steps: [['Flatten', 8], ['Grasp sleeve', 4], ['Fold sleeves', 10], ['Fold in half', 8], ['Stack', 5]] },
-    food: { name: 'food_prep', label: 'Food prep', sec: 90, say: 'Slice the cucumber and plate it.',
-      steps: [['Wash', 6], ['Pick knife', 3], ['Slice', 14], ['Transfer', 5], ['Plate', 6]] },
-    sports: { name: 'sports_motion', label: 'Sports motion', sec: 20, say: 'Shoot a free throw.',
-      steps: [['Set stance', 3], ['Dribble', 4], ['Gather', 2], ['Jump', 2], ['Release', 2], ['Land', 2]] },
-    other: { name: 'custom_task', label: 'Custom task', sec: 60, say: 'Your task, described in plain language.',
-      steps: [['Set up', 4], ['Reach', 3], ['Grasp', 4], ['Manipulate', 12], ['Place', 4], ['Reset', 3]] }
+    pick: { label: 'Pick and place', sec: 20 },
+    household: { label: 'Household manipulation', sec: 45 },
+    warehouse: { label: 'Warehouse picking', sec: 30 },
+    assembly: { label: 'Assembly', sec: 60 },
+    folding: { label: 'Cloth folding', sec: 60 },
+    other: { label: 'Custom task', sec: 60 }
   };
-  var MODS = {
-    video: { label: 'Egocentric video', gb: 7, kind: 'frames', lerobot: 'observation.images.ego' },
-    wrist: { label: 'Wrist camera', gb: 5, kind: 'frames', lerobot: 'observation.images.wrist' },
-    joints: { label: 'Joint states', gb: 0.05, kind: 'wave', seed: 4 },
-    teleop: { label: 'Teleop actions', gb: 0.05, kind: 'wave', seed: 3 },
-    depth: { label: 'Depth', gb: 5, kind: 'frames', lerobot: 'observation.images.depth' },
-    hands: { label: 'Hand pose', gb: 0.1, kind: 'wave', seed: 2 },
-    force: { label: 'Force/torque', gb: 0.05, kind: 'wave', seed: 9 },
-    imu: { label: 'IMU', gb: 0.02, kind: 'wave', seed: 5 },
-    lidar: { label: 'LiDAR', gb: 10, kind: 'frames' },
-    tactile: { label: 'Tactile', gb: 1, kind: 'wave', seed: 7 },
-    audio: { label: 'Audio', gb: 0.2, kind: 'wave', seed: 11 },
-    other: { label: 'Other sensor', gb: 1, kind: 'wave', seed: 13 }
-  };
+  // Modality options on the page: raw data per hour of recording, in GB (used for the cart's estimate)
+  var MODS = { video: 7, wrist: 5, joints: 0.05, teleop: 0.05, depth: 5, other: 1 };
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function $(id) { return document.getElementById(id); }
@@ -55,11 +23,11 @@
   function fmt(n) { return n.toLocaleString('en-US'); }
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 
-  function otherText(name) { var v = $(name + '-other').value.trim(); return v; }
+  function otherText(name) { var box = $(name + '-other'); return box ? box.value.trim() : ''; }
   function syncOthers() {
     ['task', 'body', 'mod', 'equip', 'note'].forEach(function (name) {
       var on = !!form.querySelector('input[name="' + name + '"][value="other"]:checked'), box = $(name + '-other');
-      if (box.hidden === on) { box.hidden = !on; if (on && document.activeElement && document.activeElement.value === 'other') box.focus(); }
+      if (box && box.hidden === on) { box.hidden = !on; if (on && document.activeElement && document.activeElement.value === 'other') box.focus(); }
     });
   }
   function chipLabel(name, v) {
@@ -68,14 +36,11 @@
     var input = Array.prototype.find.call(form.querySelectorAll('input[name="' + name + '"]'), function (i) { return i.value === v; });
     return input ? input.parentNode.textContent.trim() : 'Not selected';
   }
-  var GENERIC = { name: 'your_dataset', label: 'Your dataset', sec: 60, say: 'Your task, described in plain language.',
-    steps: [['Set up', 4], ['Reach', 3], ['Grasp', 4], ['Manipulate', 12], ['Place', 4], ['Reset', 3]] };
+  var GENERIC = { label: 'Your dataset', sec: 60 };
   function taskInfo(s) {
-    if (!s.task) return GENERIC;
     var t = TASKS[s.task];
-    if (s.task !== 'other') return t;
-    var txt = otherText('task');
-    return { name: t.name, label: txt || t.label, sec: t.sec, steps: t.steps, say: txt ? txt.replace(/\.?$/, '.') : t.say };
+    if (!t) return GENERIC;
+    return s.task === 'other' ? { label: otherText('task') || t.label, sec: t.sec } : t;
   }
 
   function readState() {
@@ -85,145 +50,24 @@
     };
   }
 
+  // Cart estimates: episodes, raw size, and weeks to deliver
   function estimates(s) {
     var t = taskInfo(s);
     var episodes = Math.round(s.hours * 3600 / t.sec);
     var people = Math.max(Math.ceil(s.envs * 1.2), Math.ceil(s.hours / 40));
     var hardware = !!s.body && s.body !== 'human';
-    var firstDays = 7 + (hardware ? 7 : 0) + (s.mods.indexOf('tactile') > -1 ? 4 : 0);
     var weeks = 2 + Math.ceil(s.hours / (people * 10)) + Math.ceil(s.hours / 500) + (hardware ? 1 : 0);
-    var gb = s.mods.reduce(function (sum, m) { return sum + MODS[m].gb; }, 0) * s.hours;
-    return { episodes: episodes, people: people, firstDays: firstDays, weeks: weeks, gb: gb };
-  }
-
-  /* ---------- sample episode ---------- */
-  var playing = !reduce, t0 = null, pos = 0, raf = null, segEls = [], cur = -1;
-  var LOOP_MS = 9000;
-
-  function wave(seed, w, h) {
-    var pts = [], n = 90;
-    for (var i = 0; i <= n; i++) {
-      var x = i / n;
-      var y = Math.sin(x * (6 + seed) + seed) * 0.45 + Math.sin(x * (17 + seed * 2)) * 0.2 + Math.sin(x * 41 + seed * 3) * 0.08;
-      pts.push((x * w).toFixed(1) + ',' + (h / 2 - y * h * 0.42).toFixed(1));
-    }
-    return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + pts.join(' ') + '" fill="none" stroke="#0A74E0" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg>';
-  }
-  function frames(w, h) {
-    var out = '', n = 28, gap = 2, fw = (w - gap * (n - 1)) / n;
-    for (var i = 0; i < n; i++) out += '<rect x="' + (i * (fw + gap)).toFixed(1) + '" y="3" width="' + fw.toFixed(1) + '" height="' + (h - 6) + '" rx="2" fill="' + (i % 2 ? '#CFE6FB' : '#B9DBFA') + '"/>';
-    return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" aria-hidden="true">' + out + '</svg>';
-  }
-
-  function buildEpisode(s) {
-    var t = taskInfo(s), lanes = $('lanes');
-    lanes.textContent = '';
-    var total = t.steps.reduce(function (a, st) { return a + st[1]; }, 0);
-    var actLane = el('div', 'lane');
-    actLane.appendChild(el('div', 'lane-name', s.notes.indexOf('actions') > -1 ? 'Action labels' : 'Task steps'));
-    var track = el('div', 'lane-track'), row = el('div', 'seg-row');
-    segEls = t.steps.map(function (st, i) {
-      var d = el('div', null, st[0]);
-      d.style.width = (st[1] / total * 100) + '%';
-      d.style.background = i % 2 ? '#D6EBFD' : '#EAF5FF';
-      row.appendChild(d);
-      return d;
-    });
-    track.appendChild(row); actLane.appendChild(track); lanes.appendChild(actLane);
-    s.mods.forEach(function (m) {
-      var lane = el('div', 'lane');
-      lane.appendChild(el('div', 'lane-name', m === 'other' ? (otherText('mod') || MODS[m].label) : MODS[m].label));
-      var tr = el('div', 'lane-track');
-      tr.innerHTML = MODS[m].kind === 'frames' ? frames(400, 26) : wave(MODS[m].seed, 400, 26);
-      lane.appendChild(tr); lanes.appendChild(lane);
-    });
-    var head = el('div', 'playhead'); head.id = 'playhead'; lanes.appendChild(head);
-    $('say').hidden = s.notes.indexOf('language') < 0;
-    $('say').textContent = '\u201C' + t.say + '\u201D';
-    cur = -1;
-    paint();
-  }
-
-  function paint() {
-    var s = readState(), t = taskInfo(s);
-    var total = t.steps.reduce(function (a, st) { return a + st[1]; }, 0);
-    var head = $('playhead'), lanes = $('lanes');
-    if (!head) return;
-    var nameW = lanes.querySelector('.lane-track').offsetLeft;
-    var trackW = lanes.clientWidth - nameW;
-    head.style.left = (nameW + pos * trackW - 1) + 'px';
-    var sec = pos * total, acc = 0, idx = t.steps.length - 1;
-    for (var i = 0; i < t.steps.length; i++) { acc += t.steps[i][1]; if (sec < acc) { idx = i; break; } }
-    if (idx !== cur) {
-      segEls.forEach(function (d, i) { d.classList.toggle('on', i === idx); });
-      $('now-step').textContent = t.steps[idx][0];
-      cur = idx;
-    }
-    $('now-time').textContent = sec.toFixed(1) + 's / ' + total + '.0s';
-  }
-
-  function tick(ts) {
-    if (t0 === null) t0 = ts - pos * LOOP_MS;
-    pos = ((ts - t0) % LOOP_MS) / LOOP_MS;
-    paint();
-    raf = requestAnimationFrame(tick);
-  }
-  function setPlaying(on) {
-    playing = on;
-    $('play').setAttribute('aria-pressed', on ? 'true' : 'false');
-    $('play-label').textContent = on ? 'Pause' : 'Play';
-    $('play-icon').innerHTML = on ? '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>' : '<path d="M7 5l12 7-12 7z"/>';
-    cancelAnimationFrame(raf); t0 = null;
-    if (on) raf = requestAnimationFrame(tick);
-  }
-  $('play').addEventListener('click', function () { setPlaying(!playing); });
-  $('lanes').addEventListener('click', function (e) {
-    var track = $('lanes').querySelector('.lane-track'), r = track.getBoundingClientRect();
-    pos = Math.min(0.999, Math.max(0, (e.clientX - r.left) / r.width)); t0 = null; paint();
-  });
-
-  /* ---------- delivery preview ---------- */
-  function tree(s, e) {
-    var t = taskInfo(s), n = t.name + '_v1/', L = [];
-    var has = function (m) { return s.mods.indexOf(m) > -1; }, note = function (a) { return s.notes.indexOf(a) > -1; };
-    if (s.format === 'lerobot') {
-      L.push('<b>' + n + '</b>', '  meta/', '    info.json', '    episodes.jsonl');
-      if (note('language')) L.push('    tasks.jsonl');
-      L.push('  data/chunk-000/', '    episode_000000.parquet', '    \u2026');
-      ['video', 'wrist', 'depth'].forEach(function (m) { if (has(m)) L.push('  videos/chunk-000/' + MODS[m].lerobot + '/', '    episode_000000.mp4'); });
-    } else if (s.format === 'rlds') {
-      L.push('<b>' + n + '</b>', '  1.0.0/', '    dataset_info.json', '    features.json');
-      var shards = Math.max(1, Math.ceil(e.gb / 4));
-      L.push('    ' + t.name + '-train.tfrecord-00000-of-' + String(shards).padStart(5, '0'), '    \u2026');
-    } else {
-      L.push('<b>' + n + '</b>', '  episodes/', '    ep_0001.mcap', '    ep_0002.mcap', '    \u2026');
-      if (s.notes.length) L.push('  annotations/');
-      if (note('actions')) L.push('    actions.parquet');
-      if (note('language')) L.push('    instructions.jsonl');
-      if (note('boxes')) L.push('    objects.parquet');
-      if (note('success')) L.push('    outcomes.parquet');
-      if (note('masks')) L.push('    masks/');
-      if (note('keypoints')) L.push('    keypoints.parquet');
-      L.push('  metadata.json');
-    }
-    return L.join('\n');
-  }
-  function code(s) {
-    var n = taskInfo(s).name + '_v1';
-    if (s.format === 'lerobot') return '<span class="c"># pip install lerobot</span>\nfrom lerobot.datasets.lerobot_dataset import LeRobotDataset\n\nds = LeRobotDataset(<span class="s">"abundance/' + n + '"</span>)\nframe = ds[0]\nframe.keys()';
-    if (s.format === 'rlds') return '<span class="c"># pip install tensorflow-datasets</span>\nimport tensorflow_datasets as tfds\n\nds = tfds.builder_from_directory(\n    <span class="s">"' + n + '/1.0.0"</span>\n).as_dataset(split=<span class="s">"train"</span>)\nfor ep in ds.take(1):\n    steps = ep[<span class="s">"steps"</span>]';
-    return '<span class="c"># pip install mcap</span>\nfrom mcap.reader import make_reader\n\nf = open(<span class="s">"episodes/ep_0001.mcap"</span>, <span class="s">"rb"</span>)\nfor _, ch, msg in make_reader(f).iter_messages():\n    print(ch.topic, msg.log_time)';
+    var gb = s.mods.reduce(function (sum, m) { return sum + (MODS[m] || 0); }, 0) * s.hours;
+    return { episodes: episodes, weeks: weeks, gb: gb };
   }
 
   /* ---------- task description + demo media ---------- */
   var files = [], MAX_FILES = 5;
   function kb(n) { return n >= 1e9 ? (n / 1e9).toFixed(1) + ' GB' : n >= 1e6 ? (n / 1e6).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1e3)) + ' KB'; }
-  function thumb(f, cls) {
+  function thumb(f) {
     var m = f.file.type.indexOf('video') === 0 ? el('video') : el('img');
-    var isVid = m.tagName === 'VIDEO';
-    m.src = isVid && !cls ? f.url + '#t=0.1' : f.url;
-    if (isVid) { m.preload = 'metadata'; m.muted = true; m.playsInline = true; m.loop = true; m.setAttribute('aria-label', f.file.name); if (cls) m.autoplay = !reduce; }
-    else m.alt = f.file.name;
+    if (m.tagName === 'VIDEO') { m.src = f.url + '#t=0.1'; m.preload = 'metadata'; m.muted = true; m.playsInline = true; m.setAttribute('aria-label', f.file.name); }
+    else { m.src = f.url; m.alt = f.file.name; }
     return m;
   }
   function renderMedia() {
@@ -241,14 +85,6 @@
     });
     $('media-note').hidden = !files.length;
     $('drop').hidden = files.length >= MAX_FILES;
-    var ref = $('ref'), box = $('ref-media');
-    box.textContent = '';
-    ref.hidden = !files.length;
-    if (files.length) {
-      var v = thumb(files[0], true); box.appendChild(v);
-      if (v.tagName === 'VIDEO' && !reduce) v.play().catch(function () {});
-      $('ref-name').textContent = files[0].file.name + (files.length > 1 ? ' + ' + (files.length - 1) + ' more' : '');
-    }
   }
   function addFiles(list) {
     Array.prototype.forEach.call(list, function (file) {
@@ -265,87 +101,14 @@
   drop.addEventListener('drop', function (e) { if (e.dataTransfer) addFiles(e.dataTransfer.files); });
 
   /* ---------- render ---------- */
-  var lastTask = null, lastMods = '', lastNotes = '';
-  /* ---------- selection summary (right column) ---------- */
-  var ICONS = {
-    task: '<path d="M12 3v4"></path><path d="M12 17v4"></path><path d="M3 12h4"></path><path d="M17 12h4"></path><circle cx="12" cy="12" r="5"></circle><circle cx="12" cy="12" r="1.5"></circle>',
-    body: '<path d="M5 21h8"></path><path d="M9 21v-6l4-6"></path><circle cx="13" cy="8" r="2"></circle><path d="M15 7l4-2"></path><path d="M19 5l1 3"></path><path d="M19 5l-1-2"></path>',
-    mod: '<path d="M12 3l9 5-9 5-9-5 9-5z"></path><path d="M3 13l9 5 9-5"></path>',
-    equip: '<rect x="3" y="7" width="13" height="11" rx="2"></rect><path d="M16 11l5-3v9l-5-3"></path><path d="M7 7l1.5-3h4L14 7"></path>',
-    note: '<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9-9-9z"></path><circle cx="8" cy="8" r="1.5"></circle>'
-  };
-  function renderSummary(s) {
-    var rows = [
-      ['task', 'Task', s.task ? [chipLabel('task', s.task)] : []],
-      ['body', 'Embodiment', s.body ? [chipLabel('body', s.body)] : []],
-      ['mod', 'Modalities', s.mods.map(function (v) { return chipLabel('mod', v); })],
-      ['equip', 'Equipment', s.equip.map(function (v) { return chipLabel('equip', v); })],
-      ['note', 'Annotations', s.notes.map(function (v) { return chipLabel('note', v); })]
-    ];
-    var box = $('spec-rows'), picked = 0;
-    // Build the five rows once, then update only the row whose choices changed,
-    // adding or removing just the affected tags so nothing else re-animates.
-    if (!box.children.length) {
-      rows.forEach(function (r) {
-        var row = el('div', 'spec-row'); row.dataset.key = r[0];
-        var ic = el('div', 'spec-ic');
-        ic.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[r[0]] + '</svg>';
-        row.appendChild(ic);
-        row.appendChild(el('div', 'spec-k', r[1]));
-        var v = el('div', 'spec-v'); v.appendChild(el('span', 'spec-none', 'Not selected'));
-        row.appendChild(v);
-        box.appendChild(row);
-      });
-    }
-    rows.forEach(function (r) {
-      if (r[2].length) picked++;
-      var row = box.querySelector('[data-key="' + r[0] + '"]'), v = row.querySelector('.spec-v');
-      row.classList.toggle('on', r[2].length > 0);
-      var pills = Array.prototype.slice.call(v.querySelectorAll('.spec-pill'));
-      var have = pills.map(function (p) { return p.textContent; });
-      if (have.join('\n') === r[2].join('\n')) return; // unchanged: leave this row alone
-      pills.forEach(function (p) { if (r[2].indexOf(p.textContent) < 0) p.remove(); }); // remove at once so nothing shifts around
-      var none = v.querySelector('.spec-none');
-      r[2].forEach(function (t, i) {
-        var existing = Array.prototype.find.call(v.querySelectorAll('.spec-pill'), function (p) { return p.textContent === t; });
-        var pill = existing || el('span', 'spec-pill', t);
-        pill.title = t;
-        var at = v.querySelectorAll('.spec-pill')[i];
-        if (at !== pill) v.insertBefore(pill, at || none);
-      });
-      none.hidden = r[2].length > 0;
-    });
-    $('spec-title').textContent = $('ds-name').value.trim() || 'Your dataset';
-    $('spec-count').textContent = picked + ' of 5 picked';
-    var foot = $('spec-foot'); foot.textContent = '';
-    [[fmt(s.hours) + ' hrs', 'Volume'], [fmt(s.envs), 'Locations'],
-     [form.querySelector('input[name="format"]:checked').parentNode.textContent.trim(), 'Format'],
-     [files.length ? files.length + (files.length === 1 ? ' file' : ' files') : 'None', 'Demo']].forEach(function (f) {
-      var d = el('div'); d.appendChild(el('span', 'v', f[0])); d.appendChild(el('span', 'k', f[1])); foot.appendChild(d);
-    });
-  }
-
   function render() {
     syncOthers();
-    var s = readState(), e = estimates(s), ti = taskInfo(s);
-    renderSummary(s);
+    var s = readState();
     ['hours', 'envs'].forEach(function (id) {
       var r = $(id); r.style.setProperty('--fill', ((r.value - r.min) / (r.max - r.min) * 100) + '%');
     });
     $('hours-out').textContent = fmt(s.hours) + ' hrs';
     $('envs-out').textContent = fmt(s.envs) + ' locations';
-    $('st-episodes').textContent = fmt(e.episodes);
-    $('st-people').textContent = fmt(e.people);
-    $('st-first').textContent = e.firstDays + ' days';
-    $('st-weeks').textContent = e.weeks + ' weeks';
-    $('ep-title').textContent = ti.label + ' \u00B7 episode 0001';
-    $('tree').innerHTML = tree(s, e);
-    $('code').innerHTML = code(s);
-    var key = s.task + '|' + ti.say + '|' + otherText('mod');
-    if (key !== lastTask || s.mods.join() !== lastMods || s.notes.join() !== lastNotes) {
-      lastTask = key; lastMods = s.mods.join(); lastNotes = s.notes.join();
-      buildEpisode(s);
-    }
     if (typeof cart !== 'undefined' && cart) syncQty(false);
   }
 
@@ -409,7 +172,7 @@
       var v = i.value, n = i.name;
       i.checked = n === 'task' ? it.task === v : n === 'body' ? it.body === v : n === 'mod' ? it.mods.indexOf(v) > -1 : n === 'equip' ? (it.equip || []).indexOf(v) > -1 : it.notes.indexOf(v) > -1;
     });
-    ['task', 'body', 'mod', 'equip', 'note'].forEach(function (n) { $(n + '-other').value = (it.other && it.other[n]) || ''; });
+    ['task', 'body', 'mod', 'equip', 'note'].forEach(function (n) { var box = $(n + '-other'); if (box) box.value = (it.other && it.other[n]) || ''; });
     $('task-desc').value = it.desc || '';
     $('ds-name').value = it.name || '';
     $('hours').value = it.hours; $('envs').value = it.envs;
@@ -612,8 +375,5 @@
   if (location.hash === '#cart') setTimeout(openCart, 0); // "Edit cart" from the checkout page
   form.addEventListener('input', render);
   form.addEventListener('change', render);
-  window.addEventListener('resize', paint);
   render();
-  if ($('lanes').closest('[hidden]')) playing = false; // sample episode is hidden: don't animate it in the background
-  setPlaying(playing);
 })();

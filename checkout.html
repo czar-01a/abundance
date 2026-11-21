@@ -13,9 +13,7 @@
 <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="css/styles.css">
 <link rel="stylesheet" href="css/demo.css">
 <link rel="stylesheet" href="css/checkout.css">
@@ -197,21 +195,6 @@
         <p>Spec a dataset on the demo page and add it to your cart.</p>
         <a class="btn btn-primary btn-lg" href="demo.html">Go to demo</a>
       </div>
-
-      <!-- Your details: hidden for now (remove data-off to bring it back) -->
-      <form class="co-form dpanel" id="co-form" novalidate hidden data-off>
-        <div class="dpanel-head"><span class="dpanel-title">Your details</span></div>
-        <div class="co-fields">
-          <label class="cfield"><span>Name</span><input type="text" name="name" autocomplete="name" maxlength="120"></label>
-          <label class="cfield"><span>Work email</span><input type="email" name="email" autocomplete="email" maxlength="200" required aria-required="true" aria-describedby="co-err"></label>
-          <label class="cfield co-wide"><span>Company</span><input type="text" name="company" autocomplete="organization" maxlength="120"></label>
-          <label class="cfield co-wide"><span>Notes <span class="optional">(optional)</span></span><textarea name="notes" rows="3" maxlength="1000" placeholder="Budget, deadlines, compliance needs, anything else"></textarea></label>
-          <p class="field-err co-wide" id="co-err" hidden>Please enter a valid work email.</p>
-        </div>
-        <div class="co-actions">
-          <button class="btn btn-primary btn-lg btn-block" type="submit">Checkout</button>
-        </div>
-      </form>
 
       <aside class="co-summary dpanel" id="co-summary" hidden>
         <div class="dpanel-head"><span class="dpanel-title">Your cart</span><a class="co-edit" href="demo.html#cart">Edit cart</a></div>

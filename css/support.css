@@ -5,7 +5,6 @@
 .sup-hero p { font-size: clamp(16px, 1.4vw, 19px); line-height: 1.6; color: var(--ink-2); font-weight: 300; max-width: 560px; }
 .sup { padding-top: 28px; padding-bottom: clamp(96px, 14vh, 160px); }
 .sup .wrap { display: grid; grid-template-columns: minmax(0, 760px); gap: 32px; align-items: start; }
-.sup-card, .sup-contact { border: 1px solid var(--line-2); border-radius: 20px; background: #ffffff; }
 .sup-card { padding: clamp(24px, 4vw, 48px); }
 .sup fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
 .sup legend { padding: 0; font-size: 20px; font-weight: 500; letter-spacing: -0.01em; margin-bottom: 20px; }
@@ -31,14 +30,6 @@
 .sup-back:hover { text-decoration: underline; }
 .sup-back:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
 @keyframes supin { from { opacity: 0; } to { opacity: 1; } }
-.sup-contact { padding: 28px; display: flex; flex-direction: column; gap: 22px; }
-.sup-contact h2 { font-size: 20px; font-weight: 500; letter-spacing: -0.01em; }
-.sup-row { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line); padding-top: 18px; }
-.sup-k { font-size: 14px; color: var(--muted); }
-.sup-v { font-size: 16px; font-weight: 500; overflow-wrap: anywhere; }
-.sup-social { display: flex; align-items: center; gap: 20px; }
-.sup-social a { color: #4A5568; display: inline-flex; }
-.sup-social a:hover { color: var(--ink); }
 @media (max-width: 900px) { .sup .wrap { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 640px) { .sopt { font-size: 16px; } #sup-form .btn { width: 100%; } .sup-actions .btn { width: 100%; } }
 @media (prefers-reduced-motion: reduce) { .sup-answer { animation: none; } .sopt, .sopt input, .sopt input::after { transition: none; } }

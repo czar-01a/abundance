@@ -1,25 +1,13 @@
 /* Checkout page */
 .co-hero { padding-top: clamp(40px, 7vh, 80px); padding-bottom: 24px; }
-.co-hero .wrap { display: flex; flex-direction: column; gap: 16px; }
+.co-hero .wrap { display: flex; flex-direction: column; gap: 16px; max-width: 720px; }
 .co-hero h1 { font-size: clamp(40px, 5vw, 64px); line-height: 1.04; letter-spacing: -0.045em; font-weight: 400; }
 .co-back { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; color: var(--ink-2); align-self: flex-start; }
 .co-back:hover { color: var(--ink); }
 .co { padding-bottom: clamp(96px, 14vh, 160px); }
-.co .wrap { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 32px; align-items: start; }
-.co-fields { padding: 24px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-.co-wide { grid-column: 1 / -1; }
-.cfield { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; }
-.cfield input, .cfield select, .cfield textarea { min-height: 44px; padding: 10px 14px; border: 1px solid var(--line-3); border-radius: 12px; font: inherit; font-size: 15px; font-weight: 400; color: var(--ink); background: #ffffff; }
-.cfield textarea { resize: vertical; line-height: 1.5; }
-.cfield input:focus, .cfield select:focus, .cfield textarea:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
-.cfield input[aria-invalid="true"] { border-color: var(--error); box-shadow: 0 0 0 3px rgba(180, 35, 24, .12); }
+.co .wrap { display: grid; grid-template-columns: minmax(0, 720px); justify-content: center; gap: 32px; align-items: start; }
 .co-actions { padding: 0 24px 24px; display: flex; flex-direction: column; gap: 10px; }
 .co-actions .disclaimer { text-align: center; }
-.co-summary { position: sticky; top: 112px; }
-/* While Your details is hidden, the summary sits alone in a centered column */
-.co .wrap:has(.co-form[data-off]) { grid-template-columns: minmax(0, 720px); justify-content: center; }
-body:has(.co-form[data-off]) .co-hero .wrap { max-width: 720px; }
-body:has(.co-form[data-off]) .co-summary { position: static; }
 .co-summary-actions { padding-top: 4px; }
 .co-edit { font-size: 14px; font-weight: 500; }
 .co-items { padding: 8px 24px; display: flex; flex-direction: column; }
@@ -45,14 +33,12 @@ body:has(.co-form[data-off]) .co-summary { position: static; }
 .co-empty p, .co-done p { color: var(--ink-2); max-width: 520px; line-height: 1.6; }
 .co-done svg { color: var(--blue-text); }
 .co-done-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 6px; }
-@media (max-width: 1180px) {
+@media (max-width: 760px) {
   .co .wrap { grid-template-columns: minmax(0, 1fr); }
-  .co-summary { position: static; order: -1; }
 }
 @media (max-width: 640px) {
   .co-specs { grid-template-columns: minmax(0, 1fr); row-gap: 2px; }
   .co-specs dd { margin-bottom: 8px; }
-  .co-fields { grid-template-columns: minmax(0, 1fr); padding: 18px; }
   .co-actions { padding: 0 18px 18px; }
   .co-items, .co-totals, .co-note { padding-left: 18px; padding-right: 18px; }
 }

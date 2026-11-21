@@ -13,9 +13,7 @@
 <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="css/styles.css">
 <link rel="stylesheet" href="css/demo.css">
 </head>
@@ -192,7 +190,6 @@
     <div class="wrap">
       <form class="controls" id="builder-form">
         <fieldset class="ctl">
-          <!-- Hidden options (hidden attribute) are kept for later; remove "hidden" to show them again. -->
           <legend class="ctl-label">Task</legend>
           <div class="chips">
           <!-- temporarily first; original order: by how common each option is -->
@@ -201,8 +198,6 @@
           <label class="chip"><input type="checkbox" name="task" value="household"><span>Household manipulation</span></label>
           <label class="chip"><input type="checkbox" name="task" value="warehouse"><span>Warehouse picking</span></label>
           <label class="chip"><input type="checkbox" name="task" value="assembly"><span>Assembly</span></label>
-          <label class="chip" hidden><input type="checkbox" name="task" value="food"><span>Food prep</span></label>
-          <label class="chip" hidden><input type="checkbox" name="task" value="sports"><span>Sports motion</span></label>
           <label class="chip"><input type="checkbox" name="task" value="other"><span>Other</span></label>
           </div>
           <input class="other-input" type="text" id="task-other" maxlength="80" placeholder="Name your task" aria-label="Name your task" hidden>
@@ -221,10 +216,7 @@
           <label class="chip"><input type="checkbox" name="body" value="mobile"><span>Mobile manipulator</span></label>
           <label class="chip"><input type="checkbox" name="body" value="humanoid"><span>Humanoid</span></label>
           <label class="chip"><input type="checkbox" name="body" value="human"><span>Human only</span></label>
-          <label class="chip" hidden><input type="checkbox" name="body" value="hand"><span>Dexterous hand</span></label>
-          <label class="chip" hidden><input type="checkbox" name="body" value="other"><span>Other</span></label>
           </div>
-          <input class="other-input" type="text" id="body-other" maxlength="80" placeholder="Describe your robot or setup" aria-label="Describe your robot or setup" hidden>
         </fieldset>
         <fieldset class="ctl">
           <legend class="ctl-label">Modalities</legend>
@@ -234,12 +226,6 @@
           <label class="chip"><input type="checkbox" name="mod" value="joints"><span>Joint states</span></label>
           <label class="chip"><input type="checkbox" name="mod" value="teleop"><span>Teleoperation actions</span></label>
           <label class="chip"><input type="checkbox" name="mod" value="depth"><span>Depth</span></label>
-          <label class="chip" hidden><input type="checkbox" name="mod" value="hands"><span>Hand pose</span></label>
-          <label class="chip" hidden><input type="checkbox" name="mod" value="force"><span>Force/torque</span></label>
-          <label class="chip" hidden><input type="checkbox" name="mod" value="imu"><span>IMU (Inertial Measurement Unit)</span></label>
-          <label class="chip" hidden><input type="checkbox" name="mod" value="lidar"><span>LiDAR (Light Detection and Ranging)</span></label>
-          <label class="chip" hidden><input type="checkbox" name="mod" value="tactile"><span>Tactile</span></label>
-          <label class="chip" hidden><input type="checkbox" name="mod" value="audio"><span>Audio</span></label>
           <label class="chip"><input type="checkbox" name="mod" value="other"><span>Other</span></label>
           </div>
           <input class="other-input" type="text" id="mod-other" maxlength="80" placeholder="Describe other sensors" aria-label="Describe other sensors" hidden>
@@ -252,10 +238,6 @@
           <label class="chip"><input type="checkbox" name="equip" value="wristcam"><span>Wrist camera</span></label>
           <label class="chip"><input type="checkbox" name="equip" value="depthcam"><span>Depth camera</span></label>
           <label class="chip"><input type="checkbox" name="equip" value="gloves"><span>Data gloves</span></label>
-          <label class="chip" hidden><input type="checkbox" name="equip" value="mocap"><span>Motion capture suit</span></label>
-          <label class="chip" hidden><input type="checkbox" name="equip" value="vr"><span>VR (Virtual Reality) teleoperation rig</span></label>
-          <label class="chip" hidden><input type="checkbox" name="equip" value="leader"><span>Leader arms</span></label>
-          <label class="chip" hidden><input type="checkbox" name="equip" value="lidar"><span>LiDAR scanner</span></label>
           <label class="chip"><input type="checkbox" name="equip" value="other"><span>Other</span></label>
           </div>
           <input class="other-input" type="text" id="equip-other" maxlength="80" placeholder="Describe your equipment" aria-label="Describe your equipment" hidden>
@@ -268,7 +250,6 @@
           <label class="chip"><input type="checkbox" name="note" value="actions"><span>Action labels</span></label>
           <label class="chip"><input type="checkbox" name="note" value="boxes"><span>Object boxes</span></label>
           <label class="chip"><input type="checkbox" name="note" value="masks"><span>Segmentation masks</span></label>
-          <label class="chip" hidden><input type="checkbox" name="note" value="keypoints"><span>Keypoints</span></label>
           <label class="chip"><input type="checkbox" name="note" value="other"><span>Other</span></label>
           </div>
           <input class="other-input" type="text" id="note-other" maxlength="80" placeholder="Describe other labels" aria-label="Describe other labels" hidden>
@@ -282,7 +263,7 @@
             <span class="drop-hint">Up to 5 files</span>
           </label>
           <div class="media-list" id="media-list"></div>
-          <div class="ctl-hint" id="media-note" hidden>Files stay on your device in this demo. Attach them when you email the spec.</div>
+          <div class="ctl-hint" id="media-note" hidden>Files stay on your device in this demo and aren&rsquo;t uploaded.</div>
         </div>
         <div class="ctl">
           <label class="ctl-label" for="hours">Volume <output id="hours-out" for="hours">200 hrs</output></label>
@@ -320,47 +301,6 @@
         </div>
       </form>
 
-      <!-- Right column (estimate): hidden for now; remove "hidden" to show it again -->
-      <div class="output" hidden>
-        <!-- Selection summary: hidden for now; remove "hidden" to show it again -->
-        <div class="dpanel spec" aria-live="polite" hidden>
-          <div class="dpanel-head"><span class="dpanel-title" id="spec-title">Your dataset</span><span class="dpanel-title" id="spec-count"></span></div>
-          <div class="spec-rows" id="spec-rows"></div>
-          <div class="spec-foot" id="spec-foot"></div>
-        </div>
-        <div class="dpanel">
-          <div class="dpanel-head"><span class="dpanel-title">Estimate</span></div>
-          <div class="stats" aria-live="polite">
-            <div class="stat"><span class="v" id="st-episodes"></span><span class="k">Episodes</span></div>
-            <div class="stat"><span class="v" id="st-people"></span><span class="k">Contributors</span></div>
-            <div class="stat"><span class="v" id="st-first"></span><span class="k">First batch</span></div>
-            <div class="stat"><span class="v" id="st-weeks"></span><span class="k">Full delivery</span></div>
-          </div>
-        </div>
-
-        <div class="dpanel" hidden><!-- hidden for now; remove "hidden" to show again -->
-          <div class="dpanel-head">
-            <span class="dpanel-title" id="ep-title">Sample episode</span>
-            <button class="play-btn" type="button" id="play" aria-pressed="true"><svg id="play-icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"></svg><span id="play-label">Pause</span></button>
-          </div>
-          <div class="player">
-            <div class="ref" id="ref" hidden><div class="ref-media" id="ref-media"></div><div class="ref-cap"><span class="dpanel-title">Your reference</span><span class="ref-name" id="ref-name"></span></div></div>
-            <div class="now"><span class="now-step" id="now-step"></span><span class="now-time" id="now-time"></span></div>
-            <div class="ctl-hint" id="say" style="margin-top:-8px"></div>
-            <div class="lanes" id="lanes"></div>
-          </div>
-        </div>
-
-        <div class="dpanel" hidden><!-- hidden for now; remove "hidden" to show again -->
-          <div class="dpanel-head"><span class="dpanel-title">What you receive</span></div>
-          <div class="delivery">
-            <pre class="dtree" id="tree"></pre>
-            <pre class="code" id="code"></pre>
-          </div>
-        </div>
-
-        <p class="disclaimer">Estimates are illustrative. We confirm scope, timeline, and pricing with you before collection starts.</p>
-      </div>
     </div>
   </section>
 </main>

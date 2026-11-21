@@ -6,35 +6,22 @@
 .wl-card { max-width: 640px; border: 1px solid var(--line-2); border-radius: 20px; background: #ffffff; padding: clamp(28px, 5vw, 56px); }
 .wl-card h1 { font-size: clamp(32px, 4vw, 48px); line-height: 1.08; font-weight: 400; letter-spacing: -0.04em; }
 .wl-card form > p { margin-top: 12px; font-size: 17px; line-height: 1.6; color: var(--ink-2); }
-.wl-field { display: block; margin-top: 28px; margin-bottom: 8px; font-size: 15px; font-weight: 500; }
-.wl-row { display: flex; gap: 12px; }
-.wl-row input { flex: 1; min-width: 0; min-height: 52px; box-sizing: border-box; padding: 10px 16px; border: 1px solid var(--line-3); border-radius: 999px; background: #ffffff; font: inherit; font-size: 16px; color: var(--ink); outline: none; transition: border-color .15s ease, box-shadow .15s ease; }
-.wl-row input::placeholder { color: var(--faint); }
-.wl-row input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
-.wl-row input[aria-invalid="true"] { border-color: #B42318; }
-.wl-row .btn { white-space: nowrap; }
 .wl-err { margin-top: 10px; font-size: 14px; color: #B42318; }
 .wl-done { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; outline: none; animation: wlin .3s ease-out; }
 .wl-done h2 { font-size: clamp(28px, 3vw, 36px); font-weight: 400; letter-spacing: -0.03em; }
 .wl-done p { font-size: 17px; line-height: 1.6; color: var(--ink-2); max-width: 440px; }
 .wl-done .btn { margin-top: 6px; }
 @keyframes wlin { from { opacity: 0; } to { opacity: 1; } }
-@media (max-width: 640px) { .wl-row { flex-direction: column; } .wl-row .btn { width: 100%; } }
-@media (prefers-reduced-motion: reduce) { .wl-done, .wl-other { animation: none; } .wl-f input, .wl-sel select, .wl-other { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .wl-done { animation: none; } .wl-f input, .wl-f textarea { transition: none; } }
 
 /* Fields */
 .wl-fields { display: flex; flex-direction: column; gap: 18px; margin-top: 28px; }
 .wl-f { display: flex; flex-direction: column; gap: 8px; font-size: 15px; font-weight: 500; }
-.wl-f input, .wl-sel select, .wl-other { width: 100%; min-height: 52px; box-sizing: border-box; padding: 10px 16px; border: 1px solid var(--line-3); border-radius: 12px; background: #ffffff; font: inherit; font-size: 16px; font-weight: 400; color: var(--ink); outline: none; transition: border-color .15s ease, box-shadow .15s ease; }
-.wl-f input::placeholder, .wl-other::placeholder { color: var(--faint); }
-.wl-f input:focus, .wl-sel select:focus, .wl-other:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
-.wl-f input[aria-invalid="true"], .wl-sel select[aria-invalid="true"], .wl-other[aria-invalid="true"] { border-color: #B42318; }
 .wl-sel { position: relative; display: block; }
 .wl-sel select { appearance: none; -webkit-appearance: none; padding-right: 44px; cursor: pointer; }
 .wl-sel select.empty { color: var(--faint); }
 .wl-sel select option { color: var(--ink); }
 .wl-sel svg { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--muted); }
-.wl-other { margin-top: -8px; animation: wlin .2s ease-out; }
 .wl-submit { width: 100%; margin-top: 28px; }
 .wl-f small { font-size: 13px; font-weight: 400; color: var(--faint); }
 .wl-f textarea { width: 100%; min-height: 112px; box-sizing: border-box; padding: 12px 16px; border: 1px solid var(--line-3); border-radius: 12px; background: #ffffff; font: inherit; font-size: 16px; font-weight: 400; line-height: 1.5; color: var(--ink); outline: none; resize: vertical; transition: border-color .15s ease, box-shadow .15s ease; }
