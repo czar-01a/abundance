@@ -1,8 +1,9 @@
 /*
  * Abundance site Worker.
- * Serves the static site, and handles POST /api/forms: checks the submission,
- * then hands it to the Google Apps Script in the team's Workspace, which emails it
- * to team@abundancephysical.com (see worker/apps-script.gs).
+ * Serves the static site, and handles POST /api/forms:
+ *   - Waitlist signups are saved to the "Abundance waitlist" Google Form only.
+ *   - Contact sales, Support and Order are handed to the Google Apps Script in the
+ *     team's Workspace, which emails them to team@abundancephysical.com (see worker/apps-script.gs).
  * Every other request goes straight to the static files.
  *
  * Secrets set in Cloudflare (Worker > Settings > Variables and secrets):
@@ -15,13 +16,13 @@ const SITE_HOSTS = ['abundancephysical.com', 'www.abundancephysical.com'];
 const FORMS = {
   'contact-sales': { title: 'Contact sales', fields: { name: 100, email: 200, company: 120, need: 60, message: 2000 }, required: ['name', 'email', 'company', 'need'], subject: (f) => 'Contact sales: ' + f.company },
   support:         { title: 'Support', fields: { topic: 60, note: 1000, name: 100, email: 200, company: 120, message: 2000 }, required: ['topic', 'name', 'email'], subject: (f) => 'Support: ' + f.topic },
-  waitlist:        { title: 'Waitlist', fields: { email: 200, about: 1000, kind: 10, group: 60, item: 120 }, required: ['email'], subject: (f) => 'Waitlist: ' + (f.item || f.kind || 'general') },
+  waitlist:        { title: 'Waitlist', fields: { email: 200, about: 1000, kind: 10, group: 60, item: 120 }, required: ['email'] },   // Google Form only, never emailed
   order:           { title: 'Order', fields: { summary: 20000, totals: 500 }, required: ['summary'], subject: () => 'New dataset order' }
 };
 const LABELS = { name: 'Name', email: 'Email', company: 'Company', need: 'Interested in', message: 'Message', topic: 'Topic', note: 'Note', kind: 'From', group: 'Industry or category', item: 'Job or task', about: 'About their work', summary: 'Order', totals: 'Totals' };
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Waitlist signups are also saved to the "Abundance waitlist" Google Form (for its Summary charts)
+// Waitlist signups are saved to the "Abundance waitlist" Google Form (and nowhere else)
 const WAITLIST_FORM = 'https://docs.google.com/forms/d/e/1FAIpQLSeCW81aD4clQB4A--co9xqFYp-e1WSyRv-Cj2zDsPj-ZbNYAg/formResponse';
 const WAITLIST_FIELDS = { email: 'entry.1738039988', kind: 'entry.91900747', group: 'entry.1422138126', item: 'entry.917258326', about: 'entry.115331503' };
 // Multiple-choice answers that match the form's options exactly (anything else goes to "Other")
@@ -73,11 +74,12 @@ async function handleForm(request, env) {
   for (const key of spec.required) if (!fields[key]) return json({ ok: false, error: 'missing', field: key }, 400);
   if (fields.email && !EMAIL_RE.test(fields.email)) return json({ ok: false, error: 'email' }, 400);
 
-  // Waitlist emails use the same wording and order as the Google Form
-  if (body.form === 'waitlist' && fields.kind) fields.kind = fields.kind === 'task' ? 'Tasks' : 'Jobs';
-  const labels = body.form === 'waitlist'
-    ? Object.assign({}, LABELS, { about: 'Tell us about your work', kind: 'Joined from', group: 'Industry' })
-    : LABELS;
+  const labels = LABELS;
+  // Waitlist signups go only to the Google Form (no email). Everything else is emailed to team@.
+  if (body.form === 'waitlist') {
+    return (await saveToWaitlistForm(fields)) ? json({ ok: true }) : json({ ok: false, error: 'save' }, 502);
+  }
+
   const lines = ['New ' + spec.title + ' submission from abundancephysical.com', ''];
   for (const key of Object.keys(spec.fields)) {
     if (!fields[key]) continue;
@@ -90,9 +92,6 @@ async function handleForm(request, env) {
   const replyTo = fields.email && EMAIL_RE.test(fields.email) ? clean(fields.email) : '';
   if (!env.FORMS_URL || !env.FORMS_SECRET) { console.error('FORMS_URL or FORMS_SECRET not set'); return json({ ok: false, error: 'config' }, 500); }
 
-  // Waitlist: also record it in the Google Form. A waitlist signup succeeds if either the
-  // form save or the email works, so a person is never told it failed when it was recorded.
-  const saved = body.form === 'waitlist' ? saveToWaitlistForm(fields) : Promise.resolve(false);
 
   try {
     const res = await fetch(env.FORMS_URL, {
@@ -105,16 +104,16 @@ async function handleForm(request, env) {
     if (!res.ok || !out.ok) throw new Error('apps script: ' + res.status + ' ' + (out.error || ''));
   } catch (e) {
     console.error('send failed', e && e.message);
-    if (await saved) return json({ ok: true, emailed: false });
     return json({ ok: false, error: 'send' }, 502);
   }
-  await saved;
   return json({ ok: true });
 }
 
 async function saveToWaitlistForm(fields) {
   const data = new URLSearchParams();
   const others = {};
+  if (fields.kind === 'job') fields.kind = 'Jobs';
+  if (fields.kind === 'task') fields.kind = 'Tasks';
   if (fields.kind && fields.kind !== 'Tasks' && fields.kind !== 'Jobs') others.kind = fields.kind;
   if (fields.group && !FORM_GROUPS[fields.group]) others.group = fields.group;
   const values = {
