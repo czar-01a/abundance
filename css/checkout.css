@@ -48,3 +48,5 @@
 .placed .co-done { padding: 72px 32px; }
 .placed h1 { font-size: clamp(32px, 4.4vw, 48px); line-height: 1.08; letter-spacing: -0.04em; font-weight: 400; }
 #co-send-err { margin: 12px 0 0; font-size: 14px; color: #B42318; text-align: center; }
+/* Reserve room for the order summary until the page script fills it in, so the footer doesn't jump while the page loads */
+.co .wrap:has(> #co-summary[hidden]):has(> #co-empty[hidden]) { min-height: 550px; }

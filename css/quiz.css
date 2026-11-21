@@ -39,3 +39,5 @@
   .qopt .qlabel { font-size: 16px; }
 }
 @media (prefers-reduced-motion: reduce) { .qopts, .quiz-results { animation: none; } .quiz-progress span, .qopt, .qopt input, .qopt input::after { transition: none; } }
+/* Reserve room for the answer choices (added by the page script) so the footer doesn't jump while the page loads */
+.qopts:empty { min-height: 330px; }

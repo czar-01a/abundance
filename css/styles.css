@@ -253,7 +253,8 @@ h1, h2, h3, p { margin: 0; }
 .crumbs a { color: var(--ink); }
 .crumbs .sep { color: var(--faint); }
 .jobs-title { margin-top: 40px; min-height: 1em; font-size: clamp(36px, 4.5vw, 64px); line-height: 1; font-weight: 600; letter-spacing: -0.045em; }
-.tabs { display: flex; align-items: flex-end; gap: clamp(24px, 3.3vw, 48px); margin-top: 56px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+/* min-height reserves room for the tabs (built by the page script) so the job list does not jump down when they appear */
+.tabs { min-height: calc(17px * 1.5 + 14px + 2px); display: flex; align-items: flex-end; gap: clamp(24px, 3.3vw, 48px); margin-top: 56px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
 .tab { flex-shrink: 0; background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 0 0 14px; font-size: 17px; color: var(--muted); cursor: pointer; white-space: nowrap; }
 .tab:hover { color: var(--ink); }
