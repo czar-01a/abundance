@@ -55,9 +55,16 @@
     var name = $('sup-name').value.trim(), email = $('sup-email').value.trim();
     var bad = !name ? ['sup-name', 'Please enter your name.'] : !EMAIL_RE.test(email) ? ['sup-email', 'Please enter a valid business email.'] : null;
     if (bad) { $(bad[0]).setAttribute('aria-invalid', 'true'); derr.textContent = bad[1]; derr.hidden = false; $(bad[0]).focus(); return; }
-    $('sup-sent-title').textContent = 'Thanks, ' + name.split(/\s+/)[0] + '.';
-    $('sup-sent-text').textContent = 'We’ll get back to you at ' + email + '.';
-    details.hidden = true; sent.hidden = false; reveal(sent);
+    var btn = details.querySelector('button[type="submit"]');
+    busyButton(btn, true);
+    sendForm('support', { topic: TOPICS[picked][0], note: picked === 'other' ? other.value : '', name: name, email: email, company: $('sup-company').value, message: $('sup-msg').value })
+      .then(function () {
+        busyButton(btn, false);
+        $('sup-sent-title').textContent = 'Thanks, ' + name.split(/\s+/)[0] + '.';
+        $('sup-sent-text').textContent = 'We’ll get back to you at ' + email + '.';
+        details.hidden = true; sent.hidden = false; reveal(sent);
+      })
+      .catch(function () { busyButton(btn, false); derr.textContent = 'Sorry, that didn\u2019t send. Please try again in a moment.'; derr.hidden = false; });
   });
   $('sup-back').addEventListener('click', function () {
     details.hidden = true; form.hidden = false;

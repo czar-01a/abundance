@@ -61,3 +61,4 @@ body:has(.co-form[data-off]) .co-summary { position: static; }
 .placed .wrap { grid-template-columns: minmax(0, 720px); justify-content: center; }
 .placed .co-done { padding: 72px 32px; }
 .placed h1 { font-size: clamp(32px, 4.4vw, 48px); line-height: 1.08; letter-spacing: -0.04em; font-weight: 400; }
+#co-send-err { margin: 12px 0 0; font-size: 14px; color: #B42318; text-align: center; }

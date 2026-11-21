@@ -65,9 +65,33 @@
   });
 
   // Checkout places the order: clear the cart and go to the confirmation page
+  function orderText() {
+    var L = [];
+    cart.forEach(function (it, i) {
+      L.push((i + 1) + '. ' + it.title + ' (x' + it.qty + ')');
+      [['Task', it.taskLabel && it.taskLabel !== 'No task selected' ? it.taskLabel : ''], ['Embodiment', it.bodyLabel !== 'Not selected' ? it.bodyLabel : ''],
+       ['Modalities', it.modLabels.join(', ')], ['Equipment', it.equipLabels.join(', ')], ['Annotations', it.noteLabels.join(', ')],
+       ['Volume', it.hours + ' hours'], ['Locations', String(it.envs)], ['Format', it.formatLabel], ['Demo files', it.fileNames.join(', ')], ['Description', it.desc]]
+        .forEach(function (r) { if (r[1]) L.push('   ' + r[0] + ': ' + r[1]); });
+      L.push('');
+    });
+    return L.join('\n');
+  }
+  var sending = false;
   function finish() {
-    try { localStorage.removeItem(KEY); } catch (e) {}
-    window.location.href = 'order-placed.html';
+    if (sending) return;
+    sending = true;
+    var btn = $('co-checkout'), qty = cart.reduce(function (a, c) { return a + c.qty; }, 0);
+    busyButton(btn, true);
+    sendForm('order', { summary: orderText(), totals: qty + (qty === 1 ? ' dataset' : ' datasets') })
+      .then(function () {
+        try { localStorage.removeItem(KEY); } catch (e) {}
+        window.location.href = 'order-placed.html';
+      })
+      .catch(function () {
+        sending = false; busyButton(btn, false);
+        var e = $('co-send-err'); e.textContent = 'Sorry, that didn\u2019t send. Please try again in a moment.'; e.hidden = false;
+      });
   }
   form.addEventListener('submit', function (e) {
     e.preventDefault();
