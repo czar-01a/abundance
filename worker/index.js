@@ -22,6 +22,11 @@ const FORMS = {
 const LABELS = { name: 'Name', email: 'Email', company: 'Company', need: 'Interested in', message: 'Message', topic: 'Topic', note: 'Note', kind: 'From', group: 'Industry or category', item: 'Job or task', about: 'About their work', summary: 'Order', totals: 'Totals' };
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Reply to the visitor first and send in the background (with one retry), so the thank-you is instant.
+// The waitlist is on. Emailed forms stay off until the team@ email path is confirmed working;
+// while off, they wait for the real result and show an error code if sending fails.
+const BACKGROUND = { waitlist: true, email: false };
+
 // Waitlist signups are saved to the "Abundance waitlist" Google Form (and nowhere else)
 const WAITLIST_FORM = 'https://docs.google.com/forms/d/e/1FAIpQLSeCW81aD4clQB4A--co9xqFYp-e1WSyRv-Cj2zDsPj-ZbNYAg/formResponse';
 const WAITLIST_FIELDS = { email: 'entry.1738039988', kind: 'entry.91900747', group: 'entry.1422138126', item: 'entry.917258326', about: 'entry.115331503' };
@@ -35,14 +40,14 @@ const FORM_GROUPS = {
 };
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    if (url.pathname === '/api/forms') return handleForm(request, env);
+    if (url.pathname === '/api/forms') return handleForm(request, env, ctx);
     return env.ASSETS.fetch(request);
   }
 };
 
-async function handleForm(request, env) {
+async function handleForm(request, env, ctx) {
   if (request.method !== 'POST') return json({ ok: false, error: 'method' }, 405);
 
   // Only accept submissions sent from the site itself
@@ -77,7 +82,9 @@ async function handleForm(request, env) {
   const labels = LABELS;
   // Waitlist signups go only to the Google Form (no email). Everything else is emailed to team@.
   if (body.form === 'waitlist') {
-    return (await saveToWaitlistForm(fields)) ? json({ ok: true }) : json({ ok: false, error: 'save' }, 502);
+    const save = () => saveToWaitlistForm(fields).then((ok) => (ok ? null : 'save'));
+    if (BACKGROUND.waitlist && ctx) { ctx.waitUntil(withRetry(save, 'waitlist')); return json({ ok: true }); }
+    return (await save()) ? json({ ok: false, error: 'save' }, 502) : json({ ok: true });
   }
 
   const lines = ['New ' + spec.title + ' submission from abundancephysical.com', ''];
@@ -93,27 +100,44 @@ async function handleForm(request, env) {
   if (!env.FORMS_URL || !env.FORMS_SECRET) { console.error('FORMS_URL or FORMS_SECRET not set'); return json({ ok: false, error: 'config' }, 500); }
 
 
+  const send = () => sendEmail(env, subject, lines.join('\n'), replyTo);
+  if (BACKGROUND.email && ctx) { ctx.waitUntil(withRetry(send, spec.title)); return json({ ok: true }); }
+  const error = await send();
+  return error ? json({ ok: false, error }, 502) : json({ ok: true });
+}
+
+// Hands an email to the Google Apps Script. Returns null on success, or a short code:
+//   auth    = FORMS_SECRET doesn't match the script's SECRET
+//   script  = the script ran into an error (see Apps Script > Executions)
+//   access  = Google sent a sign-in or error page (check FORMS_URL and "Who has access: Anyone")
+//   network = Google couldn't be reached
+async function sendEmail(env, subject, text, replyTo) {
   try {
     const res = await fetch(env.FORMS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ secret: env.FORMS_SECRET, subject, text: lines.join('\n'), replyTo }),
+      body: JSON.stringify({ secret: env.FORMS_SECRET, subject, text, replyTo }),
       redirect: 'follow'
     });
     const raw = await res.text();
     let out = null;
     try { out = JSON.parse(raw); } catch (e) {}
-    // Short codes shown on the page so problems can be traced:
-    //   auth   = FORMS_SECRET doesn't match the script's SECRET
-    //   script = the script ran into an error (see Apps Script > Executions)
-    //   access = Google sent a sign-in or error page (check FORMS_URL and "Who has access: Anyone")
-    if (!out) { console.error('send failed: not JSON', res.status, raw.slice(0, 200)); return json({ ok: false, error: res.status >= 400 ? 'access' : 'script' }, 502); }
-    if (!out.ok) { console.error('send failed:', out.error); return json({ ok: false, error: out.error === 'auth' ? 'auth' : 'script' }, 502); }
+    if (!out) { console.error('send failed: not JSON', res.status, raw.slice(0, 200)); return res.status >= 400 ? 'access' : 'script'; }
+    if (!out.ok) { console.error('send failed:', out.error); return out.error === 'auth' ? 'auth' : 'script'; }
+    return null;
   } catch (e) {
     console.error('send failed', e && e.message);
-    return json({ ok: false, error: 'network' }, 502);
+    return 'network';
   }
-  return json({ ok: true });
+}
+
+// Runs a background job, trying once more after 3 seconds if it fails. Failures are logged in Cloudflare.
+async function withRetry(job, label) {
+  let error = await job();
+  if (!error) return;
+  await new Promise((r) => setTimeout(r, 3000));
+  error = await job();
+  if (error) console.error('LOST ' + label + ' submission after retry:', error);
 }
 
 async function saveToWaitlistForm(fields) {
