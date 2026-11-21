@@ -12,9 +12,10 @@
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Logos and icons: cache for a week
+# Logos and icons: cache for a year. If you change one, save it under a new file name
+# (e.g. logo-92-v2.webp) and update the pages, so visitors get the new one right away.
 /assets/*
-  Cache-Control: public, max-age=604800
+  Cache-Control: public, max-age=31536000, immutable
 
 # The private area should never be indexed or cached by shared caches
 /insiders/*
