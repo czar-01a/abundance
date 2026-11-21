@@ -2,7 +2,7 @@
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var form = $('cs-form'), err = $('cs-err');
-  ['cs-size', 'cs-need'].forEach(function (id) {
+  ['cs-need'].forEach(function (id) {
     $(id).addEventListener('change', function () { $(id).classList.toggle('empty', !$(id).value); $(id).removeAttribute('aria-invalid'); err.hidden = true; });
   });
   ['cs-name', 'cs-email', 'cs-company'].forEach(function (id) {
@@ -14,7 +14,6 @@
       ['cs-name', !$('cs-name').value.trim(), 'Please enter your name.'],
       ['cs-email', !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('cs-email').value.trim()), 'Please enter a valid work email.'],
       ['cs-company', !$('cs-company').value.trim(), 'Please enter your company.'],
-      ['cs-size', !$('cs-size').value, 'Please choose a company size.'],
       ['cs-need', !$('cs-need').value, 'Please choose what you’re interested in.']
     ];
     for (var i = 0; i < checks.length; i++) {
